@@ -1,0 +1,996 @@
+.foad-openapi-docs-page .fi-page-sub-navigation-sidebar-ctn {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+
+  .fi-page-sub-navigation-sidebar {
+    row-gap: 0;
+  }
+}
+
+.foad-openapi-docs-page .fi-badge.fi-size-xs {
+  padding-inline: 0.25rem;
+}
+
+.foad-openapi-docs-page,
+.foad-openapi-docs-page .fi-section,
+.foad-openapi-docs-page .fi-section-content-ctn,
+.foad-openapi-docs-page .fi-section-content {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.foad-copyable-badge {
+  cursor: pointer;
+  user-select: none;
+}
+
+.foad-openapi-docs-page .foad-endpoint-navigation-item {
+  .fi-sidebar-item-btn {
+    align-items: flex-start;
+  }
+
+  .fi-sidebar-item-label {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+
+  .fi-sidebar-item-label::first-line {
+    color: var(--gray-950);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .fi-sidebar-item-badge-ctn {
+    margin-top: 0.125rem;
+  }
+}
+
+.foad-openapi-summary {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.foad-openapi-summary-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.foad-openapi-summary-title {
+  color: var(--gray-950);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.foad-openapi-summary-description {
+  color: var(--gray-500);
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.foad-openapi-summary-servers {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.foad-openapi-summary-server {
+  display: flex;
+  min-width: 0;
+}
+
+.foad-openapi-summary-server .fi-badge {
+  max-width: 100%;
+}
+
+.foad-openapi-summary-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dark .foad-openapi-docs-page .foad-endpoint-navigation-item {
+  .fi-sidebar-item-label {
+    color: var(--gray-400);
+  }
+
+  .fi-sidebar-item-label::first-line {
+    color: white;
+  }
+}
+
+.dark .foad-openapi-docs-page .foad-openapi-summary-title {
+  color: white;
+}
+
+.dark .foad-openapi-docs-page .foad-openapi-summary-description {
+  color: var(--gray-400);
+}
+
+.foad-stack {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.foad-stack-md {
+  gap: 1rem;
+}
+
+.foad-stack-sm {
+  gap: 0.5rem;
+}
+
+.foad-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.foad-send-layout {
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.foad-send-layout > .foad-stack {
+  align-content: start;
+}
+
+.foad-send-layout > .foad-stack:has(.foad-try-textarea),
+.foad-send-layout > .foad-stack:has(.foad-try-textarea) > .foad-stack {
+  align-content: stretch;
+}
+
+.foad-send-layout > .foad-stack:has(.foad-try-textarea) {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.foad-send-layout > .foad-stack:has(.foad-try-textarea) > .foad-stack {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.foad-send-layout > .foad-stack:has(.foad-try-textarea) .foad-try-textarea {
+  height: 100%;
+}
+
+.foad-send-layout,
+.foad-send-layout > *,
+.foad-send-actions {
+  min-width: 0;
+}
+
+.foad-send-actions {
+  display: grid;
+  gap: 1rem;
+}
+
+.foad-send-controls {
+  width: 100%;
+}
+
+.foad-send-controls-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.foad-inline-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.foad-inline-list-sm {
+  gap: 0.25rem;
+}
+
+.foad-inline-list-md {
+  gap: 0.5rem;
+}
+
+.foad-inline-list-end {
+  align-items: flex-end;
+}
+
+.foad-request-mode-controls {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.foad-request-section > .fi-section-header > .fi-section-header-text-ctn {
+  flex: 0 0 auto;
+}
+
+.foad-request-section > .fi-section-header > .fi-section-header-after-ctn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.foad-request-section,
+.foad-sample-section,
+.foad-request-section > .fi-section-content-ctn,
+.foad-sample-section > .fi-section-content-ctn,
+.foad-request-section > .fi-section-content-ctn > .fi-section-content,
+.foad-sample-section > .fi-section-content-ctn > .fi-section-content {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.foad-schema-row-header {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.foad-response-block {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.foad-response-block + .foad-response-block {
+  border-top: 1px solid color-mix(in oklab, currentColor 12%, transparent);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.foad-schema-tree {
+  display: grid;
+  gap: 0rem;
+}
+
+.foad-property-row {
+  --foad-tree-indent: 2rem;
+  border-inline-start: 1px solid color-mix(in oklab, currentColor 12%, transparent);
+  display: grid;
+  gap: 0.2rem;
+  margin-inline-start: calc(var(--foad-depth, 0) * var(--foad-tree-indent));
+  padding: 0.5rem 0 0.5rem calc(var(--foad-tree-indent));
+}
+
+.foad-property-summary {
+  cursor: pointer;
+  display: grid;
+  gap: 0.375rem;
+  list-style: none;
+}
+
+.foad-property-summary::-webkit-details-marker {
+  display: none;
+}
+
+.foad-property-main {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  flex-direction: row;
+}
+
+.foad-schema-property-main {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  justify-content: stretch;
+}
+
+.foad-schema-property-main .foad-property-title {
+  min-width: 0;
+}
+
+.foad-schema-type-badges {
+  min-width: 0;
+}
+
+.foad-schema-presence-badge {
+  justify-self: end;
+  align-items: center;
+}
+
+.foad-justify-content-space-between {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.foad-property-title {
+  align-items: center;
+  display: inline-flex;
+  min-width: 0;
+}
+
+.foad-property-connector {
+  background: color-mix(in oklab, currentColor 12%, transparent);
+  display: inline-block;
+  height: 1px;
+  margin-inline-start: calc((var(--foad-tree-indent) * -1) - 1px);
+  width: calc(var(--foad-tree-indent) - 0.2rem);
+}
+
+.foad-property-summary {
+  .foad-property-connector {
+    width: calc(var(--foad-tree-indent) - 1.2rem);
+    margin-inline-start: calc((var(--foad-tree-indent) * -1));
+  }
+
+  .foad-property-name {
+    margin-left: 0;
+  }
+}
+
+.foad-property-toggle {
+  align-items: center;
+  display: inline-flex;
+  /*height: 1rem;*/
+  justify-content: center;
+  /*margin-inline: -.0625rem .25rem;*/
+  opacity: 0.55;
+  /*width: 1rem;*/
+}
+
+.foad-property-toggle-icon {
+  /*height: 1rem;*/
+  /*width: 1rem;*/
+}
+
+.foad-property-toggle-icon-open {
+  display: none;
+}
+
+.foad-property-row-collapsible[open]
+> .foad-property-summary
+.foad-property-toggle-icon-collapsed {
+  display: none;
+}
+
+.foad-property-row-collapsible[open]
+> .foad-property-summary
+.foad-property-toggle-icon-open {
+  display: block;
+}
+
+.foad-property-name {
+  color: var(--gray-950);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-left: 0.375rem;
+}
+
+.dark .foad-property-name {
+  color: white;
+}
+
+.foad-property-description {
+  color: var(--gray-500);
+  font-size: 0.8125rem;
+}
+
+.dark .foad-property-description {
+  color: var(--gray-400);
+}
+
+.foad-property-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.foad-property-meta-label {
+  color: var(--gray-500);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.foad-property-meta-value {
+  color: var(--gray-700);
+  font-size: 0.8125rem;
+}
+
+.dark .foad-property-meta-label {
+  color: var(--gray-400);
+}
+
+.dark .foad-property-meta-value {
+  color: var(--gray-300);
+}
+
+.foad-sample {
+  border: 1px solid color-mix(in oklab, currentColor 12%, transparent);
+  border-radius: 0.5rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.foad-media-type-content,
+.foad-media-type-content .fi-sc-tabs,
+.foad-media-type-content .fi-sc-tabs-tab,
+.foad-code-sample,
+.foad-code-sample-panel,
+.foad-media-type-content [x-show],
+.foad-media-type-content .foad-sample-scroll {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
+.foad-media-type-content .fi-sc-tabs-tab,
+.foad-code-sample,
+.foad-code-sample-panel {
+  overflow: hidden;
+}
+
+.foad-sample-toolbar {
+  align-items: center;
+  border-bottom: 1px solid color-mix(in oklab, currentColor 12%, transparent);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+}
+
+.foad-sample-select {
+  background: transparent;
+  border: 0;
+  color: var(--gray-950);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  max-width: 100%;
+}
+
+.dark .foad-sample-select {
+  color: white;
+}
+
+.foad-sample-copy {
+  background: transparent;
+  border: 0;
+  color: var(--primary-600);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.125rem 0.25rem;
+}
+
+.dark .foad-sample-copy {
+  color: var(--primary-400);
+}
+
+.foad-sample-error {
+  color: var(--danger-600);
+  font-size: 0.8125rem;
+  margin: 0;
+  padding: 0.75rem 0.75rem 0;
+}
+
+.dark .foad-sample-error {
+  color: var(--danger-400);
+}
+
+.foad-try-it {
+  border-bottom: 1px solid color-mix(in oklab, currentColor 12%, transparent);
+}
+
+.foad-developer-mode {
+  align-items: center;
+  color: var(--gray-700);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.foad-developer-mode-input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.foad-developer-mode-switch {
+  align-items: center;
+  background: var(--gray-200);
+  border-radius: 999px;
+  display: inline-flex;
+  height: 1.25rem;
+  padding: 0.125rem;
+  transition: background-color 0.15s ease;
+  width: 2.25rem;
+}
+
+.foad-developer-mode-knob {
+  background: white;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  display: block;
+  height: 1rem;
+  transform: translateX(0);
+  transition: transform 0.15s ease;
+  width: 1rem;
+}
+
+.foad-developer-mode-input:checked + .foad-developer-mode-switch {
+  background: var(--primary-600);
+}
+
+.foad-developer-mode-input:checked
++ .foad-developer-mode-switch
+.foad-developer-mode-knob {
+  transform: translateX(1rem);
+}
+
+.foad-developer-mode-input:focus-visible + .foad-developer-mode-switch {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+.dark .foad-developer-mode {
+  color: var(--gray-300);
+}
+
+.dark .foad-developer-mode-switch {
+  background: var(--gray-700);
+}
+
+.dark .foad-developer-mode-input:checked + .foad-developer-mode-switch {
+  background: var(--primary-500);
+}
+
+.foad-try-it-body {
+  display: grid;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.foad-try-it-url {
+  color: var(--gray-700);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  "Courier New", monospace;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.dark .foad-try-it-url {
+  color: var(--gray-300);
+}
+
+.foad-try-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.foad-body-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.foad-request-body-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.foad-request-body-heading .fi-section-header-heading {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.foad-request-body-heading .fi-badge {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.foad-request-body-sample-wrap .foad-sample-scroll {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.foad-request-body-sample-wrap .foad-sample-code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.foad-header-row {
+  align-items: center;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.foad-header-row > * {
+  min-width: 0;
+}
+
+.foad-header-remove {
+  align-self: center;
+  justify-self: start;
+}
+
+.foad-try-input,
+.foad-try-textarea {
+  background: white;
+  border: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+  border-radius: 0.375rem;
+  color: var(--gray-950);
+  font-size: 0.8125rem;
+  width: 100%;
+}
+
+.foad-try-input {
+  min-height: 2rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.foad-try-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.foad-try-textarea {
+  field-sizing: content;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  "Courier New", monospace;
+  line-height: 1.5;
+  min-height: 3rem;
+  padding: 0.5rem;
+  resize: vertical;
+  tab-size: 2;
+}
+
+.foad-json-editor {
+  box-sizing: border-box;
+  display: grid;
+  inline-size: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.foad-json-editor-highlight,
+.foad-json-editor-textarea {
+  grid-area: 1 / 1;
+}
+
+.foad-json-editor-highlight.foad-sample-code {
+  background: white;
+  border: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+  border-radius: 0.375rem;
+  box-sizing: border-box;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 100%;
+  min-height: 3rem;
+  min-width: 0;
+  overflow: auto;
+  padding: 0.5rem;
+  pointer-events: none;
+  tab-size: 2;
+  white-space: pre;
+  word-break: normal;
+}
+
+.foad-json-editor-highlight code {
+  display: block;
+  min-width: max-content;
+}
+
+.foad-json-editor-textarea {
+  background: transparent;
+  box-sizing: border-box;
+  caret-color: var(--gray-950);
+  color: transparent;
+  field-sizing: fixed;
+  max-width: 100%;
+  min-width: 0;
+  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
+  position: relative;
+  white-space: pre;
+  width: 100%;
+  word-break: normal;
+}
+
+.foad-json-editor-textarea::selection {
+  background: color-mix(in oklab, var(--primary-500) 30%, transparent);
+  color: transparent;
+}
+
+.dark .foad-try-input,
+.dark .foad-try-textarea {
+  background: color-mix(in oklab, var(--gray-950) 82%, transparent);
+  color: white;
+}
+
+.dark .foad-json-editor-highlight {
+  background: color-mix(in oklab, var(--gray-950) 82%, transparent);
+  color: white;
+}
+
+.dark .foad-json-editor-textarea {
+  background: transparent;
+  caret-color: white;
+  color: transparent;
+}
+
+.foad-send-request {
+  background: var(--primary-600);
+  border: 0;
+  border-radius: 0.375rem;
+  color: white;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.375rem 0.625rem;
+}
+
+.foad-send-request:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.foad-try-message {
+  padding: 0;
+}
+
+.foad-response-preview {
+  border: 1px solid color-mix(in oklab, currentColor 12%, transparent);
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.foad-response-status {
+  border-radius: 999px;
+  color: var(--danger-600);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.foad-response-status-badge {
+  align-items: center;
+  background: var(--gray-50);
+  border-radius: 0.375rem;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 10%, transparent);
+  color: var(--gray-600);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1rem;
+  min-width: 1.5rem;
+  padding: 0 0.375rem;
+}
+
+.foad-response-status-badge[data-color="success"] {
+  background: color-mix(in oklab, var(--success-400) 10%, transparent);
+  color: var(--success-600);
+}
+
+.foad-response-status-badge[data-color="warning"] {
+  background: color-mix(in oklab, var(--warning-400) 10%, transparent);
+  color: var(--warning-600);
+}
+
+.foad-response-status-badge[data-color="danger"] {
+  background: color-mix(in oklab, var(--danger-400) 10%, transparent);
+  color: var(--danger-600);
+}
+
+.foad-response-status[data-success="true"] {
+  color: var(--success-600);
+}
+
+.dark .foad-response-status-badge {
+  background: color-mix(in oklab, var(--gray-400) 10%, transparent);
+  color: var(--gray-200);
+}
+
+.dark .foad-response-status-badge[data-color="success"] {
+  background: color-mix(in oklab, var(--success-400) 10%, transparent);
+  color: var(--success-400);
+}
+
+.dark .foad-response-status-badge[data-color="warning"] {
+  background: color-mix(in oklab, var(--warning-400) 10%, transparent);
+  color: var(--warning-400);
+}
+
+.dark .foad-response-status-badge[data-color="danger"] {
+  background: color-mix(in oklab, var(--danger-400) 10%, transparent);
+  color: var(--danger-400);
+}
+
+.dark .foad-response-status {
+  color: var(--danger-400);
+}
+
+.dark .foad-response-status[data-success="true"] {
+  color: var(--success-400);
+}
+
+.foad-sample-scroll.foad-response-code {
+  border: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+  border-radius: 0.375rem;
+  max-height: 22rem;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.foad-sample-scroll {
+  box-sizing: border-box;
+  display: block;
+  inline-size: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.foad-sample-code {
+  box-sizing: border-box;
+  color: var(--gray-950);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  "Courier New", monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin: 0;
+  min-width: max-content;
+  overflow: visible;
+  white-space: pre;
+  width: 100%;
+}
+
+.dark .foad-sample-code {
+  color: white;
+}
+
+.foad-sample-code .token.comment,
+.foad-sample-code .token.prolog,
+.foad-sample-code .token.doctype,
+.foad-sample-code .token.cdata {
+  color: var(--gray-500);
+}
+
+.foad-sample-code .token.punctuation {
+  color: var(--gray-700);
+}
+
+.foad-sample-code .token.property,
+.foad-sample-code .token.tag,
+.foad-sample-code .token.constant,
+.foad-sample-code .token.symbol,
+.foad-sample-code .token.deleted {
+  color: var(--danger-600);
+}
+
+.foad-sample-code .token.boolean,
+.foad-sample-code .token.number {
+  color: var(--warning-600);
+}
+
+.foad-sample-code .token.selector,
+.foad-sample-code .token.attr-name,
+.foad-sample-code .token.string,
+.foad-sample-code .token.char,
+.foad-sample-code .token.builtin,
+.foad-sample-code .token.inserted {
+  color: var(--success-600);
+}
+
+.foad-sample-code .token.operator,
+.foad-sample-code .token.entity,
+.foad-sample-code .token.url,
+.foad-sample-code .language-css .token.string,
+.foad-sample-code .style .token.string {
+  color: var(--info-600);
+}
+
+.foad-sample-code .token.atrule,
+.foad-sample-code .token.attr-value,
+.foad-sample-code .token.keyword {
+  color: var(--primary-600);
+}
+
+.foad-sample-code .token.function,
+.foad-sample-code .token.class-name {
+  color: var(--warning-700);
+}
+
+.foad-sample-code .token.regex,
+.foad-sample-code .token.important,
+.foad-sample-code .token.variable {
+  color: var(--danger-500);
+}
+
+.dark .foad-sample-code .token.punctuation {
+  color: var(--gray-300);
+}
+
+.dark .foad-sample-code .token.property,
+.dark .foad-sample-code .token.tag,
+.dark .foad-sample-code .token.constant,
+.dark .foad-sample-code .token.symbol,
+.dark .foad-sample-code .token.deleted {
+  color: var(--danger-400);
+}
+
+.dark .foad-sample-code .token.boolean,
+.dark .foad-sample-code .token.number,
+.dark .foad-sample-code .token.function,
+.dark .foad-sample-code .token.class-name {
+  color: var(--warning-400);
+}
+
+.dark .foad-sample-code .token.selector,
+.dark .foad-sample-code .token.attr-name,
+.dark .foad-sample-code .token.string,
+.dark .foad-sample-code .token.char,
+.dark .foad-sample-code .token.builtin,
+.dark .foad-sample-code .token.inserted {
+  color: var(--success-400);
+}
+
+.dark .foad-sample-code .token.operator,
+.dark .foad-sample-code .token.entity,
+.dark .foad-sample-code .token.url,
+.dark .foad-sample-code .language-css .token.string,
+.dark .foad-sample-code .style .token.string {
+  color: var(--info-400);
+}
+
+.dark .foad-sample-code .token.atrule,
+.dark .foad-sample-code .token.attr-value,
+.dark .foad-sample-code .token.keyword {
+  color: var(--primary-400);
+}
+
+.dark .foad-sample-code .token.regex,
+.dark .foad-sample-code .token.important,
+.dark .foad-sample-code .token.variable {
+  color: var(--danger-300);
+}
+
+@media (min-width: 48rem) {
+  .foad-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .foad-schema-row-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .foad-inline-list-end {
+    justify-content: flex-end;
+  }
+}

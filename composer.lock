@@ -4,8 +4,89 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3b3bd75b00a7954f2fdc297e1e5fc03",
+    "content-hash": "c9728d1334cf27476c886b10c29cf816",
     "packages": [
+        {
+            "name": "alexkramse/filament-openapi-docs",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alexkramse/filament-openapi-docs.git",
+                "reference": "d027db5c17ddf7908a64487780166f901555f13e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alexkramse/filament-openapi-docs/zipball/d027db5c17ddf7908a64487780166f901555f13e",
+                "reference": "d027db5c17ddf7908a64487780166f901555f13e",
+                "shasum": ""
+            },
+            "require": {
+                "dedoc/scramble": "^0.13.30",
+                "filament/filament": "^4.0 || ^5.0",
+                "illuminate/contracts": "^11.0 || ^12.0 || ^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "3.9.6",
+                "laravel/framework": "^12.0",
+                "laravel/pint": "^1.29",
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "4.7.0",
+                "pestphp/pest-plugin-laravel": "^4.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Alexkramse\\FilamentOpenapiDocs\\FilamentOpenApiDocsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Alexkramse\\FilamentOpenapiDocs\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oleksandr Kramarenko",
+                    "homepage": "https://github.com/alexkramse",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Render Scramble OpenAPI documentation inside a Filament panel.",
+            "homepage": "https://github.com/alexkramse/filament-openapi-docs",
+            "keywords": [
+                "api",
+                "documentation",
+                "filament",
+                "laravel",
+                "openapi",
+                "scramble",
+                "swagger"
+            ],
+            "support": {
+                "issues": "https://github.com/alexkramse/filament-openapi-docs/issues",
+                "source": "https://github.com/alexkramse/filament-openapi-docs"
+            },
+            "funding": [
+                {
+                    "url": "https://www.buymeacoffee.com/alexkramse",
+                    "type": "buy_me_a_coffee"
+                },
+                {
+                    "url": "https://github.com/alexkramse",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-09T06:52:26+00:00"
+        },
         {
             "name": "anourvalar/eloquent-serialize",
             "version": "1.3.11",
@@ -70,6 +151,149 @@
                 "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.3.11"
             },
             "time": "2026-08-07T06:14:19+00:00"
+        },
+        {
+            "name": "anselmocossa/filament-launchpad",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/anselmocossa/filament-launchpad.git",
+                "reference": "8c6ddf16aa882bc877f347ae20c5c3738b97d4c5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/anselmocossa/filament-launchpad/zipball/8c6ddf16aa882bc877f347ae20c5c3738b97d4c5",
+                "reference": "8c6ddf16aa882bc877f347ae20c5c3738b97d4c5",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "laravel/prompts": "^0.1.24|^0.2|^0.3",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.0|^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+                "spatie/laravel-permission": "^8.3"
+            },
+            "suggest": {
+                "bezhansalleh/filament-shield": "Required to manage the Permission field's roles from a Filament UI (Spatie roles/permissions admin).",
+                "spatie/laravel-permission": "Required for role-based visibility on Spaces/Pages/Sections/Cards; without it, everything is visible to everyone."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Filament\\Launchpad\\LaunchpadServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Filament\\Launchpad\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anselmo Cossa",
+                    "email": "anselmo.cossa@enh.co.mz",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Transform your Filament v5 panel homepage into a SAP Fiori-style launchpad: Spaces, Pages, Sections and drag-and-drop KPI/shortcut/widget cards with role-based visibility.",
+            "homepage": "https://github.com/anselmocossa/filament-launchpad",
+            "keywords": [
+                "dashboard",
+                "filament",
+                "filament-plugin",
+                "fiori",
+                "laravel",
+                "launchpad",
+                "sap"
+            ],
+            "support": {
+                "issues": "https://github.com/anselmocossa/filament-launchpad/issues",
+                "source": "https://github.com/anselmocossa/filament-launchpad"
+            },
+            "time": "2026-08-13T13:45:26+00:00"
+        },
+        {
+            "name": "anselmokossa/filament-changelog",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/anselmocossa/filament-changelog.git",
+                "reference": "775fd5b92553181b98d343cbc0a6cc1b73304ed1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/anselmocossa/filament-changelog/zipball/775fd5b92553181b98d343cbc0a6cc1b73304ed1",
+                "reference": "775fd5b92553181b98d343cbc0a6cc1b73304ed1",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.0|^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^2.0|^3.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Filament\\Changelog\\ChangelogServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Filament\\Changelog\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anselmo Kossa",
+                    "email": "anselmo.cossa@enh.co.mz",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Manage, read and generate Keep a Changelog files inside Filament — hybrid database + CHANGELOG.md workflow.",
+            "homepage": "https://github.com/anselmocossa/filament-changelog",
+            "keywords": [
+                "changelog",
+                "filament",
+                "filament-plugin",
+                "keep-a-changelog",
+                "laravel",
+                "release-notes"
+            ],
+            "support": {
+                "issues": "https://github.com/anselmocossa/filament-changelog/issues",
+                "source": "https://github.com/anselmocossa/filament-changelog/tree/v1.2.0"
+            },
+            "time": "2026-08-01T20:13:00+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -220,6 +444,85 @@
                 }
             ],
             "time": "2026-06-30T09:44:12+00:00"
+        },
+        {
+            "name": "blemli/formsettings-for-filament",
+            "version": "v0.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/blemli/formsettings-for-filament.git",
+                "reference": "6ea6acf27b0a42906a15b0df1e9128a4b4399a52"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/blemli/formsettings-for-filament/zipball/6ea6acf27b0a42906a15b0df1e9128a4b4399a52",
+                "reference": "6ea6acf27b0a42906a15b0df1e9128a4b4399a52",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FormSettings": "Blemli\\FormSettings\\Facades\\FormSettings"
+                    },
+                    "providers": [
+                        "Blemli\\FormSettings\\FormSettingsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Blemli\\FormSettings\\": "src/",
+                    "Blemli\\FormSettings\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "grafst",
+                    "email": "grafst@users.noreply.github.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "rule your forms",
+            "homepage": "https://github.com/blemli/formsettings-for-filament",
+            "keywords": [
+                "blemli",
+                "filament",
+                "filament-plugin",
+                "filamentphp",
+                "formsettings-for-filament",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/blemli/formsettings-for-filament/issues",
+                "source": "https://github.com/blemli/formsettings-for-filament"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/blemli",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-04T14:24:03+00:00"
         },
         {
             "name": "brick/math",
@@ -513,6 +816,83 @@
             "time": "2026-03-20T21:10:52+00:00"
         },
         {
+            "name": "coolsam/flatpickr",
+            "version": "v5.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coolsam726/flatpickr.git",
+                "reference": "82e9a9c2a6cb93e14df4f1f6149158b22569c6d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coolsam726/flatpickr/zipball/82e9a9c2a6cb93e14df4f1f6149158b22569c6d7",
+                "reference": "82e9a9c2a6cb93e14df4f1f6149158b22569c6d7",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^4.0|^5.0",
+                "filament/support": "^4.0|^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "barryvdh/laravel-ide-helper": "^3.5",
+                "filament/filament": "^4.0|^5.0",
+                "larastan/larastan": "^3.1",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest-plugin-laravel": "^3.1|^4.1",
+                "phpstan/extension-installer": "^1.4.3",
+                "spatie/laravel-ray": "^1.39"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Flatpickr": "FilamentFlatpickr"
+                    },
+                    "providers": [
+                        "Coolsam\\Flatpickr\\FlatpickrServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Coolsam\\Flatpickr\\": "src/",
+                    "Coolsam\\Flatpickr\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Maosa",
+                    "email": "maosa.sam@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Flatpickr input for Filamentphp",
+            "homepage": "https://github.com/coolsam/flatpickr",
+            "keywords": [
+                "coolsam",
+                "flatpickr",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/coolsam/flatpickr/issues",
+                "source": "https://github.com/coolsam/flatpickr"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/coolsam",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-14T00:31:28+00:00"
+        },
+        {
             "name": "danharrin/date-format-converter",
             "version": "v0.3.1",
             "source": {
@@ -616,6 +996,87 @@
                 }
             ],
             "time": "2026-08-06T08:41:51+00:00"
+        },
+        {
+            "name": "dedoc/scramble",
+            "version": "v0.13.40",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dedoc/scramble.git",
+                "reference": "8ef3770533b47d5b14e561c3b5e7ee0e886cc136"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dedoc/scramble/zipball/8ef3770533b47d5b14e561c3b5e7ee0e886cc136",
+                "reference": "8ef3770533b47d5b14e561c3b5e7ee0e886cc136",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
+                "myclabs/deep-copy": "^1.12",
+                "nikic/php-parser": "^5.0",
+                "php": "^8.1",
+                "phpstan/phpdoc-parser": "^1.0|^2.0",
+                "spatie/laravel-package-tools": "^1.9.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.3",
+                "laravel/pint": "^v1.1.0",
+                "laravel/scout": "^10.0|^11.0",
+                "nunomaduro/collision": "^7.0|^8.0",
+                "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+                "pestphp/pest": "^2.34|^3.7|^4.4",
+                "pestphp/pest-plugin-laravel": "^2.3|^3.1|^4.1",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^10.5|^11.5.3|^12.5.12",
+                "spatie/laravel-permission": "^6.10|^7.2",
+                "spatie/pest-plugin-snapshots": "^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Dedoc\\Scramble\\ScrambleServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dedoc\\Scramble\\": "src",
+                    "Dedoc\\Scramble\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Lytvynenko",
+                    "email": "litvinenko95@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Automatic generation of API documentation for Laravel applications.",
+            "homepage": "https://github.com/dedoc/scramble",
+            "keywords": [
+                "documentation",
+                "laravel",
+                "openapi"
+            ],
+            "support": {
+                "issues": "https://github.com/dedoc/scramble/issues",
+                "source": "https://github.com/dedoc/scramble/tree/v0.13.40"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/romalytvynenko",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-11T12:27:20+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -1745,6 +2206,134 @@
             "time": "2025-12-27T19:43:20+00:00"
         },
         {
+            "name": "gsferro/filament-odometer-easy",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gsferro/filament-odometer-easy.git",
+                "reference": "a65caae69a46412494f5f72382d3a8fb53b518d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gsferro/filament-odometer-easy/zipball/a65caae69a46412494f5f72382d3a8fb53b518d6",
+                "reference": "a65caae69a46412494f5f72382d3a8fb53b518d6",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.2|^4.0|^5.0",
+                "gsferro/odometer-easy": "^1.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentOdometerEasy": "Gsferro\\FilamentOdometerEasy\\Facades\\FilamentOdometerEasy"
+                    },
+                    "providers": [
+                        "Gsferro\\FilamentOdometerEasy\\FilamentOdometerEasyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gsferro\\FilamentOdometerEasy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "gsferro",
+                    "email": "g_santana26@yahoo.com.br",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Animated counters for Filament v3, v4 and v5 — tables, infolists, stats and navigation badges — powered by number-flow (default) or odometer.js.",
+            "homepage": "https://github.com/gsferro/filament-odometer-easy",
+            "keywords": [
+                "Odometer",
+                "animation",
+                "counter",
+                "dashboard",
+                "filament",
+                "filament-odometer-easy",
+                "filament-plugin",
+                "filamentphp",
+                "gsferro",
+                "laravel",
+                "number-flow"
+            ],
+            "support": {
+                "issues": "https://github.com/gsferro/filament-odometer-easy/issues",
+                "source": "https://github.com/gsferro/filament-odometer-easy"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/gsferro",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-01T22:53:16+00:00"
+        },
+        {
+            "name": "gsferro/odometer-easy",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/GuilhermeFerro/laravel-odometer-easy.git",
+                "reference": "ffed3f3a7ba43d1cbca1b6b137cd26a245f7dc50"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/GuilhermeFerro/laravel-odometer-easy/zipball/ffed3f3a7ba43d1cbca1b6b137cd26a245f7dc50",
+                "reference": "ffed3f3a7ba43d1cbca1b6b137cd26a245f7dc50",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Gsferro\\OdometerEasy\\Providers\\OdometerEasyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Gsferro\\OdometerEasy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guilherme Ferro",
+                    "email": "gsferroti@gmail.com"
+                }
+            ],
+            "description": "Use the plugin odometer in project Laravel easy",
+            "support": {
+                "issues": "https://github.com/GuilhermeFerro/laravel-odometer-easy/issues",
+                "source": "https://github.com/GuilhermeFerro/laravel-odometer-easy/tree/v1.0"
+            },
+            "time": "2023-01-28T01:17:09+00:00"
+        },
+        {
             "name": "guzzlehttp/guzzle",
             "version": "7.15.3",
             "source": {
@@ -2162,6 +2751,228 @@
             "time": "2026-07-17T13:53:03+00:00"
         },
         {
+            "name": "hammadzafar05/filament-mobile-preset",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hammadzafar05/filament-mobile-preset.git",
+                "reference": "67c1a4c8db28ae379c6f6099d9278a2965d02af8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hammadzafar05/filament-mobile-preset/zipball/67c1a4c8db28ae379c6f6099d9278a2965d02af8",
+                "reference": "67c1a4c8db28ae379c6f6099d9278a2965d02af8",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.11.5 || ^5.6.5",
+                "hammadzafar05/mobile-bottom-nav": "^1.4",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "rector/rector": "^2.0",
+                "ryangjchandler/blade-capture-directive": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Hammadzafar05\\FilamentMobilePreset\\FilamentMobilePresetServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hammadzafar05\\FilamentMobilePreset\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hammad Zafar",
+                    "email": "hammadarain05@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Mobile-first UI/UX defaults for Filament panels: bottom navigation, thumb-reachable actions, slide-over modals and larger touch targets.",
+            "homepage": "https://github.com/hammadzafar05/filament-mobile-preset",
+            "keywords": [
+                "filament",
+                "filament-mobile-preset",
+                "filament-plugin",
+                "filamentphp",
+                "hammadzafar05",
+                "laravel",
+                "mobile",
+                "responsive",
+                "ux"
+            ],
+            "support": {
+                "issues": "https://github.com/hammadzafar05/filament-mobile-preset/issues",
+                "source": "https://github.com/hammadzafar05/filament-mobile-preset"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/hammadzafar05",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-28T17:19:53+00:00"
+        },
+        {
+            "name": "hammadzafar05/mobile-bottom-nav",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hammadzafar05/mobile-bottom-nav.git",
+                "reference": "cc613ef6822b1ba4d74c160f3f987ccfde0fe7ad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hammadzafar05/mobile-bottom-nav/zipball/cc613ef6822b1ba4d74c160f3f987ccfde0fe7ad",
+                "reference": "cc613ef6822b1ba4d74c160f3f987ccfde0fe7ad",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+                "rector/rector": "^2.0",
+                "ryangjchandler/blade-capture-directive": "^1.1",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "suggest": {
+                "hammadzafar05/filament-mobile-preset": "Applies the rest of the mobile-first defaults this bar assumes: stacked tables, thumb-reachable actions, slide-over modals and larger touch targets."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Hammadzafar05\\MobileBottomNav\\MobileBottomNavServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hammadzafar05\\MobileBottomNav\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hammad Zafar",
+                    "email": "hammadarain05@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A thumb-friendly mobile bottom navigation bar for Filament panels. It programmatically integrates with the Filament navigation registry to provide a seamless, ergonomic mobile experience with full support for dark mode and safe-area insets.",
+            "homepage": "https://github.com/hammadzafar05/mobile-bottom-nav",
+            "keywords": [
+                "filament",
+                "filament-plugin",
+                "filamentphp",
+                "hammadzafar05",
+                "laravel",
+                "mobile-bottom-nav"
+            ],
+            "support": {
+                "issues": "https://github.com/hammadzafar05/mobile-bottom-nav/issues",
+                "source": "https://github.com/hammadzafar05/mobile-bottom-nav"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/hammadzafar05",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-29T11:44:22+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/filament-barcode-field",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-barcode-field.git",
+                "reference": "3358ff0ee0cfdfac5b5321d5d3af98356ddd2723"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-barcode-field/zipball/3358ff0ee0cfdfac5b5321d5d3af98356ddd2723",
+                "reference": "3358ff0ee0cfdfac5b5321d5d3af98356ddd2723",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3",
+                "php": "^8.2|^8.3",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^9.0|^10.0|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\BarcodeField\\BarcodeFieldServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\BarcodeField\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel Filament package that provides Barcode field functionality for your web applications. This package extends Filament v5 with a simple barcode input component supporting EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, ITF and Codabar.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-barcode-field",
+            "keywords": [
+                "filament",
+                "filament-barcode-field",
+                "jeffersongoncalves",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-barcode-field/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-barcode-field/tree/3.0.0"
+            },
+            "time": "2026-07-22T01:56:25+00:00"
+        },
+        {
             "name": "kirschbaum-development/eloquent-power-joins",
             "version": "4.3.3",
             "source": {
@@ -2315,6 +3126,232 @@
                 }
             ],
             "time": "2026-06-08T15:39:10+00:00"
+        },
+        {
+            "name": "laboiteacode/filament-activity-timeline",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/La-boite-a-code/Filament-Activity-Timeline.git",
+                "reference": "d460aa2c4149d98100ef7878ce48b43a1e6bd357"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/La-boite-a-code/Filament-Activity-Timeline/zipball/d460aa2c4149d98100ef7878ce48b43a1e6bd357",
+                "reference": "d460aa2c4149d98100ef7878ce48b43a1e6bd357",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "filament/schemas": "^4.0|^5.0",
+                "filament/support": "^4.0|^5.0",
+                "filament/widgets": "^4.0|^5.0",
+                "illuminate/contracts": "^12.0|^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.92"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.29",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "spatie/laravel-activitylog": "^4.12|^5.0"
+            },
+            "suggest": {
+                "spatie/laravel-activitylog": "Required to use the built-in Spatie activity source (^4.12|^5.0)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaBoiteACode\\FilamentActivityTimeline\\FilamentActivityTimelineServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaBoiteACode\\FilamentActivityTimeline\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "La Boite A Code",
+                    "email": "alexandre@laboiteacode.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The semantic activity timeline for Filament. Turn technical activity logs into clear, localized business events.",
+            "homepage": "https://github.com/la-boite-a-code/filament-activity-timeline",
+            "keywords": [
+                "Audit",
+                "activity",
+                "activity-log",
+                "activitylog",
+                "filament",
+                "history",
+                "laboiteacode",
+                "laravel",
+                "spatie",
+                "timeline"
+            ],
+            "support": {
+                "issues": "https://github.com/la-boite-a-code/filament-activity-timeline/issues",
+                "source": "https://github.com/la-boite-a-code/filament-activity-timeline"
+            },
+            "time": "2026-07-23T23:15:48+00:00"
+        },
+        {
+            "name": "laboiteacode/filament-dependency-graph",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/La-boite-a-code/Filament-Dependency-Graph.git",
+                "reference": "c3286a7da0a4f2245e4ffc9d71d10fd013e5d8a5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/La-boite-a-code/Filament-Dependency-Graph/zipball/c3286a7da0a4f2245e4ffc9d71d10fd013e5d8a5",
+                "reference": "c3286a7da0a4f2245e4ffc9d71d10fd013e5d8a5",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "illuminate/contracts": "^12.0 || ^13.0",
+                "illuminate/database": "^12.0 || ^13.0",
+                "illuminate/support": "^12.0 || ^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.13",
+                "orchestra/testbench": "^10.0 || ^11.0",
+                "pestphp/pest": "^3.0 || ^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0 || ^4.0",
+                "phpstan/extension-installer": "^1.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "DependencyGraph": "LaBoiteACode\\DependencyGraph\\Facades\\DependencyGraph"
+                    },
+                    "providers": [
+                        "LaBoiteACode\\DependencyGraph\\DependencyGraphServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaBoiteACode\\DependencyGraph\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "La Boite a Code",
+                    "email": "alexandre@laboiteacode.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The visual architecture explorer for Filament. Explore models, resources, panels and relationships from one visual workspace.",
+            "homepage": "https://github.com/la-boite-a-code/filament-dependency-graph",
+            "keywords": [
+                "architecture",
+                "dependencies",
+                "eloquent",
+                "filament",
+                "filament-plugin",
+                "graph",
+                "laravel",
+                "livewire",
+                "visualization"
+            ],
+            "support": {
+                "issues": "https://github.com/la-boite-a-code/filament-dependency-graph/issues",
+                "source": "https://github.com/la-boite-a-code/filament-dependency-graph"
+            },
+            "time": "2026-07-29T14:29:35+00:00"
+        },
+        {
+            "name": "laboiteacode/filament-logs-explorer",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/La-boite-a-code/filament-logs-explorer.git",
+                "reference": "bd9639c4715be80a99677f55a6c4c1e419d3e7a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/La-boite-a-code/filament-logs-explorer/zipball/bd9639c4715be80a99677f55a6c4c1e419d3e7a6",
+                "reference": "bd9639c4715be80a99677f55a6c4c1e419d3e7a6",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.18",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaBoiteACode\\FilamentLogsExplorer\\FilamentLogsExplorerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaBoiteACode\\FilamentLogsExplorer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexandre Ribes",
+                    "email": "alexandre@laboiteacode.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Read and search your Laravel log files without leaving your Filament panel.",
+            "homepage": "https://github.com/la-boite-a-code/filament-logs-explorer",
+            "keywords": [
+                "filament",
+                "filamentphp",
+                "laboiteacode",
+                "laravel",
+                "log-viewer",
+                "logging",
+                "logs"
+            ],
+            "support": {
+                "issues": "https://github.com/La-boite-a-code/filament-logs-explorer/issues",
+                "source": "https://github.com/La-boite-a-code/filament-logs-explorer/tree/v1.0.1"
+            },
+            "time": "2026-07-24T06:15:06+00:00"
         },
         {
             "name": "laravel/framework",
@@ -3535,6 +4572,76 @@
             "time": "2026-08-10T15:24:22+00:00"
         },
         {
+            "name": "malzariey/filament-daterangepicker-filter",
+            "version": "5.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/malzariey/filament-daterangepicker-filter.git",
+                "reference": "82502c1bc8cd35e276084170041a6d10d8dde7f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/malzariey/filament-daterangepicker-filter/zipball/82502c1bc8cd35e276084170041a6d10d8dde7f2",
+                "reference": "82502c1bc8cd35e276084170041a6d10d8dde7f2",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "spatie/laravel-package-tools": "^1.16.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentDaterangepickerFilter": "Malzariey\\FilamentDaterangepickerFilter\\Facades\\FilamentDaterangepickerFilter"
+                    },
+                    "providers": [
+                        "Malzariey\\FilamentDaterangepickerFilter\\FilamentDaterangepickerFilterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Malzariey\\FilamentDaterangepickerFilter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Majid Al-Zariey",
+                    "email": "malzariey@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This package uses daterangepciker library to filter date by a range or predefined date ranges (Today , Yesterday ...etc)",
+            "homepage": "https://github.com/malzariey/filament-daterangepicker-filter",
+            "keywords": [
+                "Malzariey",
+                "filament-daterangepicker-filter",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/malzariey/filament-daterangepicker-filter/issues",
+                "source": "https://github.com/malzariey/filament-daterangepicker-filter/tree/5.0.6"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Malzariey",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-11T09:57:10+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "3.10.0",
             "source": {
@@ -3689,6 +4796,66 @@
                 "source": "https://github.com/mpociot/reflection-docblock/tree/master"
             },
             "time": "2016-06-20T20:53:12+00:00"
+        },
+        {
+            "name": "myclabs/deep-copy",
+            "version": "1.14.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/myclabs/DeepCopy.git",
+                "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
+                "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "conflict": {
+                "doctrine/collections": "<1.6.8",
+                "doctrine/common": "<2.13.3 || >=3 <3.2.2"
+            },
+            "require-dev": {
+                "doctrine/collections": "^1.6.8",
+                "doctrine/common": "^2.13.3 || ^3.2.2",
+                "phpspec/prophecy": "^1.10",
+                "phpunit/phpunit": "^7.5.20 || ^8.5.23 || ^9.5.13"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/DeepCopy/deep_copy.php"
+                ],
+                "psr-4": {
+                    "DeepCopy\\": "src/DeepCopy/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Create deep copies (clones) of your objects",
+            "keywords": [
+                "clone",
+                "copy",
+                "duplicate",
+                "object",
+                "object graph"
+            ],
+            "support": {
+                "issues": "https://github.com/myclabs/DeepCopy/issues",
+                "source": "https://github.com/myclabs/DeepCopy/tree/1.14.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/mnapoli",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-11T10:17:44+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -4555,6 +5722,53 @@
             "time": "2025-12-27T19:41:33+00:00"
         },
         {
+            "name": "phpstan/phpdoc-parser",
+            "version": "2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpdoc-parser.git",
+                "reference": "fb19eedd2bb67ff8cf7a5502ad329e701d6398a3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/fb19eedd2bb67ff8cf7a5502ad329e701d6398a3",
+                "reference": "fb19eedd2bb67ff8cf7a5502ad329e701d6398a3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "doctrine/annotations": "^2.0",
+                "nikic/php-parser": "^5.3.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/extension-installer": "^1.0",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^9.6",
+                "symfony/process": "^5.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\PhpDocParser\\": [
+                        "src/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPDoc parser with support for nullable, intersection and generic types",
+            "support": {
+                "issues": "https://github.com/phpstan/phpdoc-parser/issues",
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.3"
+            },
+            "time": "2026-07-08T07:01:06+00:00"
+        },
+        {
             "name": "pragmarx/google2fa",
             "version": "v9.0.0",
             "source": {
@@ -4673,6 +5887,86 @@
                 "source": "https://github.com/antonioribeiro/google2fa-qrcode/tree/v4.0.0"
             },
             "time": "2026-05-08T19:24:44+00:00"
+        },
+        {
+            "name": "prodstarter/filament-notification-center",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/prodstarter/filament-notification-center.git",
+                "reference": "023368fe67ef0747d427de28c092c35a743882e2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/prodstarter/filament-notification-center/zipball/023368fe67ef0747d427de28c092c35a743882e2",
+                "reference": "023368fe67ef0747d427de28c092c35a743882e2",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "NotificationCenter": "Prodstarter\\FilamentNotificationCenter\\Facades\\FilamentNotificationCenter",
+                        "FilamentNotificationCenter": "Prodstarter\\FilamentNotificationCenter\\Facades\\FilamentNotificationCenter"
+                    },
+                    "providers": [
+                        "Prodstarter\\FilamentNotificationCenter\\FilamentNotificationCenterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Prodstarter\\FilamentNotificationCenter\\": "src/",
+                    "Prodstarter\\FilamentNotificationCenter\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stanley Ojadovwa",
+                    "email": "stanwafi@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Extend Filament's notification drawer with customizable tabs and notification categories for a cleaner, more organized user experience",
+            "homepage": "https://github.com/prodstarter/filament-notification-center",
+            "keywords": [
+                "filament",
+                "filament-notification-center",
+                "filament-plugin",
+                "filamentphp",
+                "laravel",
+                "prodstarter"
+            ],
+            "support": {
+                "issues": "https://github.com/prodstarter/filament-notification-center/issues",
+                "source": "https://github.com/prodstarter/filament-notification-center"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/prodstarter",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-07-10T14:58:50+00:00"
         },
         {
             "name": "psr/clock",
@@ -5637,6 +6931,97 @@
             "time": "2024-05-17T09:06:10+00:00"
         },
         {
+            "name": "spatie/laravel-activitylog",
+            "version": "4.12.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-activitylog.git",
+                "reference": "2a2024fcac05628b0d1bfdbb1b94dda8b0661dc0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-activitylog/zipball/2a2024fcac05628b0d1bfdbb1b94dda8b0661dc0",
+                "reference": "2a2024fcac05628b0d1bfdbb1b94dda8b0661dc0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "illuminate/database": "^8.69 || ^9.27 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "illuminate/support": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.6.3"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "orchestra/testbench": "^6.23 || ^7.0 || ^8.0 || ^9.6 || ^10.0 || ^11.0",
+                "pestphp/pest": "^1.20 || ^2.0 || ^3.0 || ^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Activitylog\\ActivitylogServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Spatie\\Activitylog\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Tom Witkowski",
+                    "email": "dev.gummibeer@gmail.com",
+                    "homepage": "https://gummibeer.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A very simple activity logger to monitor the users of your website or application",
+            "homepage": "https://github.com/spatie/activitylog",
+            "keywords": [
+                "activity",
+                "laravel",
+                "log",
+                "spatie",
+                "user"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-activitylog/issues",
+                "source": "https://github.com/spatie/laravel-activitylog/tree/4.12.3"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-24T12:33:53+00:00"
+        },
+        {
             "name": "spatie/laravel-package-tools",
             "version": "1.93.1",
             "source": {
@@ -5761,6 +7146,77 @@
                 }
             ],
             "time": "2026-04-27T14:27:52+00:00"
+        },
+        {
+            "name": "ssbityukov/filament-command-center",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ssbityukov/filament-command-center.git",
+                "reference": "e9f27fcec7218b06a61b03f1794d53edd480b97a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ssbityukov/filament-command-center/zipball/e9f27fcec7218b06a61b03f1794d53edd480b97a",
+                "reference": "e9f27fcec7218b06a61b03f1794d53edd480b97a",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "illuminate/console": "^12.0|^13.0",
+                "illuminate/contracts": "^12.0|^13.0",
+                "illuminate/database": "^12.0|^13.0",
+                "illuminate/support": "^12.0|^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.92",
+                "symfony/process": "^7.0|^8.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.27",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "pestphp/pest-plugin-livewire": "^4.1",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bityukov\\CommandCenter\\CommandCenterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bityukov\\CommandCenter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Bityukov",
+                    "email": "s.s.bityukov@gmail.com"
+                }
+            ],
+            "description": "Run pre-approved Artisan and shell commands from your Filament panel.",
+            "homepage": "https://github.com/ssbityukov/filament-command-center",
+            "keywords": [
+                "artisan",
+                "commands",
+                "filament",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/ssbityukov/filament-command-center/issues",
+                "source": "https://github.com/ssbityukov/filament-command-center"
+            },
+            "time": "2026-08-04T12:17:34+00:00"
         },
         {
             "name": "symfony/clock",
@@ -8706,6 +10162,121 @@
             "time": "2026-06-12T18:19:46+00:00"
         },
         {
+            "name": "unifilemanager/core",
+            "version": "v0.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/UniFileManager/core.git",
+                "reference": "9a0bbe42c9b7176a1d63098142015d175a2daaa0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/UniFileManager/core/zipball/9a0bbe42c9b7176a1d63098142015d175a2daaa0",
+                "reference": "9a0bbe42c9b7176a1d63098142015d175a2daaa0",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/filesystem": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "symfony/http-foundation": "^7.0|^8.0",
+                "symfony/http-kernel": "^7.0|^8.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.24",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "UniFileManager\\Core\\UniFileManagerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "UniFileManager\\Core\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sampath Arachchige",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Shared file management services for UniFileManager adapters.",
+            "support": {
+                "issues": "https://github.com/UniFileManager/core/issues",
+                "source": "https://github.com/UniFileManager/core/tree/v0.1.3"
+            },
+            "time": "2026-08-10T18:47:23+00:00"
+        },
+        {
+            "name": "unifilemanager/filament-file-manager",
+            "version": "v0.7.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/UniFileManager/filament-file-manager.git",
+                "reference": "4ade9b6b002d4669f1b57ec01354f03d5f194954"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/UniFileManager/filament-file-manager/zipball/4ade9b6b002d4669f1b57ec01354f03d5f194954",
+                "reference": "4ade9b6b002d4669f1b57ec01354f03d5f194954",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/filesystem": "^11.0|^12.0|^13.0",
+                "livewire/livewire": "^3.0|^4.0",
+                "php": "^8.2",
+                "unifilemanager/core": ">=0.1.3 <1.0.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.24",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "UniFileManager\\FilamentFileManager\\FilamentFileManagerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "UniFileManager\\FilamentFileManager\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sampath Arachchige",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "A secure, disk-scoped file manager and file picker for Laravel Filament.",
+            "support": {
+                "issues": "https://github.com/UniFileManager/filament-file-manager/issues",
+                "source": "https://github.com/UniFileManager/filament-file-manager/tree/v0.7.9"
+            },
+            "time": "2026-08-10T19:10:33+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.4",
             "source": {
@@ -8862,6 +10433,215 @@
                 }
             ],
             "time": "2026-04-26T05:33:54+00:00"
+        },
+        {
+            "name": "wallacemartinss/filament-onboarding",
+            "version": "v2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wallacemartinss/filament-onboarding.git",
+                "reference": "1074d4844614fd70e5d083bd4035e77a07215ad7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wallacemartinss/filament-onboarding/zipball/1074d4844614fd70e5d083bd4035e77a07215ad7",
+                "reference": "1074d4844614fd70e5d083bd4035e77a07215ad7",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.26",
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "wallacemartinss/filament-icon-picker": "^2.0"
+            },
+            "suggest": {
+                "wallacemartinss/filament-icon-picker": "Turns the icon field of flows and steps into a visual picker over every installed icon set (^2.0)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Onboarding": "Wallacemartinss\\FilamentOnboarding\\Facades\\Onboarding"
+                    },
+                    "providers": [
+                        "Wallacemartinss\\FilamentOnboarding\\FilamentOnboardingServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wallacemartinss\\FilamentOnboarding\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wallace Martins",
+                    "email": "wallacemartinss@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Database-driven onboarding for Filament: progress checklists and guided spotlight tours, translatable to any locale.",
+            "homepage": "https://github.com/wallacemartinss/filament-onboarding",
+            "keywords": [
+                "checklist",
+                "filament",
+                "filament-plugin",
+                "laravel",
+                "onboarding",
+                "product-tour",
+                "walkthrough"
+            ],
+            "support": {
+                "issues": "https://github.com/wallacemartinss/filament-onboarding/issues",
+                "source": "https://github.com/wallacemartinss/filament-onboarding/tree/v2.5.0"
+            },
+            "time": "2026-08-04T13:58:49+00:00"
+        },
+        {
+            "name": "yousefaman/filament-autosave",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yousef-aman/filament-autosave",
+                "reference": "f5aa809c7f85816a1a3d4e5404c30a616d5f6aea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yousef-aman/filament-autosave/zipball/f5aa809c7f85816a1a3d4e5404c30a616d5f6aea",
+                "reference": "f5aa809c7f85816a1a3d4e5404c30a616d5f6aea",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0 || ^11.0",
+                "pestphp/pest": "^3.0 || ^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "YousefAman\\FilamentAutosave\\AutosaveServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "YousefAman\\FilamentAutosave\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yousef Aman",
+                    "email": "superyousef1999@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Automatic form saving for Filament with a visual status indicator, undo, and drafts",
+            "homepage": "https://github.com/yousef-aman/filament-autosave",
+            "keywords": [
+                "Forms",
+                "autosave",
+                "filament",
+                "laravel",
+                "livewire"
+            ],
+            "support": {
+                "issues": "https://github.com/yousef-aman/filament-autosave/issues",
+                "source": "https://github.com/yousef-aman/filament-autosave"
+            },
+            "time": "2026-07-27T17:57:52+00:00"
+        },
+        {
+            "name": "zvizvi/filament-column-filters",
+            "version": "0.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zvizvi/filament-column-filters.git",
+                "reference": "eccb4f0878ba3e94bcada5080fd2e68d8ed5b5bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zvizvi/filament-column-filters/zipball/eccb4f0878ba3e94bcada5080fd2e68d8ed5b5bf",
+                "reference": "eccb4f0878ba3e94bcada5080fd2e68d8ed5b5bf",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "filament/forms": "^5.0",
+                "filament/tables": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7|^4.0",
+                "pestphp/pest-plugin-arch": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+                "rector/rector": "^2.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Zvizvi\\FilamentColumnFilters\\FilamentColumnFiltersServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zvizvi\\FilamentColumnFilters\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "zvizvi",
+                    "email": "yaakov@workflow.co.il",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Excel-style column header filters for Filament tables, with search, date range and multi-select filter types that sync with regular table filters.",
+            "homepage": "https://github.com/zvizvi/filament-column-filters",
+            "keywords": [
+                "filament",
+                "filament-column-filters",
+                "filament-plugin",
+                "filamentphp",
+                "filters",
+                "laravel",
+                "table",
+                "zvizvi"
+            ],
+            "support": {
+                "issues": "https://github.com/zvizvi/filament-column-filters/issues",
+                "source": "https://github.com/zvizvi/filament-column-filters"
+            },
+            "time": "2026-08-03T01:58:02+00:00"
         }
     ],
     "packages-dev": [
@@ -9211,66 +10991,6 @@
                 "source": "https://github.com/mockery/mockery"
             },
             "time": "2024-05-16T03:13:13+00:00"
-        },
-        {
-            "name": "myclabs/deep-copy",
-            "version": "1.14.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
-                "reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.0"
-            },
-            "conflict": {
-                "doctrine/collections": "<1.6.8",
-                "doctrine/common": "<2.13.3 || >=3 <3.2.2"
-            },
-            "require-dev": {
-                "doctrine/collections": "^1.6.8",
-                "doctrine/common": "^2.13.3 || ^3.2.2",
-                "phpspec/prophecy": "^1.10",
-                "phpunit/phpunit": "^7.5.20 || ^8.5.23 || ^9.5.13"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/DeepCopy/deep_copy.php"
-                ],
-                "psr-4": {
-                    "DeepCopy\\": "src/DeepCopy/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Create deep copies (clones) of your objects",
-            "keywords": [
-                "clone",
-                "copy",
-                "duplicate",
-                "object",
-                "object graph"
-            ],
-            "support": {
-                "issues": "https://github.com/myclabs/DeepCopy/issues",
-                "source": "https://github.com/myclabs/DeepCopy/tree/1.14.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/mnapoli",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-08-11T10:17:44+00:00"
         },
         {
             "name": "phar-io/manifest",

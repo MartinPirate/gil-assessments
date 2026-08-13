@@ -1,0 +1,147 @@
+.fi-autosave-indicator {
+    display: inline-flex;
+    align-items: center;
+}
+
+.fi-autosave-indicator > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+}
+
+.fi-autosave-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.fi-autosave-unsaved {
+    color: var(--warning-500);
+}
+
+.fi-autosave-saving {
+    color: var(--gray-400);
+}
+
+.fi-autosave-saved {
+    color: var(--success-500);
+}
+
+.fi-autosave-error {
+    color: var(--danger-500);
+}
+
+.fi-autosave-undone {
+    color: var(--info-500, var(--primary-500));
+}
+
+.fi-autosave-draft {
+    color: var(--info-500, var(--primary-500));
+}
+
+.fi-autosave-restored {
+    color: var(--success-500);
+}
+
+.fi-autosave-restore {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: underline;
+    color: var(--success-600);
+    padding: 0;
+    margin-inline-start: 0.25rem;
+}
+
+.fi-autosave-restore:hover {
+    color: var(--success-500);
+}
+
+.fi-autosave-discard {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: underline;
+    color: var(--danger-600);
+    padding: 0;
+    margin-inline-start: 0.25rem;
+}
+
+.fi-autosave-discard:hover {
+    color: var(--danger-500);
+}
+
+.fi-autosave-undo {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: underline;
+    color: var(--primary-600);
+    padding: 0;
+    margin-inline-start: 0.25rem;
+}
+
+.fi-autosave-undo:hover {
+    color: var(--primary-500);
+}
+
+:where(.dark, .dark *) .fi-autosave-unsaved {
+    color: var(--warning-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-saving {
+    color: var(--gray-500);
+}
+
+:where(.dark, .dark *) .fi-autosave-saved {
+    color: var(--success-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-error {
+    color: var(--danger-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-undone {
+    color: var(--info-400, var(--primary-400));
+}
+
+:where(.dark, .dark *) .fi-autosave-draft {
+    color: var(--info-400, var(--primary-400));
+}
+
+:where(.dark, .dark *) .fi-autosave-restored {
+    color: var(--success-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-restore {
+    color: var(--success-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-restore:hover {
+    color: var(--success-300);
+}
+
+:where(.dark, .dark *) .fi-autosave-discard {
+    color: var(--danger-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-discard:hover {
+    color: var(--danger-300);
+}
+
+:where(.dark, .dark *) .fi-autosave-undo {
+    color: var(--primary-400);
+}
+
+:where(.dark, .dark *) .fi-autosave-undo:hover {
+    color: var(--primary-300);
+}
