@@ -1,0 +1,1098 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../app/Livewire/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/livewire/**/*';
+
+/* ==========================================================================
+   SAP Business One look-and-feel
+   --------------------------------------------------------------------------
+   The assessment asks for UI consistency with the supplied AR Invoice
+   screenshot: a navy document header, dense grey chrome, hairline field
+   borders, small system-UI type and a tightly packed line grid.
+   ========================================================================== */
+
+:root {
+    --sap-navy: #1f4e79;
+    --sap-navy-dark: #163a5a;
+    --sap-chrome: #eef1f5;
+    --sap-chrome-alt: #f7f9fb;
+    --sap-border: #b8c4d0;
+    --sap-border-soft: #d6dee7;
+    --sap-field: #ffffff;
+    --sap-field-readonly: #eceff3;
+    --sap-row-alt: #eaeff5;
+    --sap-text: #1b2733;
+    --sap-label: #34435a;
+    --sap-accent: #d97706;
+    --sap-danger: #b91c1c;
+    --sap-grid-header: #dbe4ee;
+}
+
+/* --------------------------------------------------------------------------
+   Page shell
+   -------------------------------------------------------------------------- */
+
+.sap-page {
+    font-size: 0.78rem;
+    color: var(--sap-text);
+}
+
+.sap-page .fi-header-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--sap-navy);
+}
+
+/* Document window: navy title strip above the form, as in the client. */
+.sap-form {
+    border: 1px solid var(--sap-border);
+    border-radius: 4px;
+    background: var(--sap-chrome);
+    /* Only the corners are clipped. `overflow: hidden` here would make the
+       header's right-hand column unreachable instead of scrollable. */
+    overflow: clip visible;
+}
+
+/* Document title bar, with the SAP client's window chrome. */
+.sap-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, var(--sap-navy) 0%, var(--sap-navy-dark) 100%);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    letter-spacing: 0.02em;
+}
+
+.sap-titlebar__chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.sap-titlebar__btn {
+    position: relative;
+    width: 0.85rem;
+    height: 0.85rem;
+    opacity: 0.85;
+}
+
+.sap-titlebar__btn::before,
+.sap-titlebar__btn::after {
+    content: '';
+    position: absolute;
+    background: #fff;
+}
+
+/* Minimise: a single rule at the baseline. */
+.sap-titlebar__btn--min::before {
+    left: 0;
+    right: 0;
+    bottom: 0.15rem;
+    height: 1px;
+}
+
+/* Maximise: an outlined square. */
+.sap-titlebar__btn--max::before {
+    inset: 0.05rem;
+    background: transparent;
+    border: 1px solid #fff;
+}
+
+/* Close: two crossed strokes. */
+.sap-titlebar__btn--close::before,
+.sap-titlebar__btn--close::after {
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+}
+
+.sap-titlebar__btn--close::before { transform: rotate(45deg); }
+.sap-titlebar__btn--close::after  { transform: rotate(-45deg); }
+
+/* --------------------------------------------------------------------------
+   Sections: flat grey panels, no cards, no rounded shadows
+   -------------------------------------------------------------------------- */
+
+.sap-page .fi-sc-section,
+.sap-page .fi-section {
+    background: var(--sap-chrome);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.sap-page .fi-section-content-ctn {
+    background: var(--sap-chrome);
+    border: 0;
+}
+
+.sap-page .fi-section-header {
+    padding-block: 0.35rem;
+}
+
+.sap-page .fi-section-header-heading {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--sap-navy);
+    text-transform: none;
+}
+
+/* The "Contents" panel header mimics the tab strip above the line grid. */
+.sap-contents .fi-section-header {
+    background: linear-gradient(180deg, #fdfdfe 0%, var(--sap-grid-header) 100%);
+    border: 1px solid var(--sap-border);
+    border-bottom: 0;
+    padding-inline: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Fields: label on the left, hairline box on the right
+   -------------------------------------------------------------------------- */
+
+/*
+   SAP puts the caption to the LEFT of the box, not above it. Filament renders
+   each field as .fi-fo-field > (.fi-fo-field-label-col + .fi-fo-field-content-col),
+   so turning that root into a two-column grid gives the client's layout without
+   touching any Blade.
+*/
+.sap-header .fi-fo-field,
+.sap-footer .fi-fo-field {
+    display: grid;
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.sap-page .fi-fo-field-label-ctn label,
+.sap-page .fi-fo-field-label-ctn {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--sap-label);
+    margin-bottom: 0;
+    line-height: 1.2;
+}
+
+/* Remarks is a tall textarea; its caption should sit at the top. */
+.sap-footer .fi-fo-field:has(textarea) {
+    align-items: start;
+}
+
+.sap-footer .fi-fo-field:has(textarea) .fi-fo-field-label-col {
+    padding-top: 0.3rem;
+}
+
+.sap-page .fi-input-wrp {
+    border-radius: 2px;
+    border: 1px solid var(--sap-border);
+    box-shadow: none;
+    background: var(--sap-field);
+    min-height: 1.6rem;
+}
+
+.sap-page .fi-input-wrp:focus-within {
+    outline: 1px solid var(--sap-navy);
+    outline-offset: -1px;
+    border-color: var(--sap-navy);
+}
+
+.sap-page .fi-input,
+.sap-page .fi-select-input,
+.sap-page .fi-fo-select .choices__inner {
+    font-size: 0.76rem;
+    padding-block: 0.15rem;
+    padding-inline: 0.35rem;
+    min-height: 1.5rem;
+}
+
+/* Read-only/derived fields carry the greyed SAP fill. */
+.sap-page .fi-disabled .fi-input-wrp,
+.sap-page input[readonly] {
+    background: var(--sap-field-readonly);
+    color: #33414f;
+}
+
+.sap-page .fi-fo-field-helper-text,
+.sap-page .fi-fo-field-content-col .fi-helper-text {
+    font-size: 0.66rem;
+    color: #5b6b7d;
+    grid-column: 2;
+}
+
+/* Choose From List trigger — the orange drill arrow. */
+.sap-page .fi-input-wrp .fi-icon-btn,
+.cfl-trigger {
+    color: var(--sap-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Line grid: dense, bordered, alternating rows
+   -------------------------------------------------------------------------- */
+
+/*
+   The full document grid carries 14 columns. Rather than crushing them to fit,
+   let the grid scroll horizontally inside its panel the way the SAP client
+   does, and stop the columns collapsing below their declared widths.
+*/
+.sap-contents .fi-fo-table-repeater {
+    overflow-x: auto;
+    max-width: 100%;
+    /* Positioned so it becomes the containing block for the absolutely
+       positioned .fi-sr-only labels on the hidden-label columns. Without it
+       those escape this scroller and stretch the whole page sideways. */
+    position: relative;
+    border: 1px solid var(--sap-border);
+    background: #fff;
+}
+
+.sap-contents table {
+    background: #fff;
+    table-layout: fixed;
+    min-width: 1500px;
+}
+
+/*
+   Keep the page itself from scrolling sideways because of the grid.
+
+   The scrolling has to happen on the repeater, not here: clipping at this
+   level would simply hide the right-hand columns.
+*/
+.sap-contents {
+    max-width: 100%;
+    min-width: 0;
+}
+
+/*
+   Flex and grid children default to `min-width: auto`, which means a track
+   grows to fit its content — so the 1,838px line grid stretched the whole
+   page and `overflow-x: auto` on the repeater never engaged. Allowing these
+   to shrink below their content width is what makes the grid scroll inside
+   its own panel.
+*/
+.sap-page .fi-grid-col,
+.sap-page .fi-sc-component,
+.sap-page .fi-fo-field,
+.sap-page .fi-fo-field-content-col,
+.sap-page .fi-section-content-ctn,
+.sap-page .fi-tabs-content,
+.sap-page [role='tabpanel'] {
+    min-width: 0;
+}
+
+.sap-contents thead th {
+    background: linear-gradient(180deg, #fbfcfd 0%, var(--sap-grid-header) 100%);
+    border-right: 1px solid var(--sap-border-soft);
+    border-bottom: 1px solid var(--sap-border);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--sap-label);
+    padding: 0.25rem 0.4rem;
+    white-space: nowrap;
+}
+
+.sap-contents tbody td {
+    border-right: 1px solid var(--sap-border-soft);
+    border-bottom: 1px solid var(--sap-border-soft);
+    padding: 0.1rem 0.2rem;
+    vertical-align: middle;
+}
+
+.sap-contents tbody tr:nth-child(even) td {
+    background: var(--sap-row-alt);
+}
+
+/* Inside the grid the inputs are borderless so the cell IS the border. */
+.sap-contents tbody .fi-input-wrp {
+    border-color: transparent;
+    background: transparent;
+    min-height: 1.4rem;
+}
+
+.sap-contents tbody .fi-input-wrp:focus-within {
+    background: #fff;
+    border-color: var(--sap-navy);
+}
+
+.sap-contents tbody .fi-input {
+    font-size: 0.74rem;
+    padding-block: 0.1rem;
+}
+
+/*
+   Inside a narrow grid cell the select's value label is a flex child competing
+   with the clear button, the chevron and the CFL arrow. Without an explicit
+   basis it collapses to a few pixels and the item code wraps one character per
+   line, so give it the remaining space and ellipsise any overflow.
+*/
+.sap-contents .fi-select-input-value-ctn {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sap-contents .fi-select-input-value-label {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: normal;
+}
+
+.sap-contents tbody td .fi-input-wrp {
+    min-width: 0;
+}
+
+/*
+   The grid cell is tight, so drop the select's clear "×" and chevron inside
+   the table: the CFL arrow already opens the list and clearing is done by
+   deleting the row, as in the SAP client.
+*/
+.sap-contents tbody .fi-select-input-value-remove-btn {
+    display: none;
+}
+
+.sap-contents .fi-fo-repeater-item {
+    border: 0;
+    box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Totals block — right aligned, monospaced figures
+   -------------------------------------------------------------------------- */
+
+.sap-totals .fi-fo-field {
+    grid-template-columns: minmax(0, 1fr) 13rem;
+}
+
+/* Totals captions hug the figures they describe. */
+.sap-totals .fi-fo-field-label-ctn {
+    text-align: right;
+}
+
+.sap-totals input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.sap-grand-total {
+    font-weight: 700;
+    color: var(--sap-navy);
+}
+
+/* --------------------------------------------------------------------------
+   Approval label (hidden until the total exceeds the threshold)
+   -------------------------------------------------------------------------- */
+
+.sap-approval-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid #f0c36d;
+    border-left: 3px solid var(--sap-accent);
+    border-radius: 2px;
+    background: #fdf6e3;
+    color: #7c4a03;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.sap-approval-label__icon {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+    color: var(--sap-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Footer button bar
+   -------------------------------------------------------------------------- */
+
+.sap-actions {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--sap-chrome-alt);
+    border-top: 1px solid var(--sap-border);
+}
+
+.sap-actions .fi-btn {
+    border-radius: 2px;
+    font-size: 0.74rem;
+    padding-block: 0.3rem;
+    min-height: 1.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Choose From List modal
+   -------------------------------------------------------------------------- */
+
+.cfl-table .fi-ta-ctn {
+    border: 1px solid var(--sap-border);
+    border-radius: 2px;
+}
+
+.cfl-table .fi-ta-header-cell,
+.cfl-table thead th {
+    background: linear-gradient(180deg, #fbfcfd 0%, var(--sap-grid-header) 100%);
+    font-size: 0.72rem;
+}
+
+.cfl-table tbody tr {
+    cursor: pointer;
+}
+
+.cfl-table tbody tr:hover {
+    background: #dce9f7;
+}
+
+.cfl-table .fi-ta-row-actions {
+    white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Gate screens: touch-friendly on a phone, dense on the desktop
+   -------------------------------------------------------------------------- */
+
+.gate-page .fi-input-wrp {
+    min-height: 2.5rem;
+}
+
+.gate-page .fi-input {
+    font-size: 0.95rem;
+    padding-block: 0.45rem;
+}
+
+.gate-page .fi-fo-field-label-ctn label {
+    font-size: 0.8rem;
+}
+
+@media (min-width: 1024px) {
+    .gate-page .fi-input-wrp {
+        min-height: 2rem;
+    }
+
+    .gate-page .fi-input {
+        font-size: 0.85rem;
+    }
+}
+
+.gate-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.gate-status-badge--in {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.gate-status-badge--out {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+/* --------------------------------------------------------------------------
+   "Currently On Site" panel under the gate screens
+   -------------------------------------------------------------------------- */
+
+.gate-onsite {
+    margin-top: 1rem;
+    border: 1px solid var(--sap-border-soft);
+    border-radius: 0.5rem;
+    background: #fff;
+    overflow: hidden;
+}
+
+.gate-onsite__title {
+    margin: 0;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--sap-label);
+    background: var(--sap-chrome-alt);
+    border-bottom: 1px solid var(--sap-border-soft);
+}
+
+.gate-onsite__empty {
+    margin: 0;
+    padding: 0.9rem;
+    font-size: 0.82rem;
+    color: #6b7684;
+}
+
+.gate-onsite__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.gate-onsite__item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--sap-border-soft);
+}
+
+.gate-onsite__item:last-child {
+    border-bottom: 0;
+}
+
+.gate-onsite__plate {
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+.gate-onsite__driver {
+    color: #56616f;
+    font-size: 0.82rem;
+}
+
+.gate-onsite__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.78rem;
+    color: #56616f;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Raw M-Pesa payload modal */
+.json-viewer {
+    margin: 0;
+    padding: 0.9rem;
+    border-radius: 0.4rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 0.75rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+
+
+
+/* --------------------------------------------------------------------------
+   Content tab strip (Contents / Logistics / Accounting / TIMS)
+   -------------------------------------------------------------------------- */
+
+.sap-contents .fi-tabs {
+    background: linear-gradient(180deg, #fdfdfe 0%, var(--sap-grid-header) 100%);
+    border: 1px solid var(--sap-border);
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+    padding: 0;
+    gap: 0;
+}
+
+.sap-contents .fi-tabs-item {
+    border-radius: 0;
+    border-right: 1px solid var(--sap-border-soft);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 1.25rem;
+    color: var(--sap-label);
+}
+
+.sap-contents .fi-tabs-item.fi-active,
+.sap-contents .fi-tabs-item[aria-selected='true'] {
+    background: #fff;
+    color: var(--sap-navy);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 var(--sap-navy);
+}
+
+/* --------------------------------------------------------------------------
+   Audit log diff modal
+   -------------------------------------------------------------------------- */
+
+.audit-diff__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.75rem;
+    margin: 0 0 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--sap-border-soft);
+}
+
+.audit-diff__meta dt {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    margin-bottom: 0.15rem;
+}
+
+.audit-diff__meta dd {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.audit-diff__url {
+    word-break: break-all;
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+.audit-diff__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.audit-diff__table th {
+    text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid var(--sap-border-soft);
+}
+
+.audit-diff__table td {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid var(--sap-border-soft);
+    vertical-align: top;
+    word-break: break-word;
+}
+
+/* Red for what it was, green for what it became. */
+.audit-diff__from {
+    color: #b91c1c;
+    background: #fef2f2;
+    text-decoration: line-through;
+    text-decoration-color: #fca5a5;
+}
+
+.audit-diff__to {
+    color: #15803d;
+    background: #f0fdf4;
+    font-weight: 600;
+}
+
+.audit-diff__empty {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Driver portal — trip cards, sized for a phone in a cab
+   -------------------------------------------------------------------------- */
+
+.trip-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+
+.trip-toolbar__count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.trip-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.trip-card {
+    border: 1px solid var(--sap-border-soft);
+    border-left: 4px solid #94a3b8;
+    border-radius: 0.5rem;
+    background: #fff;
+    padding: 0.9rem 1rem;
+}
+
+.trip-card--in-transit { border-left-color: #16a34a; }
+.trip-card--scheduled  { border-left-color: #2563eb; }
+.trip-card--completed  { border-left-color: #94a3b8; opacity: 0.75; }
+.trip-card--cancelled  { border-left-color: #dc2626; opacity: 0.65; }
+
+.trip-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+}
+
+.trip-card__ref {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.trip-card__route {
+    display: block;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.trip-badge {
+    flex: none;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.trip-badge--scheduled  { background: #dbeafe; color: #1d4ed8; }
+.trip-badge--in-transit { background: #dcfce7; color: #15803d; }
+.trip-badge--completed  { background: #e2e8f0; color: #475569; }
+.trip-badge--cancelled  { background: #fee2e2; color: #b91c1c; }
+
+.trip-card__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    gap: 0.6rem;
+    margin: 0 0 0.6rem;
+}
+
+.trip-card__meta dt {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #94a3b8;
+}
+
+.trip-card__meta dd {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.trip-card__cargo {
+    margin: 0 0 0.7rem;
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+/* Big enough to hit with a thumb. */
+.trip-btn {
+    width: 100%;
+    min-height: 2.75rem;
+    border: 0;
+    border-radius: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+}
+
+.trip-btn--go   { background: #2563eb; }
+.trip-btn--done { background: #16a34a; }
+.trip-btn:disabled { opacity: 0.6; cursor: progress; }
+
+@media (min-width: 768px) {
+    .trip-btn { width: auto; padding-inline: 1.5rem; }
+}
+
+/* --------------------------------------------------------------------------
+   Sample-document fidelity: row numbers, filler rows, money, strip
+   -------------------------------------------------------------------------- */
+
+/*
+   Row numbers. Filament repeaters do not expose the item index to the schema,
+   so the "#" column holds an empty cell and CSS counts the rows.
+*/
+.sap-contents tbody {
+    counter-reset: sapRow;
+}
+
+.sap-contents tbody tr {
+    counter-increment: sapRow;
+}
+
+.sap-contents tbody td:first-child .sap-rownum::after {
+    content: counter(sapRow);
+    display: block;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--sap-label);
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+   The SAP grid is always full height with empty ruled rows beneath the data.
+   Drawing them as a repeating background costs nothing and avoids rendering
+   dozens of real empty repeater items.
+*/
+.sap-contents .fi-fo-table-repeater {
+    min-height: 22rem;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 1.65rem,
+        var(--sap-border-soft) 1.65rem,
+        var(--sap-border-soft) calc(1.65rem + 1px)
+    );
+    background-position: 0 2.1rem;   /* start below the header row */
+    background-repeat: repeat;
+}
+
+/* Real rows sit on an opaque background so the ruling shows only below them. */
+.sap-contents tbody tr {
+    background: #fff;
+}
+
+.sap-contents tbody tr:nth-child(even) {
+    background: var(--sap-row-alt);
+}
+
+/* Money reads as the client shows it: blue, right aligned, tabular. */
+.sap-contents .sap-money,
+.sap-totals input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #1d4ed8;
+}
+
+.sap-contents .fi-input-wrp-prefix,
+.sap-totals .fi-input-wrp-prefix {
+    font-size: 0.68rem;
+    color: #64748b;
+}
+
+/* Item/Service Type left, Summary Type right, above the grid. */
+.sap-grid-strip {
+    padding: 0.35rem 0.1rem 0.5rem;
+}
+
+.sap-grid-strip .fi-fo-field {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 12rem);
+    align-items: center;
+    column-gap: 0.5rem;
+}
+
+.sap-grid-strip__right {
+    justify-self: end;
+}
+
+@media (min-width: 768px) {
+    .sap-grid-strip > :last-child .fi-fo-field {
+        justify-content: end;
+    }
+}
+
+/* Fields the document renders in bold. */
+.sap-field--emphasis .fi-fo-field-label-ctn,
+.sap-field--emphasis .fi-fo-field-label-ctn label {
+    font-weight: 700;
+    color: var(--sap-text);
+}
+
+.sap-qrcode .fi-input-wrp {
+    min-height: 4rem;
+}
+
+/* Action bar: primary actions left, Copy From / Copy To right. */
+.sap-actions {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sap-actions__left,
+.sap-actions__right {
+    display: flex;
+    gap: 0.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   Density
+   --------------------------------------------------------------------------
+   Filament spaces a schema for comfortable web forms: a 24px row gap between
+   components and an 8px gap inside each field. The sample document fits its
+   whole header in roughly the height of two of those rows, so the gaps are
+   collapsed here rather than fought field by field.
+   -------------------------------------------------------------------------- */
+
+.sap-page .fi-sc-has-gap,
+.sap-page .fi-grid.fi-sc {
+    gap: 0.15rem;
+    row-gap: 0.15rem;
+}
+
+/* Label and control sit on one line, tight together. */
+.sap-header .fi-fo-field,
+.sap-footer .fi-fo-field,
+.sap-grid-strip .fi-fo-field {
+    gap: 0.35rem;
+    row-gap: 0;
+    margin-bottom: 0;
+    align-items: center;
+}
+
+/* The helper text under Customer must not stretch the row. */
+.sap-page .fi-fo-field-helper-text,
+.sap-page .fi-helper-text {
+    margin-top: 0;
+    line-height: 1.25;
+}
+
+/* Control heights, matching the client's ~20px rows. */
+.sap-page .fi-input-wrp,
+.sap-page .fi-fo-select-wrp .fi-input-wrp {
+    min-height: 1.45rem;
+}
+
+.sap-page .fi-input,
+.sap-page .fi-select-input {
+    min-height: 1.35rem;
+    padding-block: 0.05rem;
+    line-height: 1.3;
+}
+
+.sap-page .fi-fo-field-label-col,
+.sap-page .fi-fo-field-content-col {
+    padding-block: 0;
+}
+
+/* Sections carry their own padding on top of the grid gap. */
+.sap-page .fi-section-content {
+    padding: 0.5rem 0.75rem;
+}
+
+.sap-header .fi-section-content,
+.sap-footer .fi-section-content {
+    padding-block: 0.4rem;
+}
+
+/* Line grid rows: ~18px, as in the document. */
+.sap-contents tbody td {
+    padding: 0.05rem 0.15rem;
+}
+
+.sap-contents tbody .fi-input-wrp {
+    min-height: 1.25rem;
+}
+
+.sap-contents tbody .fi-input {
+    min-height: 1.15rem;
+    padding-block: 0;
+    font-size: 0.72rem;
+}
+
+.sap-contents thead th {
+    padding: 0.2rem 0.35rem;
+}
+
+/* Textarea keeps a usable size but stops dominating the footer. */
+.sap-footer textarea {
+    min-height: 4rem;
+    font-size: 0.76rem;
+}
+
+/* Searchable selects render a taller control than a text input; bring them
+   into line so a row of fields reads as one dense block. */
+.sap-page .fi-fo-select-wrp .fi-input-wrp,
+.sap-page .fi-select-input-btn {
+    min-height: 1.45rem;
+}
+
+.sap-page .fi-select-input-btn {
+    padding-block: 0.05rem;
+    font-size: 0.76rem;
+    line-height: 1.3;
+}
+
+.sap-page .fi-select-input-value-ctn,
+.sap-page .fi-select-input-value-label {
+    line-height: 1.3;
+}
+
+/* The chevron and clear affordances are oversized at this density. */
+.sap-page .fi-select-input-btn .fi-icon,
+.sap-page .fi-input-wrp .fi-icon-btn .fi-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+.sap-page .fi-input-wrp .fi-icon-btn {
+    padding: 0.1rem;
+}
+
+/*
+   The filler-row container has a min-height so the grid looks full, but a
+   table stretches its rows to fill available height — so one data row grew to
+   352px. Pinning the row height keeps the ruled empty space below the data
+   instead of inside it.
+*/
+.sap-contents table {
+    height: 1px;              /* shrink-to-fit; rows then take their own height */
+}
+
+.sap-contents tbody tr {
+    height: 1.55rem;
+}
+
+.sap-contents tbody td {
+    height: 1.55rem;
+    vertical-align: middle;
+}
+
+/*
+   The repeater's add button is centred in the container, which lands it in the
+   middle of the ruled filler area looking like a floating panel. Pin it to the
+   bottom-left as a small control, the way a grid's "new row" affordance reads.
+*/
+.sap-contents .fi-fo-table-repeater-add {
+    /* The repeater container is a grid with a min-height for the filler rows,
+       so this button stretched to fill its track. align-self stops that. */
+    align-self: start;
+    justify-self: start;
+    position: sticky;
+    left: 0;
+    display: flex;
+    justify-content: flex-start;
+    background: transparent;
+    padding: 0.25rem 0.4rem;
+    width: fit-content;
+    height: auto;
+}
+
+.sap-contents .fi-fo-table-repeater-add .fi-btn {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    min-height: 1.5rem;
+    border-radius: 2px;
+}
+
+/* Checkbox labels sit on one line at this density. */
+.sap-footer .fi-fo-field:has(input[type='checkbox']) .fi-fo-field-label-ctn {
+    white-space: nowrap;
+}
+
+/* Totals captions hug their figures, as the document shows them. */
+.sap-totals .fi-fo-field {
+    grid-template-columns: minmax(0, 1fr) 12rem;
+}
+
+.sap-totals .fi-fo-field-label-ctn {
+    text-align: right;
+    padding-right: 0.5rem;
+}
