@@ -112,11 +112,37 @@ class ViewInvoice extends ViewRecord
                         ->view('filament.partials.order-track')
                         ->columnSpanFull(),
 
+                    /*
+                     * The plugin's default sentence is built for a change log
+                     * — "System ran "paid" on Invoice #2" — which describes the
+                     * mechanism rather than the business. Each stage gets the
+                     * sentence a person would actually say about it.
+                     *
+                     * None of them name the causer: the plugin already prints
+                     * it on the line underneath, and a stage nobody performed
+                     * would otherwise read "placed by System".
+                     */
                     ActivityTimelineEntry::make('lifecycle')
                         ->source('order')
                         ->heading('History')
                         ->perPage(10)
                         ->loadMore()
+                        ->eventLabels([
+                            'placed' => 'Placed',
+                            'approved' => 'Approved',
+                            'paid' => 'Paid',
+                            'dispatched' => 'Dispatched',
+                            'delivered' => 'Delivered',
+                            'rated' => 'Rated',
+                            'cancelled' => 'Cancelled',
+                        ])
+                        ->eventSentence('placed', 'The order was placed')
+                        ->eventSentence('approved', 'The document cleared approval')
+                        ->eventSentence('paid', 'Payment settled the document in full')
+                        ->eventSentence('dispatched', 'The goods left the yard')
+                        ->eventSentence('delivered', 'The goods were delivered')
+                        ->eventSentence('rated', 'The customer rated the delivery')
+                        ->eventSentence('cancelled', 'The order was cancelled')
                         ->columnSpanFull(),
                 ]),
         ]);
