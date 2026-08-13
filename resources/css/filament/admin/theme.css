@@ -1267,14 +1267,16 @@
    -------------------------------------------------------------------------- */
 
 /*
-   The plugin writes `position:sticky; top:4rem` as an inline style attribute
-   on the element, not through a stylesheet. An inline declaration outranks
-   every selector, however specific, so !important is the only thing that can
-   reach it — this is the case the keyword exists for, rather than a shortcut
-   around a cascade this file could otherwise win.
+   The Launchpad space switcher is not rendered.
+
+   It is a strip across the top of every page carrying three things, none of
+   which earn the room: the panel's brand, which the sidebar already shows; a
+   sidebar toggle, which duplicates the collapse chevron in the sidebar header;
+   and a switcher between spaces, of which this application has exactly one.
+
+   The launchpad itself is untouched and still lives at the panel root, which
+   the brand in the sidebar links to.
 */
 .fi-launchpad-bar-ctn {
-    position: static !important;
-    top: auto !important;
-    border-bottom: 1px solid var(--sv-hairline);
+    display: none;
 }

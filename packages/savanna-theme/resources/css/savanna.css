@@ -113,7 +113,13 @@
    top of that rather than replacing it.
 */
 .fi-main-ctn {
-    margin: var(--sv-inset) var(--sv-inset) var(--sv-inset) 0;
+    /*
+     * The left margin is twice the inset, not zero: Filament offsets this pane
+     * by the sidebar's width alone, but the sidebar is itself inset from the
+     * window, so without this the two rounded cards butt together with no
+     * shell showing between them.
+     */
+    margin: var(--sv-inset);
     background-color: var(--sv-surface);
     border: 1px solid var(--sv-hairline);
     border-radius: var(--sv-radius-lg);
@@ -154,9 +160,16 @@
    than a strip welded to the window edge — but the height has to lose both
    insets or it overflows the bottom of the screen.
 */
-.fi-sidebar {
-    inset-block: var(--sv-inset);
-    inset-inline-start: var(--sv-inset);
+/*
+   Inset with margins, not with `inset-*`.
+   
+   Filament lays this rail out as `position: sticky`, and on a sticky element
+   the inset properties only bite once it is actually stuck — they never move
+   it off its flow position horizontally. Margins do, and they also push the
+   content pane along, which keeps the gap between the two cards even.
+*/
+.fi-body .fi-sidebar {
+    margin: var(--sv-inset) 0 var(--sv-inset) var(--sv-inset);
     height: calc(100dvh - (var(--sv-inset) * 2));
     background-color: var(--sv-ground);
     border: 1px solid var(--sv-hairline);
