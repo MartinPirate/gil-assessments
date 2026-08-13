@@ -126,5 +126,9 @@ class DatabaseSeeder extends Seeder
 
         // Routes, driver logins and demo trips.
         $this->call(OperationsSeeder::class);
+
+        // The panel root is the launchpad, and an unconfigured one renders a
+        // blank page — so a fresh install has to arrive with its tiles.
+        $this->call(LaunchpadSeeder::class);
     }
 }

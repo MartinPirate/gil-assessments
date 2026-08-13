@@ -285,13 +285,27 @@
 }
 
 /*
-   Cancel the tile's bottom padding and pull the chart out to the card edges.
-   The negative inline margin has to match the tile's inline padding above.
+   Filament draws the sparkline as an absolutely positioned backdrop — inset
+   from the top of the tile and sitting *behind* the label, value and
+   description. That works when the chart is a faint wash, but this theme gives
+   it a real stroke and fill, and at that weight it cuts straight through the
+   description text.
+
+   So it is returned to normal flow and placed after the content, which is
+   where the reference puts it: along the bottom edge of the card, under
+   everything else. The tile grows by the height of the chart instead of
+   overlapping itself.
+
+   The negative inline margin bleeds it to the card edges and must stay equal
+   to the tile's inline padding; `overflow: hidden` on the tile clips the
+   overhang back to the rounded corners.
 */
 .fi-wi-stats-overview-stat-chart {
+    position: relative;
+    inset: auto;
+    display: block;
     margin: 0.55rem -0.95rem 0;
     width: calc(100% + 1.9rem);
-    display: block;
 }
 
 /* --------------------------------------------------------------------------
