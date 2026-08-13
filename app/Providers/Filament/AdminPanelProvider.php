@@ -7,6 +7,9 @@ use Alexkramse\FilamentOpenapiDocs\FilamentOpenApiDocsPlugin;
 use Bityukov\CommandCenter\Filament\CommandCenterPlugin;
 use Blemli\FormSettings\FormSettingsPlugin;
 use Filament\Changelog\ChangelogPlugin;
+use Filament\Enums\DatabaseNotificationsPosition;
+use Filament\Enums\GlobalSearchPosition;
+use Filament\Enums\UserMenuPosition;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -48,6 +51,19 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->maxContentWidth(Width::Full)
+            /*
+             * Everything lives in the sidebar, and there is no top bar.
+             *
+             * Filament's default splits the chrome in two: brand, search,
+             * notifications and the user menu sit in a topbar, and only the
+             * navigation is in the sidebar. The reference does the opposite —
+             * one column holds the brand, the search, the whole navigation and
+             * the signed-in user, and the content area starts at the very top
+             * of the page with nothing above the page title.
+             */
+            ->topbar(false)
+            ->globalSearch(position: GlobalSearchPosition::Sidebar)
+            ->userMenu(position: UserMenuPosition::Sidebar)
             // The sample document is a light desktop client. Honouring the OS
             // dark preference would render the whole thing dark and stop it
             // matching, so this panel is light only.
@@ -64,8 +80,9 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 \App\Filament\Widgets\OperationsOverview::class,
             ])
-            // Database notifications back the Notification Center below.
-            ->databaseNotifications()
+            // Database notifications back the Notification Center below, and
+            // sit with the user menu at the foot of the sidebar.
+            ->databaseNotifications(position: DatabaseNotificationsPosition::Sidebar)
             ->plugins($this->plugins())
             ->middleware([
                 EncryptCookies::class,

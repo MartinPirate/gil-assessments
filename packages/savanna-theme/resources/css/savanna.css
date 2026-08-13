@@ -84,20 +84,25 @@
    Page shell
    -------------------------------------------------------------------------- */
 
+/*
+   The sidebar is the tinted column and the content area is white — not the
+   other way round. Getting this backwards is what makes a light panel read as
+   "grey app with a white menu" instead of "white page with a quiet rail".
+*/
 .fi-body {
-    background-color: var(--sv-ground);
+    background-color: var(--sv-surface);
     color: var(--sv-ink);
     font-family: var(--sv-font);
     -webkit-font-smoothing: antialiased;
 }
 
 .fi-main {
-    /* The reference keeps content off the rails without centring it in a
-       narrow column — the tables are wide and need the room. */
-    padding-inline: 1.5rem;
+    /* Content starts at the top of the page: there is no topbar above it. */
+    padding-inline: 1.75rem;
+    padding-block: 1.5rem;
 }
 
-/* Page title: modest, not a banner. */
+/* Page title: modest, not a banner. It is the first thing on the page. */
 .fi-header-heading {
     font-size: 1rem;
     font-weight: 650;
@@ -119,62 +124,117 @@
    -------------------------------------------------------------------------- */
 
 .fi-sidebar {
-    background-color: var(--sv-surface);
+    background-color: var(--sv-ground);
     border-right: 1px solid var(--sv-hairline);
 }
 
+/* The brand sits on the same ground as the rail, with no dividing rule. */
 .fi-sidebar-header {
-    background-color: var(--sv-surface);
-    border-bottom: 1px solid var(--sv-hairline-soft);
+    background-color: var(--sv-ground);
+    border-bottom: 0;
     box-shadow: none;
+    padding: 0.85rem 0.9rem 0.35rem;
+    height: auto;
+}
+
+.fi-sidebar-header .fi-logo {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--sv-ink);
+}
+
+/* Global search, directly under the brand. */
+.fi-sidebar .fi-global-search {
+    padding: 0.15rem 0.65rem 0.6rem;
+}
+
+.fi-sidebar .fi-global-search .fi-input-wrp {
+    background-color: var(--sv-surface);
+    border-radius: 7px;
+}
+
+.fi-sidebar .fi-global-search .fi-input {
+    font-size: 0.76rem;
+    padding-block: 0.25rem;
 }
 
 .fi-sidebar-nav {
-    padding-inline: 0.55rem;
-    gap: 0.1rem;
+    padding-inline: 0.5rem;
+    gap: 0;
 }
 
-/* Group heading — 10px, heavily tracked, muted. */
+/*
+   Group heading. The reference sets these tiny and heavily tracked, with the
+   collapse chevron pushed to the far right of the row.
+*/
 .fi-sidebar-group-label {
-    font-size: 0.62rem;
+    font-size: 0.6rem;
     font-weight: 700;
-    letter-spacing: 0.11em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--sv-muted);
 }
 
 .fi-sidebar-group-btn {
-    padding-block: 0.5rem 0.25rem;
+    padding: 0.75rem 0.45rem 0.2rem;
+    justify-content: space-between;
+    width: 100%;
 }
 
+.fi-sidebar-group-collapse-btn {
+    color: var(--sv-muted);
+    opacity: 0.7;
+}
+
+/*
+   Nav rows. Density is most of the look: the reference runs about 28px per
+   row, which is a good deal tighter than Filament's default.
+*/
 .fi-sidebar-item-btn {
+    position: relative;
     border-radius: var(--sv-radius-sm);
-    padding: 0.34rem 0.5rem;
-    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+    margin-block: 1px;
+    font-size: 0.78rem;
     font-weight: 500;
+    line-height: 1.3;
     color: var(--sv-ink-soft);
-    column-gap: 0.55rem;
+    column-gap: 0.5rem;
 }
 
 .fi-sidebar-item-btn:hover {
-    background-color: var(--sv-surface-sub);
+    background-color: var(--sv-surface);
     color: var(--sv-ink);
 }
 
 .fi-sidebar-item-icon {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 1rem;
+    height: 1rem;
     color: var(--sv-muted);
 }
 
 /*
-   Active item. Filament marks it with .fi-active on the item, so the fill and
-   the icon colour are both driven from there rather than from a URL match.
+   Active item: soft accent fill, accent text, and a short bar pinned to the
+   left edge of the row — the detail that stops the fill reading as a plain
+   hover state.
 */
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background-color: var(--sv-accent-soft);
     color: var(--sv-accent-ink);
     font-weight: 600;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn::before {
+    content: '';
+    position: absolute;
+    left: -0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 1.05rem;
+    border-radius: 0 2px 2px 0;
+    background-color: var(--sv-accent);
 }
 
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
@@ -196,18 +256,60 @@
     color: var(--sv-accent-ink);
 }
 
+/*
+   The signed-in user, pinned to the foot of the rail with the notification
+   bell beside them. This is where the reference puts them, and it is why the
+   panel needs no topbar at all.
+*/
 .fi-sidebar-footer {
-    border-top: 1px solid var(--sv-hairline-soft);
+    border-top: 1px solid var(--sv-hairline);
+    padding: 0.5rem 0.6rem;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-/* --------------------------------------------------------------------------
-   Topbar
-   -------------------------------------------------------------------------- */
+.fi-sidebar-footer .fi-dropdown-trigger {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 
-.fi-topbar > nav {
+.fi-sidebar-footer .fi-user-menu-trigger-btn,
+.fi-sidebar-footer .fi-dropdown-trigger > button {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: var(--sv-radius-sm);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--sv-ink);
+    /* A long name must ellipsise rather than wrap the row onto two lines. */
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.fi-sidebar-footer .fi-user-menu-trigger-btn > span,
+.fi-sidebar-footer .fi-dropdown-trigger > button > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+/* The bell is an icon button beside the name, not a labelled row. */
+.fi-sidebar-footer .fi-sidebar-database-notifications-btn {
+    flex: none;
+    padding: 0.3rem;
+}
+
+.fi-sidebar-footer .fi-sidebar-database-notifications-btn-label {
+    display: none;
+}
+
+.fi-sidebar-footer .fi-dropdown-trigger > button:hover {
     background-color: var(--sv-surface);
-    border-bottom: 1px solid var(--sv-hairline);
-    box-shadow: none;
 }
 
 /* --------------------------------------------------------------------------

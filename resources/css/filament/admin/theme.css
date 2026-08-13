@@ -1253,3 +1253,28 @@
     --primary-900: #142d45;
     --primary-950: #0d1d2d;
 }
+
+/* --------------------------------------------------------------------------
+   Launchpad bar without a topbar
+   --------------------------------------------------------------------------
+   The Launchpad space switcher renders as `.fi-topbar-ctn` and is stuck to
+   `top: 64px` — the height of the Filament topbar it expects to sit beneath.
+   This panel renders no topbar, so the bar hung 64px down the page and the
+   page heading passed underneath it.
+
+   It is a space switcher, not a toolbar; nothing is lost by letting it sit in
+   the normal flow at the top of the content.
+   -------------------------------------------------------------------------- */
+
+/*
+   The plugin writes `position:sticky; top:4rem` as an inline style attribute
+   on the element, not through a stylesheet. An inline declaration outranks
+   every selector, however specific, so !important is the only thing that can
+   reach it — this is the case the keyword exists for, rather than a shortcut
+   around a cascade this file could otherwise win.
+*/
+.fi-launchpad-bar-ctn {
+    position: static !important;
+    top: auto !important;
+    border-bottom: 1px solid var(--sv-hairline);
+}
