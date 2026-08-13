@@ -96,6 +96,11 @@ class InvoiceWriter
                 'payment_order_run' => (bool) ($state['payment_order_run'] ?? false),
                 'remarks' => $state['remarks'],
 
+                // Scanned off the ETR receipt, so it is only stamped when a
+                // barcode was actually captured.
+                'etr_barcode' => $etrBarcode = ($state['etr_barcode'] ?? null) ?: null,
+                'etr_scanned_at' => $etrBarcode ? now() : null,
+
                 'discount_percent' => (float) ($state['discount_percent'] ?? 0),
                 'rounding_enabled' => (bool) ($state['rounding_enabled'] ?? false),
                 ...$totals,

@@ -21,6 +21,7 @@ use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use JeffersonGoncalves\Filament\BarcodeField\Forms\Components\BarcodeInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -518,6 +519,23 @@ class ArInvoice extends Page implements HasForms
                 TextInput::make('etims_receipt_number')->label('eTIMS Receipt Number')->disabled()->dehydrated(false),
                 TextInput::make('etims_qr_url')->label('eTIMS QR URL')->disabled()->dehydrated(false),
                 TextInput::make('etims_error')->label('Last Transmission Error')->disabled()->dehydrated(false),
+
+                /*
+                 * The one TIMS field a person fills in. Everything above is
+                 * assigned by the KRA control unit on transmission; this is
+                 * scanned off the paper receipt the ETR prints, which is what
+                 * ties that receipt back to this document.
+                 *
+                 * Typed entry still works when the camera will not read a
+                 * creased receipt, so the scanner is an affordance rather than
+                 * the only way in.
+                 */
+                BarcodeInput::make('etr_barcode')
+                    ->label('ETR Receipt Barcode')
+                    ->icon('heroicon-m-qr-code')
+                    ->maxLength(64)
+                    ->helperText('Scan the barcode on the ETR receipt, or type it in.')
+                    ->columnSpanFull(),
             ]),
         ];
     }

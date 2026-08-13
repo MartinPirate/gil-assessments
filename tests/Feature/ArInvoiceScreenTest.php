@@ -329,4 +329,39 @@ class ArInvoiceScreenTest extends TestCase
 
         $this->assertNotSame(999, $component->instance()->nextDocNum);
     }
+
+    /**
+     * The ETR barcode is the one TIMS field a person fills in — it is scanned
+     * off the paper receipt — so it has to survive the save.
+     */
+    public function test_the_etr_barcode_is_saved_and_stamped(): void
+    {
+        Livewire::actingAs($this->user)
+            ->test(ArInvoice::class)
+            ->fillForm($this->validDocument(['etr_barcode' => '0060012345678901']))
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $invoice = Invoice::firstOrFail();
+
+        $this->assertSame('0060012345678901', $invoice->etr_barcode);
+        $this->assertNotNull($invoice->etr_scanned_at, 'A scanned barcode should be stamped with when it arrived.');
+    }
+
+    /**
+     * An unscanned document must not claim a scan time.
+     */
+    public function test_an_invoice_without_a_barcode_is_not_stamped(): void
+    {
+        Livewire::actingAs($this->user)
+            ->test(ArInvoice::class)
+            ->fillForm($this->validDocument())
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $invoice = Invoice::firstOrFail();
+
+        $this->assertNull($invoice->etr_barcode);
+        $this->assertNull($invoice->etr_scanned_at);
+    }
 }

@@ -50,6 +50,14 @@ class ViewInvoice extends ViewRecord
 
                 TextEntry::make('remarks')->columnSpanFull(),
 
+                TextEntry::make('etr_barcode')
+                    ->label('ETR Receipt Barcode')
+                    ->placeholder('Not scanned')
+                    ->copyable()
+                    ->helperText(fn (Invoice $record): ?string => $record->etr_scanned_at
+                        ? 'Scanned '.$record->etr_scanned_at->format('d/m/Y H:i')
+                        : null),
+
                 TextEntry::make('approval_note')
                     ->hiddenLabel()
                     ->state(fn (Invoice $record) => 'Invoice will go for approval – Amount: '

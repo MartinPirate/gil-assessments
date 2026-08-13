@@ -4,15 +4,15 @@ use Filament\Support\Enums\Width;
 
 return [
     'asset_js' => 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+    /*
+     | Narrowed to the symbologies that actually appear on a KRA ETR / eTIMS
+     | receipt. The retail formats (EAN, UPC) are for products on a shelf, and
+     | leaving them on only gives the scanner more ways to misread a creased
+     | receipt.
+     */
     'formats' => [
-        'EAN_13',
-        'EAN_8',
-        'UPC_A',
-        'UPC_E',
         'CODE_128',
         'CODE_39',
-        'ITF',
-        'CODABAR',
     ],
     'modal' => [
         'width' => Width::Large,

@@ -39,6 +39,8 @@ class Invoice extends Model
         'total_down_payment', 'freight', 'rounding_enabled', 'rounding',
         'tax_total', 'document_total', 'applied_amount', 'balance_due',
         'requires_approval', 'status', 'created_by',
+        'etr_barcode', 'etr_scanned_at',
+        'delivery_rating', 'delivery_rating_comment', 'delivery_rated_at',
     ];
 
     protected function casts(): array

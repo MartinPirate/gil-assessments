@@ -4,10 +4,9 @@ namespace App\Filament\Resources\Invoices\Tables;
 
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class InvoicesTable
 {
@@ -62,6 +61,15 @@ class InvoicesTable
                         default => 'gray',
                     }),
 
+                TextColumn::make('etr_barcode')
+                    ->label('ETR Barcode')
+                    ->placeholder('—')
+                    // The point of storing it: finding the document from the
+                    // paper receipt in your hand.
+                    ->searchable()
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('creator.name')
                     ->label('Created By')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -79,14 +87,14 @@ class InvoicesTable
                     ->trueLabel('Over the threshold')
                     ->falseLabel('Under the threshold'),
 
-                Filter::make('posting_date')
-                    ->schema([
-                        \Filament\Forms\Components\DatePicker::make('from')->label('Posted from'),
-                        \Filament\Forms\Components\DatePicker::make('until')->label('Posted until'),
-                    ])
-                    ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when($data['from'] ?? null, fn (Builder $q, $date) => $q->whereDate('posting_date', '>=', $date))
-                        ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->whereDate('posting_date', '<=', $date))),
+                /*
+                 * One range picker instead of two loose date boxes: it carries
+                 * the presets people actually reach for (today, this month,
+                 * last month) and cannot express a backwards range.
+                 */
+                DateRangeFilter::make('posting_date')
+                    ->label('Posting date')
+                    ->placeholder('Any date'),
             ])
             ->recordActions([
                 ViewAction::make(),
