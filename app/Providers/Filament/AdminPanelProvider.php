@@ -16,7 +16,6 @@ use App\Filament\Pages\Dashboard;
 use Filament\Launchpad\LaunchpadPlugin;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -28,6 +27,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Savanna\Theme\SavannaThemePlugin;
 use LaBoiteACode\DependencyGraph\DependencyGraphPlugin;
 use LaBoiteACode\FilamentActivityTimeline\FilamentActivityTimelinePlugin;
 use LaBoiteACode\FilamentLogsExplorer\FilamentLogsExplorerPlugin;
@@ -47,10 +47,6 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
-            ->colors([
-                // Matches the SAP Business One document chrome.
-                'primary' => Color::hex('#1f4e79'),
-            ])
             ->maxContentWidth(Width::Full)
             // The sample document is a light desktop client. Honouring the OS
             // dark preference would render the whole thing dark and stop it
@@ -106,6 +102,14 @@ class AdminPanelProvider extends PanelProvider
         };
 
         return [
+            /*
+             * The theme goes first: it sets the panel's primary colour ramp and
+             * sidebar width, and anything after it may deliberately override
+             * those. The A/R Invoice document is unaffected — its SAP rules are
+             * scoped to `.sap-page` and load after the theme's stylesheet.
+             */
+            SavannaThemePlugin::make(),
+
             // --- Documents and data -----------------------------------------
             // Receipts and invoice attachments.
             FilamentFileManagerPlugin::make(),

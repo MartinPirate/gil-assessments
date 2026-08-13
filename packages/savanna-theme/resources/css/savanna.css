@@ -1,0 +1,396 @@
+/* ==========================================================================
+   Savanna — a warm, quiet theme for Filament panels
+   --------------------------------------------------------------------------
+   Neutral warm ground, hairline-bordered white cards, one accent used only
+   for navigation and intent, and small heavily-tracked uppercase labels above
+   large tight numbers. That label/number contrast is most of the look.
+
+   SCOPING CONTRACT
+   ----------------
+   This file styles panel *chrome* only: sidebar, topbar, page shell, headings,
+   cards, stats, tables, inputs and buttons. It must be imported BEFORE any
+   host-specific rules so that a host screen with its own visual language can
+   override it by ordinary specificity.
+
+   In this application, the A/R Invoice document is built to a supplied SAP
+   Business One screenshot and the gate screens are built for gloved hands.
+   Those rules live behind `.sap-page` and `.gate-page` and are loaded after
+   this file, so they win on both order and specificity. Nothing here targets
+   those scopes, and nothing here should ever be written more specifically
+   than a single class.
+   ========================================================================== */
+
+:root {
+    /* Ground and surfaces ------------------------------------------------ */
+    --sv-ground: #faf8f6;
+    --sv-surface: #ffffff;
+    --sv-surface-sub: #f4f1ee;
+    --sv-hairline: #e7e2dc;
+    --sv-hairline-soft: #f0ece7;
+
+    /* Ink ---------------------------------------------------------------- */
+    --sv-ink: #1c1b19;
+    --sv-ink-soft: #4a4641;
+    --sv-muted: #857e75;
+
+    /* Accent -------------------------------------------------------------
+       One hue. Navigation, focus and intent — never "good" or "bad", which
+       are the semantic colours below. */
+    --sv-accent: #e2571f;
+    --sv-accent-soft: #fdefe7;
+    --sv-accent-ink: #b8410f;
+
+    /* Semantic ----------------------------------------------------------- */
+    --sv-good: #15803d;
+    --sv-warn: #b45309;
+    --sv-bad: #be2617;
+
+    --sv-radius: 10px;
+    --sv-radius-sm: 6px;
+    --sv-shadow: 0 1px 2px rgb(28 27 25 / 0.05);
+
+    --sv-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/*
+   Dark tokens. Filament only emits `.dark` when the panel allows dark mode;
+   this app pins itself light so the SAP document keeps matching its
+   screenshot, which leaves these inert until a host opts in. They are carried
+   here so the package is complete rather than half-themed for anyone who does.
+*/
+.dark {
+    --sv-ground: #16150f;
+    --sv-surface: #1e1d17;
+    --sv-surface-sub: #26241d;
+    --sv-hairline: #333026;
+    --sv-hairline-soft: #2a2820;
+
+    --sv-ink: #f5f1ea;
+    --sv-ink-soft: #d3cdc2;
+    --sv-muted: #9b9488;
+
+    --sv-accent: #ff7a45;
+    --sv-accent-soft: #3a2115;
+    --sv-accent-ink: #ffa077;
+
+    --sv-good: #5cc98a;
+    --sv-warn: #e0a34a;
+    --sv-bad: #f08076;
+
+    --sv-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Page shell
+   -------------------------------------------------------------------------- */
+
+.fi-body {
+    background-color: var(--sv-ground);
+    color: var(--sv-ink);
+    font-family: var(--sv-font);
+    -webkit-font-smoothing: antialiased;
+}
+
+.fi-main {
+    /* The reference keeps content off the rails without centring it in a
+       narrow column — the tables are wide and need the room. */
+    padding-inline: 1.5rem;
+}
+
+/* Page title: modest, not a banner. */
+.fi-header-heading {
+    font-size: 1rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: var(--sv-ink);
+}
+
+.fi-header-subheading {
+    font-size: 0.8rem;
+    color: var(--sv-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar
+   --------------------------------------------------------------------------
+   The most recognisable surface in the theme. White against the warm ground,
+   small type, tiny tracked group labels, and a soft accent fill on the active
+   item rather than a hard bar.
+   -------------------------------------------------------------------------- */
+
+.fi-sidebar {
+    background-color: var(--sv-surface);
+    border-right: 1px solid var(--sv-hairline);
+}
+
+.fi-sidebar-header {
+    background-color: var(--sv-surface);
+    border-bottom: 1px solid var(--sv-hairline-soft);
+    box-shadow: none;
+}
+
+.fi-sidebar-nav {
+    padding-inline: 0.55rem;
+    gap: 0.1rem;
+}
+
+/* Group heading — 10px, heavily tracked, muted. */
+.fi-sidebar-group-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--sv-muted);
+}
+
+.fi-sidebar-group-btn {
+    padding-block: 0.5rem 0.25rem;
+}
+
+.fi-sidebar-item-btn {
+    border-radius: var(--sv-radius-sm);
+    padding: 0.34rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--sv-ink-soft);
+    column-gap: 0.55rem;
+}
+
+.fi-sidebar-item-btn:hover {
+    background-color: var(--sv-surface-sub);
+    color: var(--sv-ink);
+}
+
+.fi-sidebar-item-icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    color: var(--sv-muted);
+}
+
+/*
+   Active item. Filament marks it with .fi-active on the item, so the fill and
+   the icon colour are both driven from there rather than from a URL match.
+*/
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: var(--sv-accent-soft);
+    color: var(--sv-accent-ink);
+    font-weight: 600;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: var(--sv-accent);
+}
+
+/* Count pill. Tabular so a column of them does not jitter. */
+.fi-sidebar-item-badge-ctn .fi-badge {
+    background-color: var(--sv-surface-sub);
+    color: var(--sv-muted);
+    font-size: 0.62rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    border: 0;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge {
+    background-color: var(--sv-surface);
+    color: var(--sv-accent-ink);
+}
+
+.fi-sidebar-footer {
+    border-top: 1px solid var(--sv-hairline-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Topbar
+   -------------------------------------------------------------------------- */
+
+.fi-topbar > nav {
+    background-color: var(--sv-surface);
+    border-bottom: 1px solid var(--sv-hairline);
+    box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Cards
+   --------------------------------------------------------------------------
+   Hairline border, almost no shadow. The reference separates cards from the
+   page with a border and a change of ground, not with elevation.
+   -------------------------------------------------------------------------- */
+
+.fi-section {
+    background-color: var(--sv-surface);
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius);
+    box-shadow: var(--sv-shadow);
+}
+
+.fi-section-header {
+    padding: 0.85rem 1rem;
+}
+
+.fi-section-header-heading {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--sv-ink);
+}
+
+.fi-section-header-description {
+    font-size: 0.75rem;
+    color: var(--sv-muted);
+}
+
+.fi-section-content {
+    padding: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Stat tiles
+   --------------------------------------------------------------------------
+   Tiny uppercase label, one large tight number, a coloured sub-line, and the
+   sparkline Filament already renders from Stat::chart() bled to the card
+   edges. The bleed is what makes it read as a chart belonging to the tile
+   rather than a graphic sitting inside it.
+   -------------------------------------------------------------------------- */
+
+.fi-wi-stats-overview-stat {
+    background-color: var(--sv-surface);
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius);
+    box-shadow: var(--sv-shadow);
+    padding: 0.85rem 0.95rem 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.fi-wi-stats-overview-stat-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sv-muted);
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--sv-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.fi-wi-stats-overview-stat-description {
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/*
+   Cancel the tile's bottom padding and pull the chart out to the card edges.
+   The negative inline margin has to match the tile's inline padding above.
+*/
+.fi-wi-stats-overview-stat-chart {
+    margin: 0.55rem -0.95rem 0;
+    width: calc(100% + 1.9rem);
+    display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+
+.fi-ta-ctn {
+    background-color: var(--sv-surface);
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius);
+    box-shadow: var(--sv-shadow);
+}
+
+/* Column headings become labels, matching the stat tiles. */
+.fi-ta-header-cell {
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--sv-muted);
+    background-color: var(--sv-surface);
+    border-bottom: 1px solid var(--sv-hairline);
+    white-space: nowrap;
+}
+
+.fi-ta-cell {
+    border-bottom: 1px solid var(--sv-hairline-soft);
+    font-size: 0.8rem;
+}
+
+.fi-ta-row:hover .fi-ta-cell {
+    background-color: var(--sv-surface-sub);
+}
+
+/* Any column of figures lines up. */
+.fi-ta-text-item-label {
+    font-variant-numeric: tabular-nums;
+}
+
+.fi-ta-header {
+    border-bottom: 1px solid var(--sv-hairline-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Inputs
+   --------------------------------------------------------------------------
+   Hairline box, small radius, and an accent ring on focus. Quiet until
+   touched.
+   -------------------------------------------------------------------------- */
+
+.fi-input-wrp {
+    background-color: var(--sv-surface);
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius-sm);
+    box-shadow: none;
+}
+
+.fi-input-wrp:focus-within {
+    border-color: var(--sv-accent);
+    box-shadow: 0 0 0 3px var(--sv-accent-soft);
+}
+
+.fi-fo-field-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--sv-ink-soft);
+}
+
+/* --------------------------------------------------------------------------
+   Buttons and badges
+   -------------------------------------------------------------------------- */
+
+.fi-btn {
+    border-radius: var(--sv-radius-sm);
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.fi-badge {
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 650;
+}
+
+/* --------------------------------------------------------------------------
+   Motion
+   -------------------------------------------------------------------------- */
+
+.fi-sidebar-item-btn,
+.fi-btn,
+.fi-input-wrp {
+    transition: background-color 120ms ease, color 120ms ease,
+        border-color 120ms ease, box-shadow 120ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-sidebar-item-btn,
+    .fi-btn,
+    .fi-input-wrp {
+        transition: none;
+    }
+}

@@ -37,6 +37,44 @@ class MpesaTransactionResource extends Resource
         return Auth::user()?->role()->canViewPayments() ?? false;
     }
 
+    /**
+     * Money that arrived but has not been applied to a document.
+     *
+     * Unmatched and partial receipts are the ones that need a person: the
+     * customer typed the wrong reference, or paid less than the invoice. A
+     * matched receipt needs nobody, so it is not counted here.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $waiting = static::unallocatedCount();
+
+        return $waiting > 0 ? (string) $waiting : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        $waiting = static::unallocatedCount();
+
+        return $waiting > 0
+            ? "{$waiting} receipt(s) have not been applied to an invoice."
+            : null;
+    }
+
+    protected static function unallocatedCount(): int
+    {
+        return MpesaTransaction::query()
+            ->whereIn('allocation_status', [
+                MpesaTransaction::ALLOCATION_UNMATCHED,
+                MpesaTransaction::ALLOCATION_PARTIAL,
+            ])
+            ->count();
+    }
+
     public static function canCreate(): bool
     {
         return false;

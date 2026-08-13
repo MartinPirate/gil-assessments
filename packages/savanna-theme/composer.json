@@ -1,0 +1,25 @@
+{
+    "name": "gil/filament-savanna-theme",
+    "description": "A warm, quiet theme for Filament panels: neutral ground, hairline cards, one accent.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["filament", "theme", "laravel"],
+    "require": {
+        "php": "^8.3",
+        "filament/filament": "^4.0 || ^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Savanna\\Theme\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Savanna\\Theme\\SavannaThemeServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9728d1334cf27476c886b10c29cf816",
+    "content-hash": "bb3cb3a13cfd501744aebdc6a4bf5ae2",
     "packages": [
         {
             "name": "alexkramse/filament-openapi-docs",
@@ -2142,6 +2142,44 @@
                 }
             ],
             "time": "2025-12-03T09:33:47+00:00"
+        },
+        {
+            "name": "gil/filament-savanna-theme",
+            "version": "dev-upgrade/filament5-plugins",
+            "dist": {
+                "type": "path",
+                "url": "packages/savanna-theme",
+                "reference": "b80baddecd69b19a0928a6a756f2ebe1c723f39f"
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Savanna\\Theme\\SavannaThemeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Savanna\\Theme\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "A warm, quiet theme for Filament panels: neutral ground, hairline cards, one accent.",
+            "keywords": [
+                "filament",
+                "laravel",
+                "theme"
+            ],
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "graham-campbell/result-type",
@@ -12642,7 +12680,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "gil/filament-savanna-theme": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
