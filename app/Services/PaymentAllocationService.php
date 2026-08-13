@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStage;
 use App\Models\Invoice;
 use App\Models\MpesaTransaction;
 use App\Models\PaymentAllocation;
@@ -18,6 +19,8 @@ use Illuminate\Validation\ValidationException;
  */
 class PaymentAllocationService
 {
+    public function __construct(protected OrderLifecycleService $lifecycle) {}
+
     /**
      * Try to settle a receipt against the invoice named in BillRefNumber.
      *
@@ -192,6 +195,26 @@ class PaymentAllocationService
             'balance_due' => $balance,
             'status' => $this->statusAfterPayment($invoice, $balance),
         ]);
+
+        /*
+         * Settled in full — the order has reached "paid".
+         *
+         * Recorded here rather than in allocate() because this is the one place
+         * that knows the balance actually reached zero, and it is also reached
+         * by unallocate(): a receipt taken back off a document leaves a balance
+         * again, and the stage is simply not recorded.
+         *
+         * There is no user in a Safaricom callback, so the causer is left to
+         * resolve to whoever is authenticated, which is nobody.
+         */
+        if ($balance <= 0) {
+            $this->lifecycle->record(
+                $invoice,
+                OrderStage::Paid,
+                note: 'Settled in full — KES '.number_format($applied, 2).' applied.',
+                meta: ['applied_amount' => round($applied, 3)],
+            );
+        }
     }
 
     /**

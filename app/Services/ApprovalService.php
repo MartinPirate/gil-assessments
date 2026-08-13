@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStage;
 use App\Models\ApprovalRequest;
 use App\Models\Invoice;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Illuminate\Validation\ValidationException;
  */
 class ApprovalService
 {
+    public function __construct(protected OrderLifecycleService $lifecycle) {}
+
     /**
      * Open a request if the document breached the threshold.
      *
@@ -110,6 +113,18 @@ class ApprovalService
                     ? ($invoice->balance_due > 0 ? Invoice::STATUS_OPEN : Invoice::STATUS_CLOSED)
                     : Invoice::STATUS_REJECTED,
             ]);
+
+            // A rejection ends the order rather than advancing it, so the two
+            // decisions map to different stages.
+            $this->lifecycle->record(
+                $invoice,
+                $status === ApprovalRequest::STATUS_APPROVED ? OrderStage::Approved : OrderStage::Cancelled,
+                $locked->decided_at,
+                $decider,
+                $status === ApprovalRequest::STATUS_APPROVED
+                    ? "Approved by {$decider->name}."
+                    : "Rejected by {$decider->name}: {$reason}",
+            );
 
             return $locked->refresh();
         });

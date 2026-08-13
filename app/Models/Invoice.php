@@ -106,6 +106,18 @@ class Invoice extends Model
         return $this->hasMany(PaymentAllocation::class);
     }
 
+    /** The order's lifecycle, oldest milestone first. */
+    public function stageEvents(): HasMany
+    {
+        return $this->hasMany(OrderStageEvent::class)->orderBy('occurred_at')->orderBy('id');
+    }
+
+    /** The trips carrying this order. */
+    public function trips(): HasMany
+    {
+        return $this->hasMany(Trip::class);
+    }
+
     /* ----------------------------------------------------------------- */
 
     public function scopeDrafts(Builder $query): Builder

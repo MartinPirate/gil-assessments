@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStage;
 use App\Models\Driver;
 use App\Models\Route;
 use App\Models\Trip;
@@ -14,7 +15,10 @@ use Illuminate\Validation\ValidationException;
  */
 class TripService
 {
-    public function __construct(protected DocumentNumberService $numbers) {}
+    public function __construct(
+        protected DocumentNumberService $numbers,
+        protected OrderLifecycleService $lifecycle,
+    ) {}
 
     public const TRIP_SERIES = 'TRIP';
 
@@ -110,7 +114,52 @@ class TripService
 
             $locked->update($attributes + ['status' => $to]);
 
+            $this->recordOrderStage($locked, $to);
+
             return $locked->refresh();
         });
+    }
+
+    /**
+     * Carry a trip's movement onto the order it is carrying.
+     *
+     * Done here, in the one method every status change passes through, so
+     * departing from the gate screen, the trip resource and the driver's phone
+     * all record the same thing.
+     *
+     * A cancelled trip records nothing: the goods have not moved, and the order
+     * itself is not cancelled just because this vehicle will not carry it.
+     */
+    protected function recordOrderStage(Trip $trip, string $status): void
+    {
+        if ($trip->invoice_id === null) {
+            return;
+        }
+
+        $stage = match ($status) {
+            Trip::STATUS_IN_TRANSIT => OrderStage::Dispatched,
+            Trip::STATUS_COMPLETED => OrderStage::Delivered,
+            default => null,
+        };
+
+        if ($stage === null) {
+            return;
+        }
+
+        $invoice = $trip->invoice;
+
+        if ($invoice === null) {
+            return;
+        }
+
+        $this->lifecycle->record(
+            $invoice,
+            $stage,
+            $stage === OrderStage::Dispatched ? $trip->departed_at : $trip->arrived_at,
+            note: $stage === OrderStage::Dispatched
+                ? "Trip {$trip->reference} departed on {$trip->route_name} ({$trip->vehicle_number})."
+                : "Trip {$trip->reference} arrived. Driver: {$trip->driver_name}.",
+            meta: ['trip_id' => $trip->getKey(), 'trip_reference' => $trip->reference],
+        );
     }
 }

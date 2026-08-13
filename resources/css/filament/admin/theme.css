@@ -1096,3 +1096,124 @@
     text-align: right;
     padding-right: 0.5rem;
 }
+
+/* --------------------------------------------------------------------------
+   Order lifecycle track
+   --------------------------------------------------------------------------
+   Placed -> Paid -> Dispatched -> Delivered -> Rated, drawn as a rail with the
+   reached steps filled in. The connecting line is a pseudo-element on each
+   step rather than a background on the container, so it survives wrapping on a
+   narrow screen instead of running through empty space.
+   -------------------------------------------------------------------------- */
+
+.order-track {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 0.5rem 0;
+    margin: 0.25rem 0 1.25rem;
+}
+
+.order-track__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 0.35rem;
+}
+
+/* The rail, drawn to the left of every step but the first. */
+.order-track__step::before {
+    content: '';
+    position: absolute;
+    top: 0.95rem;
+    right: 50%;
+    left: -50%;
+    height: 2px;
+    background: var(--sap-border-soft);
+}
+
+.order-track__step:first-child::before {
+    display: none;
+}
+
+.order-track__step--done::before {
+    background: #16a34a;
+}
+
+.order-track__marker {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    border: 2px solid var(--sap-border-soft);
+    background: #fff;
+    color: #94a3b8;
+}
+
+.order-track__icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.order-track__step--done .order-track__marker {
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #fff;
+}
+
+.order-track__step--next .order-track__marker {
+    border-color: var(--sap-accent);
+    color: var(--sap-accent);
+    /* A soft halo marks where the order is actually waiting. */
+    box-shadow: 0 0 0 3px rgb(217 119 6 / 0.15);
+}
+
+.order-track__body {
+    margin-top: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.order-track__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--sap-text);
+}
+
+.order-track__step--todo .order-track__label {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.order-track__time {
+    font-size: 0.68rem;
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+}
+
+.order-track__step--next .order-track__time {
+    color: var(--sap-accent);
+    font-weight: 600;
+}
+
+.order-track__cancelled {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0 0 1rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid #fecaca;
+    border-left: 3px solid var(--sap-danger);
+    border-radius: 2px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 0.78rem;
+    font-weight: 600;
+}

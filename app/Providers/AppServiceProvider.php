@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Support\Timeline\OrderStageSource;
 use Illuminate\Cache\RateLimiting\Limit;
+use LaBoiteACode\FilamentActivityTimeline\ActivityTimeline;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -20,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
         $this->configureGates();
+
+        // The order lifecycle, available to any timeline as ->source('order').
+        ActivityTimeline::registerSource('order', fn (): OrderStageSource => new OrderStageSource());
     }
 
     /**

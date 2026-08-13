@@ -18,7 +18,7 @@ class Trip extends Model
     public const STATUS_CANCELLED = 'Cancelled';
 
     protected $fillable = [
-        'reference', 'route_id', 'vehicle_id', 'driver_id',
+        'reference', 'invoice_id', 'route_id', 'vehicle_id', 'driver_id',
         'route_name', 'vehicle_number', 'driver_name',
         'scheduled_at', 'departed_at', 'arrived_at',
         'status', 'cargo_description', 'notes', 'created_by',
@@ -31,6 +31,12 @@ class Trip extends Model
             'departed_at' => 'datetime',
             'arrived_at' => 'datetime',
         ];
+    }
+
+    /** The order this trip is carrying, when it is carrying one. */
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function route(): BelongsTo

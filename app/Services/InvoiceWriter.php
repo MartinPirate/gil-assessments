@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStage;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
 use App\Models\Item;
 use App\Models\SalesEmployee;
+use App\Models\User;
 use App\Models\VatCode;
 use App\Support\InvoiceCalculator;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +26,7 @@ class InvoiceWriter
     public function __construct(
         protected DocumentNumberService $numbers,
         protected ApprovalService $approvals,
+        protected OrderLifecycleService $lifecycle,
     ) {}
 
     /**
@@ -115,6 +118,21 @@ class InvoiceWriter
             // Opened inside the same transaction: a document is never committed
             // as "Pending Approval" without a matching queue entry.
             $this->approvals->requestIfNeeded($invoice, $userId);
+
+            /*
+             * A draft is not an order yet — it carries no balance and may never
+             * be posted — so the lifecycle starts only once the document is
+             * real.
+             */
+            if (! $asDraft) {
+                $this->lifecycle->record(
+                    $invoice,
+                    OrderStage::Placed,
+                    $invoice->created_at,
+                    User::find($userId),
+                    "Invoice {$invoice->document_number} raised.",
+                );
+            }
 
             return $invoice;
         });
