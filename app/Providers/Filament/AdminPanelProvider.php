@@ -20,7 +20,6 @@ use Filament\Launchpad\LaunchpadPlugin;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Enums\Width;
-use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Gsferro\FilamentOdometerEasy\FilamentOdometerEasyPlugin;
 use Hammadzafar05\FilamentMobilePreset\FilamentMobilePresetPlugin;
@@ -62,6 +61,13 @@ class AdminPanelProvider extends PanelProvider
              * of the page with nothing above the page title.
              */
             ->topbar(false)
+            /*
+             * No breadcrumb strip above the page title. The reference opens
+             * each screen with the title itself, and in a panel this shallow a
+             * breadcrumb only ever repeats the navigation item already
+             * highlighted in the sidebar.
+             */
+            ->breadcrumbs(false)
             ->globalSearch(position: GlobalSearchPosition::Sidebar)
             ->userMenu(position: UserMenuPosition::Sidebar)
             // The sample document is a light desktop client. Honouring the OS
@@ -76,8 +82,12 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            /*
+             * No account widget: the signed-in user sits at the foot of the
+             * sidebar now, so a "Welcome, <name>" card on the dashboard only
+             * repeats it and pushes the real numbers down the page.
+             */
             ->widgets([
-                AccountWidget::class,
                 \App\Filament\Widgets\OperationsOverview::class,
             ])
             // Database notifications back the Notification Center below, and

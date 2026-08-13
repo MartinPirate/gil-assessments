@@ -23,6 +23,21 @@ class OperationsOverview extends StatsOverviewWidget
 {
     protected ?string $pollingInterval = '60s';
 
+    // The stat band reads first, above the charts and the worklist.
+    protected static ?int $sort = 1;
+
+    /*
+     * The stat row spans the full dashboard grid so the tiles sit four across
+     * as one band, rather than inheriting the page's column count and wrapping
+     * three-and-two.
+     */
+    protected int | string | array $columnSpan = 'full';
+
+    protected function getColumns(): int
+    {
+        return 4;
+    }
+
     protected function getStats(): array
     {
         $role = Auth::user()?->role();

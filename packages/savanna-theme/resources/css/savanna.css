@@ -45,8 +45,15 @@
     --sv-warn: #b45309;
     --sv-bad: #be2617;
 
+    /* The ground the whole panel card floats on. */
+    --sv-shell: #f1eeea;
+
     --sv-radius: 10px;
+    --sv-radius-lg: 14px;
     --sv-radius-sm: 6px;
+
+    /* How far the panel card is inset from the window edge. */
+    --sv-inset: 0.6rem;
     --sv-shadow: 0 1px 2px rgb(28 27 25 / 0.05);
 
     --sv-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
@@ -78,6 +85,7 @@
     --sv-bad: #f08076;
 
     --sv-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+    --sv-shell: #100f0b;
 }
 
 /* --------------------------------------------------------------------------
@@ -85,33 +93,50 @@
    -------------------------------------------------------------------------- */
 
 /*
-   The sidebar is the tinted column and the content area is white — not the
-   other way round. Getting this backwards is what makes a light panel read as
-   "grey app with a white menu" instead of "white page with a quiet rail".
+   The panel floats as a rounded card on a soft shell, rather than running
+   edge to edge. The sidebar is the tinted column and the content area is
+   white — not the other way round. Getting that backwards is what makes a
+   light panel read as "grey app with a white menu" instead of "white page
+   with a quiet rail".
 */
 .fi-body {
-    background-color: var(--sv-surface);
+    background-color: var(--sv-shell);
     color: var(--sv-ink);
     font-family: var(--sv-font);
+    font-size: 0.8125rem;
     -webkit-font-smoothing: antialiased;
 }
 
+/*
+   The content pane, inset from the shell on every side so the rounded corners
+   read. Filament offsets this by the sidebar width, so the inset is added on
+   top of that rather than replacing it.
+*/
+.fi-main-ctn {
+    margin: var(--sv-inset) var(--sv-inset) var(--sv-inset) 0;
+    background-color: var(--sv-surface);
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius-lg);
+    min-height: calc(100dvh - (var(--sv-inset) * 2));
+    overflow: hidden;
+}
+
 .fi-main {
-    /* Content starts at the top of the page: there is no topbar above it. */
-    padding-inline: 1.75rem;
-    padding-block: 1.5rem;
+    /* Content starts at the top of the pane: there is no topbar above it. */
+    padding-inline: 1.5rem;
+    padding-block: 1.25rem;
 }
 
 /* Page title: modest, not a banner. It is the first thing on the page. */
 .fi-header-heading {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 650;
     letter-spacing: -0.01em;
     color: var(--sv-ink);
 }
 
 .fi-header-subheading {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: var(--sv-muted);
 }
 
@@ -123,9 +148,20 @@
    item rather than a hard bar.
    -------------------------------------------------------------------------- */
 
+/*
+   Filament fixes the sidebar to the viewport at full height. Insetting it and
+   rounding the corners is what turns the rail into a floating panel rather
+   than a strip welded to the window edge — but the height has to lose both
+   insets or it overflows the bottom of the screen.
+*/
 .fi-sidebar {
+    inset-block: var(--sv-inset);
+    inset-inline-start: var(--sv-inset);
+    height: calc(100dvh - (var(--sv-inset) * 2));
     background-color: var(--sv-ground);
-    border-right: 1px solid var(--sv-hairline);
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius-lg);
+    overflow: hidden;
 }
 
 /* The brand sits on the same ground as the rail, with no dividing rule. */
@@ -196,7 +232,7 @@
     border-radius: var(--sv-radius-sm);
     padding: 0.3rem 0.5rem;
     margin-block: 1px;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.3;
     color: var(--sv-ink-soft);
@@ -319,7 +355,13 @@
    page with a border and a change of ground, not with elevation.
    -------------------------------------------------------------------------- */
 
-.fi-section {
+/*
+   Filament flags a section that is a layout wrapper rather than a card with
+   `fi-section-not-contained` — the dashboard's widget grid is one. Painting
+   those as cards draws a box around a row of tiles that are already cards, so
+   the modifier has to be excluded rather than assumed away.
+*/
+.fi-section:not(.fi-section-not-contained) {
     background-color: var(--sv-surface);
     border: 1px solid var(--sv-hairline);
     border-radius: var(--sv-radius);
@@ -331,7 +373,7 @@
 }
 
 .fi-section-header-heading {
-    font-size: 0.875rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--sv-ink);
 }
@@ -373,7 +415,7 @@
 }
 
 .fi-wi-stats-overview-stat-value {
-    font-size: 1.55rem;
+    font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
@@ -435,7 +477,7 @@
 
 .fi-ta-cell {
     border-bottom: 1px solid var(--sv-hairline-soft);
-    font-size: 0.8rem;
+    font-size: 0.76rem;
 }
 
 .fi-ta-row:hover .fi-ta-cell {
@@ -483,7 +525,7 @@
 .fi-btn {
     border-radius: var(--sv-radius-sm);
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
 }
 
 .fi-badge {

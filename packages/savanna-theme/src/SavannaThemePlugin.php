@@ -31,7 +31,18 @@ class SavannaThemePlugin implements Plugin
 
     protected string $accent = self::ACCENT;
 
-    protected string $sidebarWidth = '15rem';
+    /**
+     * 270px. Wide enough that a two-word navigation label and its count badge
+     * sit on one line without the label truncating, which is what forces the
+     * rail wider than Filament's default in the first place.
+     */
+    protected string $sidebarWidth = '17rem';
+
+    /**
+     * Figtree — a humanist sans with a tall x-height, which is what keeps
+     * 12px navigation labels legible at this density.
+     */
+    protected ?string $font = 'Figtree';
 
     public static function make(): static
     {
@@ -58,11 +69,23 @@ class SavannaThemePlugin implements Plugin
         return $this;
     }
 
+    /** Pass null to keep the host panel's own typeface. */
+    public function font(?string $family): static
+    {
+        $this->font = $family;
+
+        return $this;
+    }
+
     public function register(Panel $panel): void
     {
         $panel
             ->colors(['primary' => Color::hex($this->accent)])
             ->sidebarWidth($this->sidebarWidth);
+
+        if ($this->font !== null) {
+            $panel->font($this->font);
+        }
     }
 
     public function boot(Panel $panel): void
