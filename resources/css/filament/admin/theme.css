@@ -1365,3 +1365,202 @@
     color: var(--sv-muted);
     max-width: 70ch;
 }
+
+/* ==========================================================================
+   Vehicle detail page
+   ========================================================================== */
+
+.veh-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    gap: 1.25rem 1.75rem;
+    align-items: center;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius);
+    /* A warm wash so the plate reads as a header rather than another card. */
+    background:
+        radial-gradient(120% 140% at 0% 0%, var(--sv-accent-soft) 0%, transparent 60%),
+        var(--sv-surface);
+}
+
+.veh-hero__art svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.veh-hero__shadow { fill: rgb(28 27 25 / 0.07); }
+.veh-hero__body   { fill: var(--sv-surface-sub); stroke: var(--sv-hairline); stroke-width: 1.5; }
+.veh-hero__panel  { fill: #fff; stroke: var(--sv-hairline); stroke-width: 1.2; }
+.veh-hero__cab    { fill: var(--sv-accent); }
+.veh-hero__glass  { fill: #fff; opacity: 0.85; }
+.veh-hero__tyre   { fill: #2b2925; }
+.veh-hero__hub    { fill: var(--sv-surface-sub); }
+
+.veh-hero__id { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
+
+.veh-hero__plate {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--sv-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.veh-hero__meta { font-size: 0.8rem; color: var(--sv-muted); }
+.veh-hero__dot  { margin-inline: 0.35rem; }
+
+.veh-hero__badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.15rem; }
+
+.veh-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 650;
+}
+
+.veh-badge--in      { background: #e9f6ed; color: var(--sv-good); }
+.veh-badge--out     { background: var(--sv-surface-sub); color: var(--sv-muted); }
+.veh-badge--retired { background: #fdecea; color: var(--sv-bad); }
+
+.veh-hero__stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--sv-hairline-soft);
+}
+
+.veh-stat { display: flex; flex-direction: column; gap: 0.05rem; }
+
+.veh-stat dt {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sv-muted);
+}
+
+.veh-stat dd {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--sv-ink);
+}
+
+.veh-stat__unit { font-size: 0.75rem; font-weight: 600; color: var(--sv-muted); margin-left: 0.15rem; }
+.veh-stat__sub  { font-size: 0.68rem; color: var(--sv-muted); }
+
+/* --- people ---------------------------------------------------------- */
+
+.veh-people, .veh-routes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+.veh-person {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--sv-hairline-soft);
+}
+
+.veh-person:last-child, .veh-route:last-child { border-bottom: 0; }
+
+.veh-person__avatar {
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: var(--sv-ink);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.veh-person__body { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.veh-person__name { font-size: 0.8rem; font-weight: 600; color: var(--sv-ink); }
+.veh-person__meta { font-size: 0.68rem; color: var(--sv-muted); }
+
+.veh-person__count {
+    text-align: right;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--sv-ink-soft);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.veh-person__last { display: block; font-size: 0.66rem; font-weight: 500; color: var(--sv-muted); }
+
+/* --- routes ---------------------------------------------------------- */
+
+.veh-route {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--sv-hairline-soft);
+}
+
+.veh-route__head { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
+.veh-route__name { font-size: 0.8rem; font-weight: 600; color: var(--sv-ink); }
+
+.veh-route__runs {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--sv-accent-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.veh-route__bar {
+    display: block;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--sv-surface-sub);
+    overflow: hidden;
+}
+
+.veh-route__fill { display: block; height: 100%; border-radius: 999px; background: var(--sv-accent); }
+.veh-route__meta { font-size: 0.68rem; color: var(--sv-muted); }
+
+/* --- gate history ---------------------------------------------------- */
+
+.veh-gate { overflow-x: auto; }
+.veh-gate__table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+
+.veh-gate__table th {
+    text-align: left;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--sv-muted);
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--sv-hairline);
+    white-space: nowrap;
+}
+
+.veh-gate__table td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--sv-hairline-soft);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.veh-gate__table tr:last-child td { border-bottom: 0; }
+.veh-gate__now { color: var(--sv-good); font-weight: 650; }
+
+.veh-empty { font-size: 0.78rem; color: var(--sv-muted); margin: 0.25rem 0; }
+
+@media (max-width: 640px) {
+    .veh-hero { grid-template-columns: 1fr; }
+}

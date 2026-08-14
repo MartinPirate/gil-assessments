@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Vehicles;
 use App\Filament\Resources\Vehicles\Pages\CreateVehicle;
 use App\Filament\Resources\Vehicles\Pages\EditVehicle;
 use App\Filament\Resources\Vehicles\Pages\ListVehicles;
+use App\Filament\Resources\Vehicles\Pages\ViewVehicle;
 use App\Filament\Resources\Vehicles\Schemas\VehicleForm;
 use App\Filament\Resources\Vehicles\Tables\VehiclesTable;
 use App\Models\Vehicle;
@@ -52,6 +53,7 @@ class VehicleResource extends Resource
     {
         return [
             'index' => ListVehicles::route('/'),
+            'view' => ViewVehicle::route('/{record}'),
             'create' => CreateVehicle::route('/create'),
             'edit' => EditVehicle::route('/{record}/edit'),
         ];
