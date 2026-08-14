@@ -83,4 +83,40 @@ class UserDetailTest extends TestCase
 
         $this->get(UserResource::getUrl('view', ['record' => $subject]))->assertForbidden();
     }
+
+    /**
+     * A null approval limit means unlimited, per User::canApproveAmount().
+     * Rendering it as "KES 0.00" said the opposite, so the two spellings are
+     * pinned here against the behaviour they describe.
+     */
+    public function test_an_unlimited_approver_is_not_shown_as_a_zero_ceiling(): void
+    {
+        $subject = User::factory()->role(UserRole::Approver)->create(['approval_limit' => null]);
+
+        $this->assertTrue($subject->canApproveAmount(999_999_999));
+
+        $this->actingAs(User::factory()->role(UserRole::Admin)->create());
+
+        $this->get(UserResource::getUrl('view', ['record' => $subject]))
+            ->assertSuccessful()
+            ->assertSee('No approval limit')
+            // "KES 0.00" on its own is legitimate elsewhere on the page - an
+            // account that has raised no invoices. The regression is the old
+            // approval wording specifically.
+            ->assertDontSee('Limit KES 0.00');
+    }
+
+    public function test_a_capped_approver_shows_their_ceiling(): void
+    {
+        $subject = User::factory()->role(UserRole::Approver)->create(['approval_limit' => 50000]);
+
+        $this->assertTrue($subject->canApproveAmount(50000));
+        $this->assertFalse($subject->canApproveAmount(50001));
+
+        $this->actingAs(User::factory()->role(UserRole::Admin)->create());
+
+        $this->get(UserResource::getUrl('view', ['record' => $subject]))
+            ->assertSuccessful()
+            ->assertSee('Up to KES 50,000.00');
+    }
 }

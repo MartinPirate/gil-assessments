@@ -1928,3 +1928,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Header rows to the sample's ~15px: the select control carries its own
+   min-height that the generic input rule above does not reach. */
+.sap-header .fi-fo-field,
+.sap-header .fi-fo-field-content-col,
+.sap-header .fi-fo-field-label-col { min-height: 0; }
+
+.sap-header .fi-input-wrp,
+.sap-header .fi-fo-select-wrp .fi-input-wrp { min-height: 1.05rem; }
+
+.sap-header .fi-select-input-btn,
+.sap-header .fi-input {
+    min-height: 0.95rem;
+    padding-block: 0;
+    font-size: 0.71rem;
+    line-height: 1.1;
+}
+
+/* The suffix action (the orange drill arrow) was setting the row height. */
+.sap-header .fi-input-wrp .fi-icon-btn { padding: 0; min-height: 0; }
+.sap-header .fi-input-wrp .fi-icon-btn .fi-icon { width: 0.8rem; height: 0.8rem; }

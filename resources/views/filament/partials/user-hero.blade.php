@@ -46,10 +46,16 @@
             <dt>Approvals decided</dt>
             <dd>{{ number_format($s['decisions']) }}</dd>
             <span class="usr-stat__sub">
-                @if ($role->canApprove())
-                    Limit KES {{ number_format((float) ($user->approval_limit ?? 0), 2) }}
-                @else
+                @if (! $role->canApprove())
                     Not an approver
+                @elseif ($user->approval_limit === null)
+                    {{-- A null limit means unlimited, per canApproveAmount().
+                         Coalescing it to 0 printed "Limit KES 0.00", which
+                         reads as "may approve nothing" — the exact opposite of
+                         what the account can actually do. --}}
+                    No approval limit
+                @else
+                    Up to KES {{ number_format((float) $user->approval_limit, 2) }}
                 @endif
             </span>
         </div>

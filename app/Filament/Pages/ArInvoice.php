@@ -173,7 +173,7 @@ class ArInvoice extends Page implements HasForms
                     Grid::make(1)->schema([
                         Select::make('customer_id')
                             ->label('Customer')
-                            ->placeholder('Type to search a customer code…')
+                            ->placeholder('Search code')
                             ->searchable()
                             ->required()
                             ->getSearchResultsUsing(fn (string $search) => ChooseFromListRegistry::search('customers_by_code', $search))
@@ -184,7 +184,7 @@ class ArInvoice extends Page implements HasForms
 
                         Select::make('customer_name_lookup')
                             ->label('Name')
-                            ->placeholder('Type to search a customer name…')
+                            ->placeholder('Search name')
                             ->searchable()
                             ->dehydrated(false)
                             ->getSearchResultsUsing(fn (string $search) => ChooseFromListRegistry::search('customers_by_name', $search))
@@ -202,7 +202,7 @@ class ArInvoice extends Page implements HasForms
                             ->label('Customer Name')
                             ->maxLength(150)
                             ->live(onBlur: true)
-                            ->extraAttributes(['class' => 'sap-field--emphasis']),
+                            ->extraFieldWrapperAttributes(['class' => 'sap-field--emphasis']),
 
                         TextInput::make('currency')->label('BP Currency')->disabled()->dehydrated(false),
 
@@ -210,7 +210,7 @@ class ArInvoice extends Page implements HasForms
                             ->label('KRA PIN')
                             ->disabled()
                             ->dehydrated(false)
-                            ->extraAttributes(['class' => 'sap-field--emphasis']),
+                            ->extraFieldWrapperAttributes(['class' => 'sap-field--emphasis']),
                     ]),
 
                     // Right: document numbering and dates
