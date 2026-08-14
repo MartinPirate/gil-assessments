@@ -161,6 +161,40 @@
    insets or it overflows the bottom of the screen.
 */
 /*
+   Collapsed rail: everything hugs the right-hand edge.
+
+   Filament toggles the collapse in Alpine and leaves no stable class behind to
+   hook, so the rail is asked about its own width instead. Below the threshold
+   only icons remain, and pushing them to the edge nearest the content keeps
+   them beside the pane they open rather than floating in the middle of a
+   column of whitespace.
+*/
+/*
+   The query container is the nav list, never the rail itself: `container-type:
+   inline-size` applies inline-size containment, so putting it on .fi-sidebar
+   made the rail independent of its contents and it collapsed to 2px. The nav
+   takes its width from the rail, so containing it there is inert.
+*/
+.fi-sidebar-nav {
+    container-type: inline-size;
+    container-name: rail;
+}
+
+@container rail (max-width: 7rem) {
+    .fi-sidebar-item-btn,
+    .fi-sidebar-group-btn {
+        justify-content: flex-end;
+    }
+
+    /* The active bar would sit under the icon once the row is right-aligned. */
+    .fi-sidebar-item.fi-active > .fi-sidebar-item-btn::before {
+        left: auto;
+        right: -0.5rem;
+        border-radius: 2px 0 0 2px;
+    }
+}
+
+/*
    Inset with margins, not with `inset-*`.
    
    Filament lays this rail out as `position: sticky`, and on a sticky element
