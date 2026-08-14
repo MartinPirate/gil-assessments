@@ -1735,3 +1735,196 @@
 .usr-activity__when { flex: none; font-size: 0.68rem; color: var(--sv-muted); }
 
 .usr-empty { font-size: 0.78rem; color: var(--sv-muted); margin: 0.25rem 0; }
+
+/* ==========================================================================
+   A/R Invoice — fidelity pass against the supplied screenshot
+   --------------------------------------------------------------------------
+   Everything here is scoped to .sap-page and loads last, so it overrides both
+   Filament and the Savanna chrome without touching either.
+   ========================================================================== */
+
+/* The panel chrome puts a page heading above the document; the client has only
+   the window's own title bar, so the outer heading is redundant. */
+.sap-page > .fi-header { display: none; }
+
+/* The client draws a thin gold rule around the whole window. */
+.sap-form {
+    border: 1px solid #c8a95a;
+    border-radius: 0;
+    box-shadow: 0 0 0 1px #fff inset;
+}
+
+.sap-titlebar {
+    background: linear-gradient(180deg, #3d6485 0%, #31546f 100%);
+    padding: 0.2rem 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   Header density
+   --------------------------------------------------------------------------
+   The sample fits six caption/field rows in ~80px. Captions are ~11px, the
+   boxes ~17px tall, and the field does NOT stretch to the column — it is a
+   fixed ~150px box with the rest of the row left empty.
+   -------------------------------------------------------------------------- */
+
+.sap-header .fi-fo-field,
+.sap-footer .fi-fo-field {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    column-gap: 0.35rem;
+    margin-bottom: 0;
+}
+
+.sap-page .fi-fo-field-label-ctn label,
+.sap-page .fi-fo-field-label-ctn {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #1b2733;
+}
+
+.sap-page .fi-input-wrp,
+.sap-page .fi-fo-select-wrp .fi-input-wrp {
+    min-height: 1.15rem;
+    border-radius: 0;
+    border-color: #7f9db9;
+}
+
+.sap-page .fi-input,
+.sap-page .fi-select-input,
+.sap-page .fi-select-input-btn {
+    min-height: 1.05rem;
+    font-size: 0.72rem;
+    padding-block: 0;
+    padding-inline: 0.25rem;
+    line-height: 1.15;
+}
+
+/* Header inputs are fixed-width boxes, not full-bleed fields. */
+.sap-header .fi-fo-field-content-col { max-width: 10.5rem; }
+
+/* The document bolds this one caption. */
+.sap-field--emphasis .fi-fo-field-label-ctn,
+.sap-field--emphasis .fi-fo-field-label-ctn label { font-weight: 700; }
+
+/* --------------------------------------------------------------------------
+   Tab strip — one row spanning the full width, tabs sharing it equally
+   -------------------------------------------------------------------------- */
+
+.sap-contents .fi-tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    background: transparent;
+    border: 0;
+    gap: 0;
+}
+
+.sap-contents .fi-tabs-item {
+    justify-content: center;
+    border: 1px solid var(--sap-border);
+    border-bottom: 1px solid var(--sap-border);
+    background: linear-gradient(180deg, #f7fafd 0%, #dbe4ee 100%);
+    font-size: 0.72rem;
+    font-weight: 400;
+    padding: 0.25rem 0.5rem;
+    color: #1b2733;
+    margin: 0;
+}
+
+.sap-contents .fi-tabs-item + .fi-tabs-item { border-left: 0; }
+
+.sap-contents .fi-tabs-item.fi-active,
+.sap-contents .fi-tabs-item[aria-selected='true'] {
+    background: #fff;
+    border-bottom-color: #fff;
+    font-weight: 400;
+    box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Line grid
+   -------------------------------------------------------------------------- */
+
+.sap-contents thead th {
+    background: linear-gradient(180deg, #f7fafd 0%, #dbe4ee 100%);
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #1b2733;
+    padding: 0.15rem 0.3rem;
+    border-right: 1px solid #a8bdd0;
+}
+
+.sap-contents tbody td {
+    padding: 0 0.2rem;
+    height: 1.05rem;
+    border-right: 1px solid #d6dee7;
+}
+
+.sap-contents tbody tr { height: 1.05rem; background: #fff; }
+
+/* The client shades the derived columns rather than alternating rows. */
+.sap-contents tbody td:nth-child(6),
+.sap-contents tbody td:nth-child(12),
+.sap-contents tbody td:nth-child(14) { background: #dce6f1; }
+
+.sap-contents tbody .fi-input-wrp { min-height: 0.95rem; border: 0; background: transparent; }
+.sap-contents tbody .fi-input { min-height: 0.9rem; font-size: 0.7rem; padding-block: 0; }
+
+/* Money reads blue in the client — in the grid and in the totals block. */
+.sap-contents tbody .fi-input,
+.sap-totals input { color: #16418a; }
+
+/* The add-row control is chrome the client does not have; rows append as you
+   type into the last one. */
+.sap-contents .fi-fo-table-repeater-add { display: none; }
+
+/* --------------------------------------------------------------------------
+   Totals block
+   -------------------------------------------------------------------------- */
+
+.sap-totals .fi-fo-field { grid-template-columns: minmax(0, 1fr) 9rem; }
+.sap-totals .fi-fo-field-label-ctn { text-align: left; padding-right: 0.35rem; }
+.sap-totals input { text-align: right; font-size: 0.72rem; }
+
+/* --------------------------------------------------------------------------
+   Action bar
+   -------------------------------------------------------------------------- */
+
+.sap-actions {
+    background: transparent;
+    border-top: 0;
+    padding: 0.4rem 0.5rem 0.5rem;
+}
+
+.sap-actions .fi-btn {
+    border-radius: 2px;
+    font-size: 0.72rem;
+    font-weight: 400;
+    min-height: 1.4rem;
+    padding-inline: 0.7rem;
+}
+
+/* The outer page heading is not a direct child of .sap-page, so the earlier
+   child selector never matched it. */
+.sap-page .fi-header { display: none; }
+
+/* Header rows: the sample runs six of them inside ~80px, which means the
+   schema's own row gap has to go, not just the field's margin. */
+.sap-header .fi-sc-has-gap,
+.sap-header .fi-grid.fi-sc,
+.sap-footer .fi-sc-has-gap {
+    gap: 0;
+    row-gap: 0;
+}
+
+.sap-header .fi-fo-field { min-height: 1.25rem; align-items: center; }
+
+/* The two Choose From List fields wrapped their placeholder onto a second
+   line, which doubled the row height. */
+.sap-header .fi-select-input-value-label,
+.sap-header .fi-select-input-btn {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
