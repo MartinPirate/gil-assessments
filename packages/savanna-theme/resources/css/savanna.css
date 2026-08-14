@@ -177,6 +177,25 @@
     overflow: hidden;
 }
 
+/*
+   The collapse toggle sits at the end of the header, not in the middle of it.
+
+   Filament already swaps the glyph by state — a left chevron while the rail is
+   open, a right one once it is collapsed — so only the placement needs saying.
+   Centred in a collapsed rail it reads as a navigation item; pushed to the
+   edge it reads as the affordance that widens the panel.
+*/
+.fi-sidebar-open-collapse-sidebar-btn,
+.fi-sidebar-close-collapse-sidebar-btn {
+    /*
+     * The button is markup-ordered before the brand, so an auto margin alone
+     * leaves it on the left. `order` moves it to the end of the row without
+     * touching the DOM, and the auto margin then takes up the slack.
+     */
+    order: 1;
+    margin-inline-start: auto;
+}
+
 /* The brand sits on the same ground as the rail, with no dividing rule. */
 .fi-sidebar-header {
     background-color: var(--sv-ground);

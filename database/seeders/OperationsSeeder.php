@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\UserRole;
 use App\Models\Driver;
+use App\Models\GateLog;
 use App\Models\Route;
 use App\Models\Trip;
 use App\Models\User;
@@ -86,6 +87,51 @@ class OperationsSeeder extends Seeder
                     ],
                 );
             }
+        }
+
+        $this->gateInVehicles();
+    }
+
+    /**
+     * Put a few vehicles inside the yard.
+     *
+     * "Vehicles on site" is a headline figure on the dashboard and the badge on
+     * the Gate Log, and both read as broken at zero — there is no way to tell a
+     * quiet yard from a feature that never worked. Three trucks in, at
+     * staggered times, also gives the gate-out screen something to release and
+     * the dwell-time column a spread to show.
+     */
+    protected function gateInVehicles(): void
+    {
+        $officer = User::where('email', 'gate@gil.test')->first();
+        $drivers = Driver::orderBy('id')->take(3)->get();
+        $vehicles = Vehicle::orderBy('id')->skip(2)->take(3)->get();
+
+        if ($drivers->count() < 3 || $vehicles->count() < 3) {
+            return;
+        }
+
+        foreach ([0, 1, 2] as $index) {
+            $vehicle = $vehicles[$index];
+            $driver = $drivers[$index];
+
+            GateLog::updateOrCreate(
+                // Keyed on the vehicle being inside, so re-running the seeder
+                // cannot admit the same truck twice — the invariant GateService
+                // enforces at runtime.
+                ['vehicle_id' => $vehicle->getKey(), 'time_out' => null],
+                [
+                    'vehicle_number' => $vehicle->vehicle_number,
+                    'driver_id' => $driver->getKey(),
+                    'driver_name' => $driver->name,
+                    'driver_national_id' => $driver->national_id,
+                    'driver_phone' => $driver->phone,
+                    'time_in' => now()->subHours(($index * 3) + 1),
+                    'status' => GateLog::STATUS_IN,
+                    'gated_in_by' => $officer?->getKey(),
+                    'gate_in_remarks' => 'Collection run',
+                ],
+            );
         }
     }
 }

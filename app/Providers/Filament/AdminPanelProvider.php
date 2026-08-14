@@ -34,7 +34,6 @@ use LaBoiteACode\DependencyGraph\DependencyGraphPlugin;
 use LaBoiteACode\FilamentActivityTimeline\FilamentActivityTimelinePlugin;
 use LaBoiteACode\FilamentLogsExplorer\FilamentLogsExplorerPlugin;
 use Prodstarter\FilamentNotificationCenter\FilamentNotificationCenterPlugin;
-use UniFileManager\FilamentFileManager\FilamentFileManagerPlugin;
 use Wallacemartinss\FilamentOnboarding\FilamentOnboardingPlugin;
 use YousefAman\FilamentAutosave\AutosavePlugin;
 use Zvizvi\FilamentColumnFilters\FilamentColumnFiltersPlugin;
@@ -75,6 +74,23 @@ class AdminPanelProvider extends PanelProvider
             // matching, so this panel is light only.
             ->darkMode(false)
             ->sidebarCollapsibleOnDesktop()
+            /*
+             * Explicit group order, worked outward from the daily job: the
+             * documents people raise, then the money against them, then the
+             * yard, then the fleet. Reference data, tooling and reading matter
+             * sit behind those because they are consulted, not worked.
+             */
+            ->navigationGroups([
+                'Sales',
+                'Payments',
+                'Gate Operations',
+                'Operations',
+                'Administration',
+                'Master Data',
+                'Command Center',
+                'Documentation',
+                'Changelog',
+            ])
             ->brandName('GIL Business Suite')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -137,10 +153,6 @@ class AdminPanelProvider extends PanelProvider
              */
             SavannaThemePlugin::make(),
 
-            // --- Documents and data -----------------------------------------
-            // Receipts and invoice attachments.
-            FilamentFileManagerPlugin::make(),
-
             // --- Working the screens ----------------------------------------
             AutosavePlugin::make(),
             FormSettingsPlugin::make(),
@@ -156,9 +168,11 @@ class AdminPanelProvider extends PanelProvider
 
             // --- Administrator-only system tools ----------------------------
             FilamentLogsExplorerPlugin::make()
+                ->navigationGroup('Documentation')
                 ->canAccessUsing($isAdministrator),
 
             DependencyGraphPlugin::make()
+                ->navigationGroup('Documentation')
                 ->canAccessUsing($isAdministrator),
 
             // Command Center reads its own gates from config/command-center.php;
@@ -171,6 +185,7 @@ class AdminPanelProvider extends PanelProvider
              * write entries.
              */
             ChangelogPlugin::make()
+                ->navigationGroup('Changelog')
                 ->canManage($isAdministrator),
 
             /*
@@ -180,7 +195,7 @@ class AdminPanelProvider extends PanelProvider
              */
             FilamentOpenApiDocsPlugin::make()
                 ->enabledInProduction(false)
-                ->navigationGroup('Administration'),
+                ->navigationGroup('Documentation'),
         ];
     }
 }

@@ -22,28 +22,6 @@ class PluginAccessTest extends TestCase
     /**
      * @return array<string, array{UserRole, bool}>
      */
-    public static function fileManagerMatrix(): array
-    {
-        return [
-            'admin may manage files' => [UserRole::Admin, true],
-            'sales may manage files' => [UserRole::Sales, true],
-            'approver may not' => [UserRole::Approver, false],
-            'gate officer may not' => [UserRole::GateOfficer, false],
-            'driver may not' => [UserRole::Driver, false],
-        ];
-    }
-
-    #[\PHPUnit\Framework\Attributes\DataProvider('fileManagerMatrix')]
-    public function test_only_the_roles_that_raise_documents_may_manage_files(UserRole $role, bool $allowed): void
-    {
-        $user = User::factory()->role($role)->create();
-
-        $this->assertSame($allowed, Gate::forUser($user)->allows('manageFileManager'));
-    }
-
-    /**
-     * @return array<string, array{UserRole, bool}>
-     */
     public static function commandCentreMatrix(): array
     {
         return [
@@ -88,7 +66,6 @@ class PluginAccessTest extends TestCase
         return [
             'logs explorer' => ['admin/logs'],
             'dependency graph' => ['admin/dependency-graph'],
-            'file manager' => ['admin/file-manager'],
             'changelog' => ['admin/changelog'],
             'command centre' => ['admin/command-center/commands'],
         ];
@@ -123,7 +100,6 @@ class PluginAccessTest extends TestCase
         $registered = array_keys(\Filament\Facades\Filament::getPanel('admin')->getPlugins());
 
         foreach ([
-            'filament-file-manager',
             'filament-autosave',
             'formsettings-for-filament',
             'filament-column-filters',

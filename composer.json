@@ -27,7 +27,6 @@
         "prodstarter/filament-notification-center": "^1.0",
         "spatie/laravel-activitylog": "^4.10",
         "ssbityukov/filament-command-center": "^1.0",
-        "unifilemanager/filament-file-manager": "^0.7.9",
         "wallacemartinss/filament-onboarding": "^2.5",
         "yousefaman/filament-autosave": "^1.0",
         "zvizvi/filament-column-filters": "^0.0.6"

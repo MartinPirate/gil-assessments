@@ -80,21 +80,6 @@ class OperationsOverview extends StatsOverviewWidget
                 ->color($onSite > 0 ? 'success' : 'gray');
         }
 
-        if ($role?->canViewPayments()) {
-            $unmatched = MpesaTransaction::query()
-                ->where('callback_type', MpesaTransaction::TYPE_CONFIRMATION)
-                ->where('allocation_status', MpesaTransaction::ALLOCATION_UNMATCHED)
-                ->count();
-
-            $stats[] = Stat::make('Unmatched receipts', (string) $unmatched)
-                ->description($unmatched > 0 ? 'Need manual allocation' : 'All payments applied')
-                ->chart($this->lastSevenDays(
-                    MpesaTransaction::query()->where('callback_type', MpesaTransaction::TYPE_CONFIRMATION),
-                    'created_at',
-                ))
-                ->color($unmatched > 0 ? 'danger' : 'success');
-        }
-
         return $stats;
     }
 

@@ -20,7 +20,7 @@ class GateLogResource extends Resource
 {
     protected static ?string $model = GateLog::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
 
     protected static string|UnitEnum|null $navigationGroup = 'Gate Operations';
 

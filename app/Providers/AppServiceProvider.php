@@ -36,11 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function configureGates(): void
     {
-        // Receipt and invoice attachments. Scoped by config to a private
-        // "file-manager" root, not the whole disk, so the people who raise the
-        // documents can also manage the files that back them.
-        Gate::define('manageFileManager', fn (User $user): bool => $user->role()->canSell());
-
         /*
          * Command Center runs real artisan commands from the browser. That is
          * deploy-level authority, so all three of its abilities stay with the

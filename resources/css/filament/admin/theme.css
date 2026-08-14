@@ -1280,3 +1280,88 @@
 .fi-launchpad-bar-ctn {
     display: none;
 }
+
+/* --------------------------------------------------------------------------
+   Roles and permissions matrix
+   -------------------------------------------------------------------------- */
+
+.roles-matrix {
+    overflow-x: auto;
+    border: 1px solid var(--sv-hairline);
+    border-radius: var(--sv-radius);
+    background: var(--sv-surface);
+}
+
+.roles-matrix__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+}
+
+.roles-matrix__role-head,
+.roles-matrix__cap-head {
+    text-align: left;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--sv-muted);
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--sv-hairline);
+}
+
+/* The capability columns are read as a grid of ticks, so centre them. */
+.roles-matrix__cap-head {
+    text-align: center;
+    /* Long labels would otherwise force the table far wider than the page. */
+    max-width: 7rem;
+    white-space: normal;
+}
+
+.roles-matrix__role {
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--sv-hairline-soft);
+    white-space: nowrap;
+}
+
+.roles-matrix__role-name {
+    display: block;
+    font-weight: 600;
+    color: var(--sv-ink);
+}
+
+.roles-matrix__holders {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--sv-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.roles-matrix__cell {
+    text-align: center;
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--sv-hairline-soft);
+}
+
+.roles-matrix tbody tr:last-child .roles-matrix__role,
+.roles-matrix tbody tr:last-child .roles-matrix__cell {
+    border-bottom: 0;
+}
+
+.roles-matrix__yes {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--sv-good);
+    display: inline-block;
+}
+
+.roles-matrix__no {
+    color: #c9c2b8;
+}
+
+.roles-matrix__note {
+    margin-top: 1rem;
+    font-size: 0.76rem;
+    color: var(--sv-muted);
+    max-width: 70ch;
+}
