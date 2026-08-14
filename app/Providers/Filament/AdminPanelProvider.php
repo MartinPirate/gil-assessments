@@ -31,6 +31,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Savanna\Theme\SavannaThemePlugin;
 use LaBoiteACode\DependencyGraph\DependencyGraphPlugin;
+use lockscreen\FilamentLockscreen\Lockscreen;
 use LaBoiteACode\FilamentActivityTimeline\FilamentActivityTimelinePlugin;
 use LaBoiteACode\FilamentLogsExplorer\FilamentLogsExplorerPlugin;
 use Prodstarter\FilamentNotificationCenter\FilamentNotificationCenterPlugin;
@@ -152,6 +153,24 @@ class AdminPanelProvider extends PanelProvider
              * scoped to `.sap-page` and load after the theme's stylesheet.
              */
             SavannaThemePlugin::make(),
+
+            /*
+             * Lock the screen when a terminal is left alone.
+             *
+             * This matters more here than in an office system: the gate screens
+             * run on a shared terminal at the yard entrance, and whoever is
+             * signed in there can raise invoices and admit vehicles. Fifteen
+             * minutes rather than the default thirty, because that terminal is
+             * unattended between trucks.
+             *
+             * Repeated failures sign the session out rather than sitting on the
+             * lock screen — on a shared machine an abandoned locked session is
+             * the thing being attacked.
+             */
+            Lockscreen::make()
+                ->enablePlugin()
+                ->enableIdleTimeout(seconds: 15 * 60)
+                ->enableRateLimit(limit: 5, decayMinutes: 5, forceLogout: true),
 
             // --- Working the screens ----------------------------------------
             AutosavePlugin::make(),
