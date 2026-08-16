@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Support\AccessControl;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -31,22 +32,55 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => UserRole::Admin,
             'is_active' => true,
             'approval_limit' => null,
         ];
     }
 
     /**
+     * Every user gets a role, and unless a test says otherwise it is the
+     * administrator — the same default the factory had when the role was a
+     * column, so existing tests keep the actor they were written against.
+     *
+     * role() below re-syncs, so a stated role replaces this rather than
+     * stacking on top of it.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            AccessControl::sync();
+
+            if ($user->roles()->count() === 0) {
+                $user->syncRoles([UserRole::Admin->value]);
+                $user->load('roles.permissions');
+            }
+        });
+    }
+
+    /**
      * Role states, so a test can be explicit about what the actor may do
      * rather than relying on the default.
+     *
+     * The role is a Laratrust row, not a column, so it is attached after the
+     * user exists. Provisioning is done here too: a test that builds a user
+     * without seeding the matrix would otherwise get an account holding a role
+     * that grants nothing.
      */
     public function role(UserRole $role, ?float $approvalLimit = null): static
     {
-        return $this->state(fn (array $attributes) => [
-            'role' => $role,
-            'approval_limit' => $approvalLimit,
-        ]);
+        return $this
+            ->state(fn (array $attributes) => ['approval_limit' => $approvalLimit])
+            ->afterCreating(function (User $user) use ($role): void {
+                AccessControl::sync();
+
+                $user->syncRoles([$role->value]);
+                $user->load('roles.permissions');
+            });
+    }
+
+    public function admin(): static
+    {
+        return $this->role(UserRole::Admin);
     }
 
     public function sales(): static
@@ -54,9 +88,9 @@ class UserFactory extends Factory
         return $this->role(UserRole::Sales);
     }
 
-    public function approver(?float $limit = null): static
+    public function manager(?float $limit = null): static
     {
-        return $this->role(UserRole::Approver, $limit);
+        return $this->role(UserRole::Manager, $limit);
     }
 
     public function gateOfficer(): static
