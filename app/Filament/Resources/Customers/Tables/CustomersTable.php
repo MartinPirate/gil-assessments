@@ -19,8 +19,30 @@ class CustomersTable
                     ->searchable(),
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('contact_person')
-                    ->searchable(),
+                TextColumn::make('contactPerson.name')
+                    ->label('Contact Person')
+                    ->searchable()
+                    ->placeholder('—'),
+                TextColumn::make('contactPerson.email')
+                    ->label('Contact Email')
+                    ->searchable()
+                    ->placeholder('—')
+                    ->toggleable(),
+                TextColumn::make('contactPerson.phone')
+                    ->label('Contact Phone')
+                    ->searchable()
+                    ->placeholder('—')
+                    ->toggleable(),
+                TextColumn::make('contactPeople_count')
+                    ->label('Contacts')
+                    ->counts('contactPeople')
+                    ->alignRight()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('city')
+                    ->label('Location')
+                    ->description(fn ($record) => $record->address_line)
+                    ->searchable(['city', 'county', 'address_line'])
+                    ->placeholder('—'),
                 TextColumn::make('currency')
                     ->searchable(),
                 TextColumn::make('kra_pin')

@@ -13,12 +13,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
 
@@ -28,7 +30,7 @@ class CustomerResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canAdminister() ?? false;
+        return Auth::user()?->canAdminister() ?? false;
     }
 
     public static function form(Schema $schema): Schema
