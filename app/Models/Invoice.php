@@ -2,31 +2,171 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Concerns\Auditable;
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Invoice extends Model
+/**
+ * @property int $id
+ * @property int $doc_num
+ * @property string $series
+ * @property int $customer_id
+ * @property string $customer_code
+ * @property string $customer_name
+ * @property string $currency
+ * @property Carbon $posting_date
+ * @property int|null $sales_employee_id
+ * @property string|null $sales_employee_name
+ * @property string $remarks
+ * @property numeric $total_before_discount
+ * @property numeric $discount_percent
+ * @property numeric $total_after_discount
+ * @property bool $requires_approval
+ * @property string $status
+ * @property int|null $created_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property string $doc_type
+ * @property string|null $contact_person
+ * @property string|null $kra_pin
+ * @property Carbon|null $value_date
+ * @property Carbon|null $document_date
+ * @property int|null $owner_id
+ * @property string|null $owner_name
+ * @property string $summary_type
+ * @property bool $payment_order_run
+ * @property numeric $total_down_payment
+ * @property numeric $freight
+ * @property bool $rounding_enabled
+ * @property numeric $rounding
+ * @property numeric $tax_total
+ * @property numeric $document_total
+ * @property numeric $applied_amount
+ * @property numeric $balance_due
+ * @property string|null $customer_display_name
+ * @property string $item_service_type
+ * @property string|null $qr_code
+ * @property int|null $delivery_rating
+ * @property string|null $delivery_rating_comment
+ * @property string|null $delivery_rated_at
+ * @property string|null $etr_barcode
+ * @property string|null $etr_scanned_at
+ * @property-read Collection<int, PaymentAllocation> $allocations
+ * @property-read int|null $allocations_count
+ * @property-read Collection<int, ApprovalRequest> $approvalRequests
+ * @property-read int|null $approval_requests_count
+ * @property-read Collection<int, AuditLog> $auditLogs
+ * @property-read int|null $audit_logs_count
+ * @property-read User|null $creator
+ * @property-read Customer $customer
+ * @property-read Collection<int, InvoiceFreightCharge> $freightCharges
+ * @property-read int|null $freight_charges_count
+ * @property-read string $document_number
+ * @property-read Collection<int, InvoiceLine> $lines
+ * @property-read int|null $lines_count
+ * @property-read MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
+ * @property-read User|null $owner
+ * @property-read ApprovalRequest|null $pendingApproval
+ * @property-read SalesEmployee|null $salesEmployee
+ * @property-read Collection<int, OrderStageEvent> $stageEvents
+ * @property-read int|null $stage_events_count
+ * @property-read Collection<int, Trip> $trips
+ * @property-read int|null $trips_count
+ *
+ * @method static Builder<static>|Invoice drafts()
+ * @method static Builder<static>|Invoice newModelQuery()
+ * @method static Builder<static>|Invoice newQuery()
+ * @method static Builder<static>|Invoice outstanding()
+ * @method static Builder<static>|Invoice posted()
+ * @method static Builder<static>|Invoice query()
+ * @method static Builder<static>|Invoice whereAppliedAmount($value)
+ * @method static Builder<static>|Invoice whereBalanceDue($value)
+ * @method static Builder<static>|Invoice whereContactPerson($value)
+ * @method static Builder<static>|Invoice whereCreatedAt($value)
+ * @method static Builder<static>|Invoice whereCreatedBy($value)
+ * @method static Builder<static>|Invoice whereCurrency($value)
+ * @method static Builder<static>|Invoice whereCustomerCode($value)
+ * @method static Builder<static>|Invoice whereCustomerDisplayName($value)
+ * @method static Builder<static>|Invoice whereCustomerId($value)
+ * @method static Builder<static>|Invoice whereCustomerName($value)
+ * @method static Builder<static>|Invoice whereDeliveryRatedAt($value)
+ * @method static Builder<static>|Invoice whereDeliveryRating($value)
+ * @method static Builder<static>|Invoice whereDeliveryRatingComment($value)
+ * @method static Builder<static>|Invoice whereDiscountPercent($value)
+ * @method static Builder<static>|Invoice whereDocNum($value)
+ * @method static Builder<static>|Invoice whereDocType($value)
+ * @method static Builder<static>|Invoice whereDocumentDate($value)
+ * @method static Builder<static>|Invoice whereDocumentTotal($value)
+ * @method static Builder<static>|Invoice whereEtrBarcode($value)
+ * @method static Builder<static>|Invoice whereEtrScannedAt($value)
+ * @method static Builder<static>|Invoice whereFreight($value)
+ * @method static Builder<static>|Invoice whereId($value)
+ * @method static Builder<static>|Invoice whereItemServiceType($value)
+ * @method static Builder<static>|Invoice whereKraPin($value)
+ * @method static Builder<static>|Invoice whereOwnerId($value)
+ * @method static Builder<static>|Invoice whereOwnerName($value)
+ * @method static Builder<static>|Invoice wherePaymentOrderRun($value)
+ * @method static Builder<static>|Invoice wherePostingDate($value)
+ * @method static Builder<static>|Invoice whereQrCode($value)
+ * @method static Builder<static>|Invoice whereRemarks($value)
+ * @method static Builder<static>|Invoice whereRequiresApproval($value)
+ * @method static Builder<static>|Invoice whereRounding($value)
+ * @method static Builder<static>|Invoice whereRoundingEnabled($value)
+ * @method static Builder<static>|Invoice whereSalesEmployeeId($value)
+ * @method static Builder<static>|Invoice whereSalesEmployeeName($value)
+ * @method static Builder<static>|Invoice whereSeries($value)
+ * @method static Builder<static>|Invoice whereStatus($value)
+ * @method static Builder<static>|Invoice whereSummaryType($value)
+ * @method static Builder<static>|Invoice whereTaxTotal($value)
+ * @method static Builder<static>|Invoice whereTotalAfterDiscount($value)
+ * @method static Builder<static>|Invoice whereTotalBeforeDiscount($value)
+ * @method static Builder<static>|Invoice whereTotalDownPayment($value)
+ * @method static Builder<static>|Invoice whereUpdatedAt($value)
+ * @method static Builder<static>|Invoice whereValueDate($value)
+ *
+ * @mixin Eloquent
+ */
+class Invoice extends Model implements HasMedia
 {
     use Auditable;
     use HasFactory;
+    use InteractsWithMedia;
+
+    /** The rendered document, and anything scanned back in against it. */
+    public const string PDF = 'pdf';
+
+    public const string ATTACHMENTS = 'attachments';
 
     /** Documents above this total are routed for approval (Task 1b). */
-    public const APPROVAL_THRESHOLD = 10000;
+    public const int APPROVAL_THRESHOLD = 10000;
 
-    public const TYPE_INVOICE = 'Invoice';
-    public const TYPE_DRAFT = 'Draft';
+    public const string TYPE_INVOICE = 'Invoice';
 
-    public const STATUS_DRAFT = 'Draft';
-    public const STATUS_OPEN = 'Open';
-    public const STATUS_PENDING_APPROVAL = 'Pending Approval';
-    public const STATUS_REJECTED = 'Rejected';
-    public const STATUS_CLOSED = 'Closed';
-    public const STATUS_CANCELLED = 'Cancelled';
+    public const string TYPE_DRAFT = 'Draft';
+
+    public const string STATUS_DRAFT = 'Draft';
+
+    public const string STATUS_OPEN = 'Open';
+
+    public const string STATUS_PENDING_APPROVAL = 'Pending Approval';
+
+    public const string STATUS_REJECTED = 'Rejected';
+
+    public const string STATUS_CLOSED = 'Closed';
+
+    public const string STATUS_CANCELLED = 'Cancelled';
 
     protected $fillable = [
         'doc_num', 'series', 'doc_type', 'customer_id', 'customer_code', 'customer_name',
@@ -64,8 +204,6 @@ class Invoice extends Model
             'payment_order_run' => 'boolean',
         ];
     }
-
-    /* ----------------------------------------------------------------- */
 
     public function lines(): HasMany
     {
@@ -120,8 +258,6 @@ class Invoice extends Model
         return $this->hasMany(Trip::class);
     }
 
-    /* ----------------------------------------------------------------- */
-
     public function scopeDrafts(Builder $query): Builder
     {
         return $query->where('doc_type', self::TYPE_DRAFT);
@@ -161,5 +297,41 @@ class Invoice extends Model
         return ! $this->isDraft()
             && ! in_array($this->status, [self::STATUS_CANCELLED, self::STATUS_REJECTED], true)
             && (float) $this->balance_due > 0;
+    }
+
+    /**
+     * Two collections, because they answer different questions.
+     *
+     * `pdf` is the document this system produced — one file, replaced whenever
+     * it is rendered again, so there is never a question of which PDF *is* the
+     * invoice. `attachments` is everything that came back the other way: a
+     * signed delivery note, a stamped copy, a customer's purchase order.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(self::PDF)
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf']);
+
+        $this->addMediaCollection(self::ATTACHMENTS)
+            ->acceptsMimeTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    /**
+     * The named charges making up this document's freight.
+     */
+    public function freightCharges(): HasMany
+    {
+        return $this->hasMany(InvoiceFreightCharge::class)->orderBy('line_num');
+    }
+
+    public function pdf(): ?Media
+    {
+        return $this->getFirstMedia(self::PDF);
+    }
+
+    public function hasPdf(): bool
+    {
+        return $this->pdf() !== null;
     }
 }
