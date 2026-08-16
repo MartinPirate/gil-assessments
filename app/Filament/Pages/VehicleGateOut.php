@@ -2,9 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\InteractsWithChooseFromList;
 use App\Models\GateLog;
 use App\Services\GateService;
-use App\Filament\Concerns\InteractsWithChooseFromList;
 use App\Support\ChooseFromListRegistry;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -19,6 +19,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
@@ -51,7 +52,7 @@ class VehicleGateOut extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canOperateGate() ?? false;
+        return Auth::user()?->canOperateGate() ?? false;
     }
 
     public function mount(): void
@@ -138,9 +139,9 @@ class VehicleGateOut extends Page implements HasForms
     {
         $log = $vehicleId ? app(GateService::class)->openLogFor((int) $vehicleId) : null;
 
-        $set('driver_name', $log?->driver_name);
-        $set('driver_national_id', $log?->driver_national_id);
-        $set('driver_phone', $log?->driver_phone);
+        $set('driver_name', $log?->driver?->name);
+        $set('driver_national_id', $log?->driver?->national_id);
+        $set('driver_phone', $log?->driver?->phone);
         $set('time_in_display', $log?->time_in?->format('d/m/Y H:i'));
         $set('duration_display', $log?->duration);
     }
@@ -165,7 +166,7 @@ class VehicleGateOut extends Page implements HasForms
 
         Notification::make()
             ->title('Gate out recorded')
-            ->body("{$log->vehicle_number} left at {$log->time_out->format('d/m/Y H:i')} after {$log->duration}.")
+            ->body("{$log->vehicle->vehicle_number} left at {$log->time_out->format('d/m/Y H:i')} after {$log->duration}.")
             ->success()
             ->send();
 
@@ -173,13 +174,13 @@ class VehicleGateOut extends Page implements HasForms
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, GateLog>
+     * @return Collection<int, GateLog>
      */
     public function getVehiclesOnSite()
     {
         return GateLog::query()
             ->open()
-            ->with('vehicle')
+            ->with(['vehicle', 'driver'])
             ->latest('time_in')
             ->limit(10)
             ->get();
