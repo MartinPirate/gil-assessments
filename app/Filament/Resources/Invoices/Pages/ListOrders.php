@@ -3,13 +3,16 @@
 namespace App\Filament\Resources\Invoices\Pages;
 
 use App\Enums\OrderStage;
+use App\Filament\Pages\ArInvoice;
 use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Widgets\OrderSummary;
 use App\Models\Invoice;
 use App\Models\OrderStageEvent;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Enums\Width;
+use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -41,14 +44,23 @@ class ListOrders extends ListRecords
      */
     public function getTabs(): array
     {
+        /*
+         * Counted over the same documents the table shows. Counting every
+         * order in the system put "12" on a tab that opened onto three rows,
+         * which reads as a bug in the filter rather than a badge that forgot
+         * to ask who was looking.
+         */
+        $visible = InvoiceResource::getEloquentQuery()->posted();
+
         $counts = OrderStageEvent::query()
+            ->whereIn('invoice_id', (clone $visible)->select('invoices.id'))
             ->selectRaw('[stage], COUNT(DISTINCT [invoice_id]) AS total')
             ->groupBy('stage')
             ->pluck('total', 'stage');
 
         $tabs = [
             'all' => Tab::make('All')
-                ->badge(Invoice::query()->posted()->count()),
+                ->badge((clone $visible)->count()),
         ];
 
         foreach (OrderStage::track() as $stage) {
@@ -92,11 +104,11 @@ class ListOrders extends ListRecords
             Action::make('newOrder')
                 ->label('New order')
                 ->icon('heroicon-m-plus')
-                ->url(fn (): string => \App\Filament\Pages\ArInvoice::getUrl()),
+                ->url(fn (): string => ArInvoice::getUrl()),
         ];
     }
 
-    public function getMaxContentWidth(): Width | string | null
+    public function getMaxContentWidth(): Width|string|null
     {
         return Width::Full;
     }
@@ -104,16 +116,16 @@ class ListOrders extends ListRecords
     /**
      * The three numbers above the tabs.
      *
-     * @return array<class-string<\Filament\Widgets\Widget>>
+     * @return array<class-string<Widget>>
      */
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\OrderSummary::class,
+            OrderSummary::class,
         ];
     }
 
-    public function getHeaderWidgetsColumns(): int | array
+    public function getHeaderWidgetsColumns(): int|array
     {
         return ['default' => 1, 'md' => 3];
     }
