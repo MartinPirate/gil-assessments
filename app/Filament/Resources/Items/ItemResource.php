@@ -13,12 +13,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class ItemResource extends Resource
 {
     protected static ?string $model = Item::class;
+
+    protected static ?string $recordTitleAttribute = 'item_no';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
@@ -28,7 +30,7 @@ class ItemResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canAdminister() ?? false;
+        return Auth::user()?->canAdminister() ?? false;
     }
 
     public static function form(Schema $schema): Schema

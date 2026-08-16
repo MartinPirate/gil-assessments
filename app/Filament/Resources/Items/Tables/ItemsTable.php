@@ -21,7 +21,7 @@ class ItemsTable
                     ->searchable(),
                 TextColumn::make('uom')
                     ->searchable(),
-                TextColumn::make('warehouse')
+                TextColumn::make('warehouse.code')
                     ->searchable(),
                 TextColumn::make('unit_price')
                     ->money()

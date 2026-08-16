@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Items\Schemas;
 
+use App\Models\Warehouse;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -19,9 +21,13 @@ class ItemForm
                 TextInput::make('uom')
                     ->required()
                     ->default('Bales'),
-                TextInput::make('warehouse')
+                Select::make('warehouse_id')
+                    ->label('Warehouse')
+                    ->relationship('warehouse', 'code')
                     ->required()
-                    ->default('FG WHS'),
+                    ->default(fn () => Warehouse::default()?->getKey())
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('unit_price')
                     ->required()
                     ->numeric()
