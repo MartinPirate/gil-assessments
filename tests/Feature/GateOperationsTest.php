@@ -11,6 +11,9 @@ use App\Models\User;
 use App\Models\Vehicle;
 use App\Services\GateService;
 use App\Support\ChooseFromListRegistry;
+use Database\Seeders\ReferenceDataSeeder;
+use Filament\Auth\Pages\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
@@ -33,7 +36,7 @@ class GateOperationsTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\ReferenceDataSeeder::class);
+        $this->seed(ReferenceDataSeeder::class);
 
         // Gate screens are gated to the gate-officer role.
         $this->user = User::factory()->gateOfficer()->create();
@@ -44,7 +47,7 @@ class GateOperationsTest extends TestCase
             'vehicle_type' => 'Truck',
         ]);
 
-        $this->driver = Driver::create([
+        $this->driver = Driver::factory()->create([
             'name' => 'John Mwangi Kamau',
             'national_id' => '23456789',
             'phone' => '0722345678',
@@ -58,17 +61,16 @@ class GateOperationsTest extends TestCase
             ->fillForm([
                 'vehicle_id' => $this->vehicle->id,
                 'driver_id' => $this->driver->id,
-                'driver_national_id' => $this->driver->national_id,
-                'driver_phone' => $this->driver->phone,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $log = GateLog::firstOrFail();
 
-        $this->assertSame('KDA 123A', $log->vehicle_number);
-        $this->assertSame('John Mwangi Kamau', $log->driver_name);
-        $this->assertSame('23456789', $log->driver_national_id);
+        // The log stores ids; the plate and the driver read through.
+        $this->assertSame('KDA 123A', $log->vehicle->vehicle_number);
+        $this->assertSame('John Mwangi Kamau', $log->driver->name);
+        $this->assertSame('23456789', $log->driver->national_id);
         $this->assertSame(GateLog::STATUS_IN, $log->status);
         $this->assertNotNull($log->time_in);
         $this->assertEquals($this->user->id, $log->gated_in_by);
@@ -187,7 +189,7 @@ class GateOperationsTest extends TestCase
     {
         // Filament's login is a Livewire component, not a plain POST route,
         // so drive the real page to prove the listener fires in production.
-        Livewire::test(\Filament\Auth\Pages\Login::class)
+        Livewire::test(Login::class)
             ->fillForm([
                 'email' => $this->user->email,
                 'password' => 'password',
@@ -208,7 +210,7 @@ class GateOperationsTest extends TestCase
         $this->actingAs($this->user);
 
         event(new \Illuminate\Auth\Events\Login('web', $this->user, false));
-        event(new \Illuminate\Auth\Events\Logout('web', $this->user));
+        event(new Logout('web', $this->user));
 
         $session = LoginSession::where('user_id', $this->user->id)->latest('id')->first();
 
