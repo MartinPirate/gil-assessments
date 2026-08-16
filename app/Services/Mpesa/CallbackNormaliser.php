@@ -24,13 +24,14 @@ namespace App\Services\Mpesa;
  */
 class CallbackNormaliser
 {
-    public const SHAPE_C2B = 'c2b';
-    public const SHAPE_STK = 'stk';
+    public const string SHAPE_C2B = 'c2b';
+
+    public const string SHAPE_STK = 'stk';
 
     /**
      * STK metadata item name => the C2B field it corresponds to.
      */
-    protected const STK_FIELD_MAP = [
+    protected const array STK_FIELD_MAP = [
         'MpesaReceiptNumber' => 'TransID',
         'Amount' => 'TransAmount',
         'TransactionDate' => 'TransTime',

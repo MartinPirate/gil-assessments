@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Services\Mpesa\CallbackNormaliser;
+use App\Services\MpesaC2BService;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -122,8 +123,8 @@ class MpesaC2BCallbackRequest extends FormRequest
     public function attributes(): array
     {
         return array_combine(
-            array_keys(\App\Services\MpesaC2BService::FIELD_MAP),
-            array_keys(\App\Services\MpesaC2BService::FIELD_MAP),
+            array_keys(MpesaC2BService::FIELD_MAP),
+            array_keys(MpesaC2BService::FIELD_MAP),
         );
     }
 

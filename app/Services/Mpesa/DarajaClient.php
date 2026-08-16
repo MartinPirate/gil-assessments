@@ -2,6 +2,7 @@
 
 namespace App\Services\Mpesa;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -59,6 +60,8 @@ class DarajaClient
      * away — the receipt is reconciled afterwards instead.
      *
      * @return array<string, mixed>
+     *
+     * @throws ConnectionException
      */
     public function registerUrls(?string $confirmationUrl = null, ?string $validationUrl = null): array
     {

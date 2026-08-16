@@ -19,7 +19,7 @@ class MpesaC2BService
      *
      * @var array<string, string>
      */
-    public const FIELD_MAP = [
+    public const array FIELD_MAP = [
         'TransactionType' => 'transaction_type',
         'TransID' => 'trans_id',
         'TransTime' => 'trans_time',
