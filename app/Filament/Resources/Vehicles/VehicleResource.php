@@ -14,12 +14,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class VehicleResource extends Resource
 {
     protected static ?string $model = Vehicle::class;
+
+    protected static ?string $recordTitleAttribute = 'vehicle_number';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
@@ -29,7 +31,7 @@ class VehicleResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canAdminister() ?? false;
+        return Auth::user()?->canAdminister() ?? false;
     }
 
     public static function form(Schema $schema): Schema

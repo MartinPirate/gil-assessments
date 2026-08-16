@@ -1,6 +1,6 @@
 @php
     /** @var \App\Models\Vehicle $vehicle */
-    $logs = $getRecord()->gateLogs()->with(['gatedInBy', 'gatedOutBy'])->latest('time_in')->limit(25)->get();
+    $logs = $getRecord()->gateLogs()->with(['driver', 'gatedInBy', 'gatedOutBy'])->latest('time_in')->limit(25)->get();
 @endphp
 
 @if ($logs->isEmpty())
@@ -20,7 +20,7 @@
             <tbody>
                 @foreach ($logs as $log)
                     <tr>
-                        <td>{{ $log->driver_name }}</td>
+                        <td>{{ $log->driver->name }}</td>
                         <td>{{ $log->time_in?->format('d/m/Y H:i') }}</td>
                         <td>
                             {{ $log->time_out?->format('d/m/Y H:i') ?? '—' }}
