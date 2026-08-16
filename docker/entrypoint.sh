@@ -56,6 +56,11 @@ while (true) {
 
 php artisan migrate --force --no-interaction
 
+# Safe on every boot: each seeder either upserts or returns early once its own
+# records exist, so a redeploy tops up what is missing instead of stacking a
+# second set on top of the first.
+php artisan db:seed --force --no-interaction
+
 # Cached at boot rather than in the image: the config cache bakes in
 # environment variables, and those are only known once the service starts.
 php artisan config:cache
