@@ -170,12 +170,24 @@ class ChooseFromListRegistry
 
     /**
      * Label for an already-selected id, used when the form is re-hydrated.
+     *
+     * Two columns are joined for the search results, where you are choosing
+     * between rows and need to tell them apart. Once chosen, the field shows
+     * only its own column — the Customer field carries the code and the Name
+     * field the name, as the client does. Joining both there overflowed a
+     * 10rem box and left the value truncated under the clear button.
      */
-    public static function optionLabel(string $key, int|string $id): ?string
+    public static function optionLabel(string $key, int|string $id, bool $primaryOnly = true): ?string
     {
         $source = self::get($key);
         $record = self::query($key)->find($id);
 
-        return $record ? self::label($record, array_keys($source['columns'])) : null;
+        if (! $record) {
+            return null;
+        }
+
+        $columns = array_keys($source['columns']);
+
+        return self::label($record, $primaryOnly ? array_slice($columns, 0, 1) : $columns);
     }
 }
