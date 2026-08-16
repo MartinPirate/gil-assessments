@@ -9,8 +9,8 @@
             @foreach ($logs as $log)
                 <li class="gate-onsite__item">
                     <div>
-                        <span class="gate-onsite__plate">{{ $log->vehicle_number }}</span>
-                        <span class="gate-onsite__driver">{{ $log->driver_name }}</span>
+                        <span class="gate-onsite__plate">{{ $log->vehicle->vehicle_number }}</span>
+                        <span class="gate-onsite__driver">{{ $log->driver->name }}</span>
                     </div>
                     <div class="gate-onsite__meta">
                         <span class="gate-status-badge gate-status-badge--in">IN</span>

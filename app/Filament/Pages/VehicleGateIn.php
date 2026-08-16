@@ -2,10 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\InteractsWithChooseFromList;
 use App\Models\Driver;
 use App\Models\GateLog;
 use App\Services\GateService;
-use App\Filament\Concerns\InteractsWithChooseFromList;
 use App\Support\ChooseFromListRegistry;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -20,6 +20,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
@@ -52,7 +53,7 @@ class VehicleGateIn extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canOperateGate() ?? false;
+        return Auth::user()?->canOperateGate() ?? false;
     }
 
     public function mount(): void
@@ -91,18 +92,21 @@ class VehicleGateIn extends Page implements HasForms
                                 ->live()
                                 ->afterStateUpdated(fn (?string $state, Set $set) => $this->applyDriver($state, $set)),
 
+                            /*
+                             * Shown so the officer can check the ID against
+                             * the one in the driver's hand, but not stored and
+                             * not editable — the log keeps only driver_id, and
+                             * these read through to the driver master.
+                             */
                             TextInput::make('driver_national_id')
                                 ->label('Driver ID')
-                                ->required()
-                                ->maxLength(32)
-                                ->live(onBlur: true),
+                                ->disabled()
+                                ->dehydrated(false),
 
                             TextInput::make('driver_phone')
                                 ->label('Phone Number')
-                                ->tel()
-                                ->required()
-                                ->maxLength(32)
-                                ->live(onBlur: true),
+                                ->disabled()
+                                ->dehydrated(false),
                         ]),
 
                         Textarea::make('gate_in_remarks')
@@ -158,7 +162,7 @@ class VehicleGateIn extends Page implements HasForms
         if ($open) {
             Notification::make()
                 ->title('Vehicle already on site')
-                ->body("{$open->vehicle_number} was gated in at {$open->time_in->format('d/m/Y H:i')} and has not gated out.")
+                ->body("{$open->vehicle->vehicle_number} was gated in at {$open->time_in->format('d/m/Y H:i')} and has not gated out.")
                 ->warning()
                 ->send();
         }
@@ -180,7 +184,7 @@ class VehicleGateIn extends Page implements HasForms
 
         Notification::make()
             ->title('Gate in recorded')
-            ->body("{$log->vehicle_number} — {$log->driver_name} at {$log->time_in->format('d/m/Y H:i')}")
+            ->body("{$log->vehicle->vehicle_number} — {$log->driver->name} at {$log->time_in->format('d/m/Y H:i')}")
             ->success()
             ->send();
 
@@ -190,13 +194,13 @@ class VehicleGateIn extends Page implements HasForms
     /**
      * Vehicles currently on site, shown as a live list beneath the form.
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, GateLog>
+     * @return Collection<int, GateLog>
      */
     public function getVehiclesOnSite()
     {
         return GateLog::query()
             ->open()
-            ->with('vehicle')
+            ->with(['vehicle', 'driver'])
             ->latest('time_in')
             ->limit(10)
             ->get();
