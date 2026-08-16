@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Filament\Pages\MyTrips;
+use App\Filament\Resources\GateLogs\GateLogResource;
+use App\Filament\Resources\Routes\RouteResource;
 use App\Models\Driver;
+use App\Models\GateLog;
 use App\Models\Route;
 use App\Models\Trip;
 use App\Models\User;
@@ -12,6 +15,7 @@ use App\Models\Vehicle;
 use App\Services\TripService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -46,7 +50,7 @@ class DriverPortalTest extends TestCase
             'name' => 'John Mwangi', 'national_id' => '111', 'phone' => '0700000001',
         ]);
 
-        $this->otherDriver = Driver::create([
+        $this->otherDriver = Driver::factory()->create([
             'name' => 'Someone Else', 'national_id' => '222', 'phone' => '0700000002',
         ]);
 
@@ -139,7 +143,7 @@ class DriverPortalTest extends TestCase
 
     public function test_non_drivers_cannot_reach_the_page(): void
     {
-        foreach ([UserRole::Sales, UserRole::Approver, UserRole::GateOfficer, UserRole::Admin] as $role) {
+        foreach ([UserRole::Sales, UserRole::Manager, UserRole::GateOfficer, UserRole::Admin] as $role) {
             $this->actingAs(User::factory()->role($role)->create());
 
             $this->assertFalse(MyTrips::canAccess(), "{$role->value} should not reach the driver portal.");
@@ -172,7 +176,7 @@ class DriverPortalTest extends TestCase
     {
         $trip = $this->tripFor($this->driver, $this->vehicle, Trip::STATUS_COMPLETED);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(TripService::class)->depart($trip);
     }
@@ -181,7 +185,7 @@ class DriverPortalTest extends TestCase
     {
         $this->tripFor($this->driver, $this->vehicle, Trip::STATUS_SCHEDULED);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(TripService::class)->schedule([
             'route_id' => $this->route->id,
@@ -195,7 +199,7 @@ class DriverPortalTest extends TestCase
     {
         $this->tripFor($this->driver, $this->vehicle, Trip::STATUS_IN_TRANSIT);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(TripService::class)->schedule([
             'route_id' => $this->route->id,
@@ -219,5 +223,87 @@ class DriverPortalTest extends TestCase
         $this->assertSame('KDA 111A', $trip->vehicle_number);
         $this->assertSame('John Mwangi', $trip->driver_name);
         $this->assertStringStartsWith('TRP-', $trip->reference);
+    }
+
+    /**
+     * A driver reads the routes they are sent down, and no others.
+     */
+    public function test_a_driver_sees_only_the_routes_they_drive(): void
+    {
+        $other = Route::create([
+            'code' => 'RT-2', 'name' => 'Nairobi to Kisumu',
+            'origin' => 'Nairobi', 'destination' => 'Kisumu',
+        ]);
+
+        $this->tripFor($this->driver, $this->vehicle);
+
+        $this->actingAs($this->driverUser);
+
+        $codes = RouteResource::getEloquentQuery()->pluck('code');
+
+        $this->assertTrue($codes->contains($this->route->code));
+        $this->assertFalse($codes->contains($other->code), 'A driver must not see a route none of their trips run on.');
+    }
+
+    /**
+     * Reading is not planning: no create, no edit, no delete.
+     */
+    public function test_a_driver_cannot_change_a_route(): void
+    {
+        $this->actingAs($this->driverUser);
+
+        $this->assertTrue(RouteResource::canAccess());
+        $this->assertFalse(RouteResource::canPlan());
+        $this->assertFalse(RouteResource::canCreate());
+        $this->assertFalse(RouteResource::canEdit($this->route));
+        $this->assertFalse(RouteResource::canDelete($this->route));
+    }
+
+    /**
+     * The gate log is the record of the driver's own crossings.
+     */
+    public function test_a_driver_sees_only_their_own_gate_log_entries(): void
+    {
+        $officer = User::factory()->role(UserRole::GateOfficer)->create();
+
+        $mine = GateLog::create([
+            'vehicle_id' => $this->vehicle->id,
+            'driver_id' => $this->driver->id,
+            'time_in' => now()->subHour(),
+            'status' => GateLog::STATUS_IN,
+            'gated_in_by' => $officer->id,
+        ]);
+
+        $theirs = GateLog::create([
+            'vehicle_id' => $this->otherVehicle->id,
+            'driver_id' => $this->otherDriver->id,
+            'time_in' => now()->subHour(),
+            'status' => GateLog::STATUS_IN,
+            'gated_in_by' => $officer->id,
+        ]);
+
+        $this->actingAs($this->driverUser);
+
+        $this->assertTrue(GateLogResource::canAccess());
+
+        $ids = GateLogResource::getEloquentQuery()->pluck('id');
+
+        $this->assertTrue($ids->contains($mine->id));
+        $this->assertFalse($ids->contains($theirs->id), 'A driver must not read another driver\'s movements.');
+
+        // The badge counts the same query, so it cannot advertise a queue the
+        // table will not show.
+        $this->assertSame('1', GateLogResource::getNavigationBadge());
+    }
+
+    /**
+     * A driver account with no driver record must see nothing, not everything.
+     */
+    public function test_an_unlinked_driver_account_reaches_neither_screen(): void
+    {
+        $this->actingAs(User::factory()->role(UserRole::Driver)->create());
+
+        $this->assertFalse(GateLogResource::canAccess());
+        $this->assertFalse(RouteResource::canAccess());
     }
 }
