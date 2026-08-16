@@ -9,6 +9,7 @@ use App\Models\PaymentAllocation;
 use App\Models\User;
 use App\Services\PaymentAllocationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -53,7 +54,7 @@ class PaymentReconciliationTest extends TestCase
     /**
      * @param  array<string, mixed>  $payload
      */
-    protected function sendReceipt(array $payload = []): \Illuminate\Testing\TestResponse
+    protected function sendReceipt(array $payload = []): TestResponse
     {
         return $this->postJson('/api/mpesa/c2b/confirmation', array_merge([
             'TransactionType' => 'Pay Bill',
