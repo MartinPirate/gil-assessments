@@ -15,6 +15,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'mpesa.callback' => \App\Http\Middleware\AllowMpesaCallbacks::class,
         ]);
+
+        /*
+         * Behind Railway's edge, every request arrives over plain HTTP on an
+         * internal address. Without this, Laravel builds http:// links on an
+         * https:// page and the browser blocks its own assets — the panel
+         * loads unstyled and Livewire never reaches the server.
+         *
+         * The proxy is the platform's own and is not addressable directly,
+         * so there is no list of addresses to pin to.
+         */
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontReport(\App\Exceptions\Handler::NOT_REPORTED);
