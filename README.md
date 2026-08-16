@@ -9,6 +9,8 @@ invoice raised on the A/R screen routes itself for approval when it breaches the
 threshold, and an M-Pesa receipt arriving on the C2B endpoint settles that same
 invoice and closes it.
 
+![The dashboard: orders, money owed, documents awaiting a decision and vehicles currently on site](docs/screenshots/dashboard.png)
+
 | Task | Scope | Where |
 | --- | --- | --- |
 | 1 | A/R Invoice document (SAP B1 parity, Choose From List, VAT, approval label, validations) | `Sales → A/R Invoice` |
