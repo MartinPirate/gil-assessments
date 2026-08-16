@@ -1,17 +1,13 @@
 @php
-    $role = $getRecord()->role();
+    $user = $getRecord();
 
-    // Same list the Roles and permissions screen builds from, so the two
-    // cannot disagree about what a role may do.
-    $capabilities = [
-        'Raise and view invoices' => $role->canSell(),
-        'Decide approvals' => $role->canApprove(),
-        'Record vehicle movements' => $role->canOperateGate(),
-        'Plan and assign trips' => $role->canManageTrips(),
-        'See payments' => $role->canViewPayments(),
-        'Read the audit trail' => $role->canViewAuditLog(),
-        'Edit master data' => $role->canAdminister(),
-    ];
+    // Built from the permission catalogue and asked of the account itself, so
+    // this screen cannot disagree about what the user may do.
+    $capabilities = collect(\App\Enums\Permission::cases())
+        ->mapWithKeys(fn (\App\Enums\Permission $permission) => [
+            $permission->label() => $user->isAbleTo($permission->value),
+        ])
+        ->all();
 @endphp
 
 <ul class="usr-caps">

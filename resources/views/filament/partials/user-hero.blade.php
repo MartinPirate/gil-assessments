@@ -16,7 +16,7 @@
             <a class="usr-hero__email" href="mailto:{{ $user->email }}">{{ $user->email }}</a>
 
             <div class="usr-hero__badges">
-                <span class="usr-badge usr-badge--role">{{ $role->label() }}</span>
+                <span class="usr-badge usr-badge--role">{{ $user->roleLabel() }}</span>
 
                 @if ($user->is_active)
                     <span class="usr-badge usr-badge--active">Active</span>
@@ -46,7 +46,7 @@
             <dt>Approvals decided</dt>
             <dd>{{ number_format($s['decisions']) }}</dd>
             <span class="usr-stat__sub">
-                @if (! $role->canApprove())
+                @if (! $user->canApprove())
                     Not an approver
                 @elseif ($user->approval_limit === null)
                     {{-- A null limit means unlimited, per canApproveAmount().
