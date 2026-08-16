@@ -5,11 +5,11 @@ namespace App\Providers;
 use App\Models\User;
 use App\Support\Timeline\OrderStageSource;
 use Illuminate\Cache\RateLimiting\Limit;
-use LaBoiteACode\FilamentActivityTimeline\ActivityTimeline;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use LaBoiteACode\FilamentActivityTimeline\ActivityTimeline;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureGates();
 
         // The order lifecycle, available to any timeline as ->source('order').
-        ActivityTimeline::registerSource('order', fn (): OrderStageSource => new OrderStageSource());
+        ActivityTimeline::registerSource('order', fn (): OrderStageSource => new OrderStageSource);
     }
 
     /**
@@ -42,9 +42,9 @@ class AppServiceProvider extends ServiceProvider
          * administrator — an undefined gate would deny anyway, but saying so
          * explicitly keeps the decision visible.
          */
-        Gate::define('command-center:access', fn (User $user): bool => $user->role()->canAdminister());
-        Gate::define('command-center:prune-history', fn (User $user): bool => $user->role()->canAdminister());
-        Gate::define('command-center:manage-commands', fn (User $user): bool => $user->role()->canAdminister());
+        Gate::define('command-center:access', fn (User $user): bool => $user->canAdminister());
+        Gate::define('command-center:prune-history', fn (User $user): bool => $user->canAdminister());
+        Gate::define('command-center:manage-commands', fn (User $user): bool => $user->canAdminister());
     }
 
     /**

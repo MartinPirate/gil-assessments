@@ -2,11 +2,16 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Landing;
+use App\Filament\Pages\ApiDocs;
+use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\OperationsOverview;
+use App\Http\Middleware\RestrictChangelogToAdministrators;
 use App\Models\User;
-use Alexkramse\FilamentOpenapiDocs\FilamentOpenApiDocsPlugin;
 use Bityukov\CommandCenter\Filament\CommandCenterPlugin;
 use Blemli\FormSettings\FormSettingsPlugin;
 use Filament\Changelog\ChangelogPlugin;
+use Filament\Contracts\Plugin;
 use Filament\Enums\DatabaseNotificationsPosition;
 use Filament\Enums\GlobalSearchPosition;
 use Filament\Enums\UserMenuPosition;
@@ -15,26 +20,26 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\Dashboard;
-use Filament\Launchpad\LaunchpadPlugin;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Enums\Width;
-use Filament\Widgets\FilamentInfoWidget;
+use Filament\View\PanelsRenderHook;
 use Gsferro\FilamentOdometerEasy\FilamentOdometerEasyPlugin;
 use Hammadzafar05\FilamentMobilePreset\FilamentMobilePresetPlugin;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Savanna\Theme\SavannaThemePlugin;
 use LaBoiteACode\DependencyGraph\DependencyGraphPlugin;
-use lockscreen\FilamentLockscreen\Lockscreen;
 use LaBoiteACode\FilamentActivityTimeline\FilamentActivityTimelinePlugin;
 use LaBoiteACode\FilamentLogsExplorer\FilamentLogsExplorerPlugin;
+use lockscreen\FilamentLockscreen\Lockscreen;
 use Prodstarter\FilamentNotificationCenter\FilamentNotificationCenterPlugin;
+use Savanna\Theme\SavannaThemePlugin;
 use Wallacemartinss\FilamentOnboarding\FilamentOnboardingPlugin;
 use YousefAman\FilamentAutosave\AutosavePlugin;
 use Zvizvi\FilamentColumnFilters\FilamentColumnFiltersPlugin;
@@ -93,10 +98,19 @@ class AdminPanelProvider extends PanelProvider
                 'Changelog',
             ])
             ->brandName('GIL Business Suite')
+            /*
+             * Signing in, and clicking the brand, land you on the screen you
+             * work from. Evaluated per request, so it follows the signed-in
+             * user rather than being fixed at boot.
+             */
+            ->homeUrl(fn (): string => Landing::urlFor(Auth::user()))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
+                // Registered here rather than by the plugin, so canAccess()
+                // can keep it to administrators — see App\Filament\Pages\ApiDocs.
+                ApiDocs::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             /*
@@ -105,12 +119,28 @@ class AdminPanelProvider extends PanelProvider
              * repeats it and pushes the real numbers down the page.
              */
             ->widgets([
-                \App\Filament\Widgets\OperationsOverview::class,
+                OperationsOverview::class,
             ])
             // Database notifications back the Notification Center below, and
             // sit with the user menu at the foot of the sidebar.
             ->databaseNotifications(position: DatabaseNotificationsPosition::Sidebar)
             ->plugins($this->plugins())
+            /*
+             * Column widths on the A/R Invoice grid are draggable, as they are
+             * in the client. The panel does not load the application's own JS
+             * bundle, so the behaviour is injected here.
+             */
+            // The tab icon: the document title bar's navy with the drill-arrow
+            // orange, so the tab matches the panel rather than Filament's mark.
+            ->favicon(asset('favicon-32.png'))
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): View => view('filament.partials.icons'),
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): View => view('filament.partials.sap-grid-resize'),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -124,6 +154,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                // The changelog reader is administrators-only, and the packaged
+                // page has no access hook to hang that on.
+                RestrictChangelogToAdministrators::class,
             ]);
     }
 
@@ -135,14 +168,14 @@ class AdminPanelProvider extends PanelProvider
      * runnable commands, which the sales, gate and driver roles have no
      * business seeing — the same rule the rest of this panel follows.
      *
-     * @return array<int, \Filament\Contracts\Plugin>
+     * @return array<int, Plugin>
      */
     protected function plugins(): array
     {
         $isAdministrator = static function (): bool {
             $user = Filament::auth()->user();
 
-            return $user instanceof User && $user->role()->canAdminister();
+            return $user instanceof User && $user->canAdminister();
         };
 
         return [
@@ -180,8 +213,30 @@ class AdminPanelProvider extends PanelProvider
             FilamentMobilePresetPlugin::make(),
 
             // --- Orientation and comms --------------------------------------
-            LaunchpadPlugin::make(),
-            FilamentOnboardingPlugin::make(),
+            /*
+             * Each journey is shown to the role it is written for, so a driver
+             * is not walked through raising an invoice they cannot reach.
+             *
+             * These read the same UserRole capabilities the navigation and the
+             * gates use, rather than naming roles again — a role's reach stays
+             * described in one place. An unregistered condition hides what it
+             * guards, so a typo here quietly shows nothing rather than showing
+             * everything.
+             */
+            FilamentOnboardingPlugin::make()
+                ->conditions([
+                    'can-sell' => fn (User $user): bool => $user->canSell(),
+                    'can-approve' => fn (User $user): bool => $user->canApprove(),
+                    'can-operate-gate' => fn (User $user): bool => $user->canOperateGate(),
+                    'is-driver' => fn (User $user): bool => $user->isDriver(),
+                    'can-administer' => fn (User $user): bool => $user->canAdminister(),
+                ], [
+                    'can-sell' => 'Works on sales documents',
+                    'can-approve' => 'Approves documents over the threshold',
+                    'can-operate-gate' => 'Works the gate',
+                    'is-driver' => 'Drives',
+                    'can-administer' => 'Administers the system',
+                ]),
             FilamentNotificationCenterPlugin::make(),
             FilamentActivityTimelinePlugin::make(),
 
@@ -199,22 +254,19 @@ class AdminPanelProvider extends PanelProvider
             CommandCenterPlugin::make(),
 
             /*
-             * The changelog reader stays open to every signed-in user - telling
-             * people what changed is the point of it. Only an administrator may
-             * write entries.
+             * Administrators only, reading and writing alike. What changed in
+             * the system is a maintenance record; a gate officer and a driver
+             * have no more use for it than for the log viewer beside it.
+             *
+             * The nav condition hides the item; the route itself is closed by
+             * RestrictChangelogToAdministrators, because the packaged page
+             * offers no access hook.
              */
             ChangelogPlugin::make()
                 ->navigationGroup('Changelog')
+                ->registerNavigation($isAdministrator)
                 ->canManage($isAdministrator),
 
-            /*
-             * The API reference documents the M-Pesa C2B endpoints. It maps the
-             * request surface of the application, so it is kept off production
-             * and out of every navigation but the administrator's.
-             */
-            FilamentOpenApiDocsPlugin::make()
-                ->enabledInProduction(false)
-                ->navigationGroup('Documentation'),
         ];
     }
 }
