@@ -81,7 +81,7 @@ class ThemeTest extends TestCase
         $this->invoice(2500, today()->toDateString(), 2);
 
         $series = $this->series(
-            new OperationsOverview(),
+            new OperationsOverview,
             Invoice::query()->posted(),
             'posting_date',
             'document_total',
@@ -101,7 +101,7 @@ class ThemeTest extends TestCase
         $this->invoice(4000, today()->toDateString(), 1);
 
         $series = $this->series(
-            new OperationsOverview(),
+            new OperationsOverview,
             Invoice::query()->posted(),
             'posting_date',
             'document_total',
@@ -117,7 +117,7 @@ class ThemeTest extends TestCase
         $this->invoice(1500, today()->toDateString(), 2);
 
         $series = $this->series(
-            new OperationsOverview(),
+            new OperationsOverview,
             Invoice::query()->posted(),
             'posting_date',
             'document_total',
@@ -135,7 +135,7 @@ class ThemeTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $this->series(
-            new OperationsOverview(),
+            new OperationsOverview,
             Invoice::query(),
             'posting_date); DROP TABLE invoices; --',
         );
@@ -145,7 +145,7 @@ class ThemeTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->series(new OperationsOverview(), Invoice::query(), 'posting_date', 'password');
+        $this->series(new OperationsOverview, Invoice::query(), 'posting_date', 'password');
     }
 
     /**
@@ -155,7 +155,7 @@ class ThemeTest extends TestCase
     {
         Auth::login(User::factory()->role(UserRole::Admin)->create());
 
-        $widget = new OperationsOverview();
+        $widget = new OperationsOverview;
         $method = new ReflectionMethod($widget, 'getStats');
         $method->setAccessible(true);
 
