@@ -2,36 +2,44 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Landing;
+use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\DatePicker;
+use Illuminate\Support\Facades\Auth;
 
 /**
- * The role dashboard, moved off the panel root.
+ * The panel root.
  *
- * Launchpad hard-codes its own route path to '/' because being the landing
- * page is the whole point of it. Filament's stock Dashboard claims the same
- * path, so only one of the two could win — and with the dashboard losing,
- * every sidebar in the panel died on a missing
- * `filament.admin.pages.dashboard` route.
- *
- * Giving the dashboard an explicit path settles it: the launchpad keeps the
- * root, the dashboard keeps its route and its widgets, and both appear in the
- * navigation.
+ * This used to sit at /dashboard because the Launchpad plugin hard-coded its
+ * own route to '/' and only one page can hold it. The launchpad has been
+ * removed — a grid of tiles duplicating the sidebar was a page nobody needed —
+ * so the dashboard is the landing page again, which is where signing in leaves
+ * you.
  */
 class Dashboard extends BaseDashboard
 {
     use HasFiltersForm;
-
-    protected static string $routePath = 'dashboard';
 
     protected static ?int $navigationSort = -1;
 
     public static function getNavigationLabel(): string
     {
         return 'Dashboard';
+    }
+
+    /**
+     * Not everybody has one.
+     *
+     * Hidden rather than forbidden: the panel root still routes here, so a 403
+     * would greet a gate officer who clicked the logo. mount() sends them on to
+     * the screen they actually work from.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Landing::hasDashboard(Auth::user());
     }
 
     /**
@@ -51,6 +59,12 @@ class Dashboard extends BaseDashboard
      */
     public function mount(): void
     {
+        if (! Landing::hasDashboard(Auth::user())) {
+            $this->redirect(Landing::urlFor(Auth::user()));
+
+            return;
+        }
+
         $this->filters['from'] ??= now()->subDays(29)->startOfDay()->toDateString();
         $this->filters['until'] ??= now()->toDateString();
     }
@@ -95,7 +109,7 @@ class Dashboard extends BaseDashboard
      * Four across on a wide screen — the stat row reads as one band rather
      * than wrapping three-and-two.
      */
-    public function getColumns(): int | array
+    public function getColumns(): int|array
     {
         return ['default' => 1, 'md' => 2, 'xl' => 4];
     }
