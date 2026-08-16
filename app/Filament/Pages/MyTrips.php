@@ -9,6 +9,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -38,7 +39,7 @@ class MyTrips extends Page
 
         // Admins can open it to see what a driver sees, but only if their own
         // account is linked to a driver record.
-        return (bool) ($user?->role()->isDriver() && $user->driverId());
+        return (bool) ($user?->isDriver() && $user->driverId());
     }
 
     public static function getNavigationBadge(): ?string
@@ -55,7 +56,7 @@ class MyTrips extends Page
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, Trip>
+     * @return Collection<int, Trip>
      */
     public function getTrips()
     {
@@ -69,7 +70,7 @@ class MyTrips extends Page
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, GateLog>
+     * @return Collection<int, GateLog>
      */
     public function getRecentGateLogs()
     {

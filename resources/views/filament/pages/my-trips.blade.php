@@ -62,7 +62,7 @@
                 @foreach ($logs as $log)
                     <li wire:key="gatelog-{{ $log->id }}" class="gate-onsite__item">
                         <div>
-                            <span class="gate-onsite__plate">{{ $log->vehicle_number }}</span>
+                            <span class="gate-onsite__plate">{{ $log->vehicle->vehicle_number }}</span>
                             <span class="gate-onsite__driver">{{ $log->time_in->format('d/m/Y H:i') }}</span>
                         </div>
                         <div class="gate-onsite__meta">
