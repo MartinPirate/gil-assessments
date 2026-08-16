@@ -32,7 +32,7 @@ class ApprovalRequestResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canApprove() ?? false;
+        return Auth::user()?->canApprove() ?? false;
     }
 
     public static function canCreate(): bool

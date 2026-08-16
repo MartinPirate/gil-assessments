@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Approvals\Tables;
 
+use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\ApprovalRequest;
 use App\Services\ApprovalService;
+use App\Support\InvoiceCalculator;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
@@ -11,6 +13,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class ApprovalRequestsTable
 {
@@ -23,7 +26,7 @@ class ApprovalRequestsTable
                     ->weight('bold')
                     ->searchable(['doc_num'])
                     ->url(fn (ApprovalRequest $r) => $r->invoice
-                        ? \App\Filament\Resources\Invoices\InvoiceResource::getUrl('view', ['record' => $r->invoice])
+                        ? InvoiceResource::getUrl('view', ['record' => $r->invoice])
                         : null),
 
                 TextColumn::make('invoice.customer_name')
@@ -33,7 +36,10 @@ class ApprovalRequestsTable
 
                 TextColumn::make('amount')
                     ->label('Amount')
-                    ->numeric(decimalPlaces: 3)
+                    // Three places, like every other figure on the document —
+                    // InvoiceCalculator holds the scale so this column and the
+                    // register cannot disagree about the same amount.
+                    ->numeric(decimalPlaces: InvoiceCalculator::DOCUMENT_SCALE)
                     ->prefix('KES ')
                     ->alignEnd()
                     ->weight('bold')
@@ -97,8 +103,36 @@ class ApprovalRequestsTable
                     ->schema([
                         Textarea::make('reason')->label('Note (optional)')->rows(2)->maxLength(1000),
                     ])
-                    ->action(function (ApprovalRequest $record, array $data) {
-                        app(ApprovalService::class)->approve($record, Auth::user(), $data['reason'] ?? null);
+                    // Said before the click, not after: an approver whose
+                    // ceiling this breaches cannot decide it, and finding that
+                    // out by pressing Confirm and watching nothing happen is
+                    // how a working guard reads as a broken button.
+                    ->disabled(fn (ApprovalRequest $r) => ! (Auth::user()?->canApproveAmount((float) $r->amount) ?? false))
+                    ->tooltip(fn (ApprovalRequest $r) => (Auth::user()?->canApproveAmount((float) $r->amount) ?? false)
+                        ? null
+                        : 'KES '.number_format((float) $r->amount, 2).' is above your approval limit of KES '
+                            .number_format((float) Auth::user()?->approval_limit, 2).'. Someone with a higher ceiling must decide this one.')
+                    ->action(function (ApprovalRequest $record, array $data, Action $action) {
+                        try {
+                            app(ApprovalService::class)->approve($record, Auth::user(), $data['reason'] ?? null);
+                        } catch (ValidationException $e) {
+                            /*
+                             * The service reports refusals as validation
+                             * messages keyed 'request', and there is no form
+                             * field by that name — so Filament had nowhere to
+                             * put them and the modal sat there saying nothing.
+                             * Shown as a notification instead.
+                             */
+                            Notification::make()
+                                ->title('Not approved')
+                                ->body(collect($e->errors())->flatten()->implode(' '))
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+
+                            return;
+                        }
 
                         Notification::make()
                             ->title("{$record->invoice?->document_number} approved")
@@ -120,8 +154,24 @@ class ApprovalRequestsTable
                             ->required()
                             ->maxLength(1000),
                     ])
-                    ->action(function (ApprovalRequest $record, array $data) {
-                        app(ApprovalService::class)->reject($record, Auth::user(), $data['reason']);
+                    ->disabled(fn (ApprovalRequest $r) => ! (Auth::user()?->canApproveAmount((float) $r->amount) ?? false))
+                    ->tooltip(fn (ApprovalRequest $r) => (Auth::user()?->canApproveAmount((float) $r->amount) ?? false)
+                        ? null
+                        : 'KES '.number_format((float) $r->amount, 2).' is above your approval limit.')
+                    ->action(function (ApprovalRequest $record, array $data, Action $action) {
+                        try {
+                            app(ApprovalService::class)->reject($record, Auth::user(), $data['reason']);
+                        } catch (ValidationException $e) {
+                            Notification::make()
+                                ->title('Not rejected')
+                                ->body(collect($e->errors())->flatten()->implode(' '))
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+
+                            return;
+                        }
 
                         Notification::make()
                             ->title("{$record->invoice?->document_number} rejected")
