@@ -22,12 +22,13 @@ class UsersTable
                 TextColumn::make('name')->searchable()->sortable()->weight('bold'),
                 TextColumn::make('email')->searchable()->copyable(),
 
-                TextColumn::make('role')
+                TextColumn::make('roles.name')
+                    ->label('Role')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state instanceof UserRole ? $state->label() : $state)
-                    ->color(fn ($state): string => match ($state instanceof UserRole ? $state : null) {
+                    ->formatStateUsing(fn ($state) => UserRole::tryFrom((string) $state)?->label() ?? $state)
+                    ->color(fn ($state): string => match (UserRole::tryFrom((string) $state)) {
                         UserRole::Admin => 'danger',
-                        UserRole::Approver => 'warning',
+                        UserRole::Manager => 'warning',
                         UserRole::Sales => 'success',
                         UserRole::GateOfficer => 'info',
                         default => 'gray',

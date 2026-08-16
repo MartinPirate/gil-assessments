@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Enums\Permission;
 use App\Enums\UserRole;
-use App\Models\Driver;
 use App\Models\User;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -52,11 +53,18 @@ class UserForm
             ]),
 
             Section::make('Role & permissions')->columns(2)->schema([
+                /*
+                 * The role is a Laratrust row rather than a column, so it is
+                 * read from the pivot here and written back by the create and
+                 * edit pages once the user exists.
+                 */
                 Select::make('role')
                     ->options(UserRole::options())
                     ->required()
                     ->live()
+                    ->dehydrated(false)
                     ->default(UserRole::Sales->value)
+                    ->afterStateHydrated(fn ($component, ?User $record) => $component->state($record?->role()?->value))
                     // Same reasoning: do not let the last admin demote themself.
                     ->disabled(fn (?User $record) => $record?->is(Auth::user()) ?? false)
                     ->helperText(fn (?User $record) => $record?->is(Auth::user())
@@ -68,23 +76,30 @@ class UserForm
                     ->numeric()
                     ->minValue(0)
                     ->step('0.01')
-                    ->visible(fn (Get $get) => $get('role') === UserRole::Approver->value)
+                    /*
+                     * Shown for any role that carries the approval permission,
+                     * rather than for one named role — the ceiling belongs to
+                     * whoever may approve.
+                     */
+                    ->visible(fn (Get $get) => in_array(
+                        Permission::ApproveDocuments,
+                        UserRole::tryFrom((string) $get('role'))?->permissions() ?? [],
+                        true,
+                    ))
                     ->helperText('Leave blank for unlimited authority.'),
 
-                Select::make('driver_id')
+                /*
+                 * Read-only on purpose. Every driver record must have a login,
+                 * so a driver cannot be released from here — doing so would
+                 * leave the driver row pointing at nothing, which the database
+                 * no longer allows. The pairing is made once, on the Drivers
+                 * screen, where the driver and the account are created together.
+                 */
+                Placeholder::make('driver_record')
                     ->label('Linked driver record')
-                    ->options(fn (?User $record) => Driver::query()
-                        // Only unlinked drivers, plus whoever is already linked
-                        // to this user, so the current value is never lost.
-                        ->where(fn ($q) => $q->whereNull('user_id')->orWhere('user_id', $record?->getKey() ?? 0))
-                        ->orderBy('name')
-                        ->pluck('name', 'id'))
-                    ->searchable()
-                    ->visible(fn (Get $get) => $get('role') === UserRole::Driver->value)
-                    ->required(fn (Get $get) => $get('role') === UserRole::Driver->value)
-                    ->helperText('A driver login only shows the trips assigned to this driver record.')
-                    ->dehydrated(false)
-                    ->afterStateHydrated(fn ($component, ?User $record) => $component->state($record?->driver?->getKey())),
+                    ->content(fn (?User $record) => $record?->driver?->name
+                        ?? 'None. Driver records are created together with their login under Master Data → Drivers.')
+                    ->visible(fn (Get $get) => $get('role') === UserRole::Driver->value),
             ]),
         ]);
     }

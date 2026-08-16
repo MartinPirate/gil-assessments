@@ -15,6 +15,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Collection;
 
 /**
  * A person, as an account with a history rather than four form fields.
@@ -107,9 +108,9 @@ class ViewUser extends ViewRecord
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, LoginSession>
+     * @return Collection<int, LoginSession>
      */
-    public function getSessions(): \Illuminate\Support\Collection
+    public function getSessions(): Collection
     {
         return LoginSession::query()
             ->where('user_id', $this->getRecord()->getKey())
@@ -119,9 +120,9 @@ class ViewUser extends ViewRecord
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, AuditLog>
+     * @return Collection<int, AuditLog>
      */
-    public function getActivity(): \Illuminate\Support\Collection
+    public function getActivity(): Collection
     {
         return AuditLog::query()
             ->where('user_id', $this->getRecord()->getKey())
