@@ -103,7 +103,9 @@ trait Auditable
             // Snapshotted: the log must still read correctly if the user is
             // renamed or deactivated later.
             'user_name' => $user?->name,
-            'user_role' => $user?->role?->value ?? null,
+            // role() rather than ->role: the role is a Laratrust row now, not
+            // a column, so there is no attribute of that name to read.
+            'user_role' => $user?->role()?->value,
             'event' => $event,
             'auditable_type' => static::class,
             'auditable_id' => $this->getKey(),
