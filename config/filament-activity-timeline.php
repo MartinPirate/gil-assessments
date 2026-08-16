@@ -14,12 +14,14 @@ return [
     |--------------------------------------------------------------------------
     |
     | The name of the source used when a timeline does not explicitly pick one.
-    | The package ships with the "spatie" source. Register your own sources
-    | through the SourceRegistry to add more.
+    | The package ships with a "spatie" source, but this application keeps its
+    | trail in audit_logs rather than spatie/laravel-activitylog, so the default
+    | points at our own order lifecycle source instead. Register further sources
+    | through the SourceRegistry.
     |
     */
 
-    'default_source' => 'spatie',
+    'default_source' => 'order',
 
     /*
     |--------------------------------------------------------------------------
