@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Drivers;
 use App\Filament\Resources\Drivers\Pages\CreateDriver;
 use App\Filament\Resources\Drivers\Pages\EditDriver;
 use App\Filament\Resources\Drivers\Pages\ListDrivers;
+use App\Filament\Resources\Drivers\Pages\ViewDriver;
 use App\Filament\Resources\Drivers\Schemas\DriverForm;
 use App\Filament\Resources\Drivers\Tables\DriversTable;
 use App\Models\Driver;
@@ -13,12 +14,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class DriverResource extends Resource
 {
     protected static ?string $model = Driver::class;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
 
@@ -28,7 +31,7 @@ class DriverResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canAdminister() ?? false;
+        return Auth::user()?->canAdminister() ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -53,6 +56,7 @@ class DriverResource extends Resource
         return [
             'index' => ListDrivers::route('/'),
             'create' => CreateDriver::route('/create'),
+            'view' => ViewDriver::route('/{record}'),
             'edit' => EditDriver::route('/{record}/edit'),
         ];
     }
