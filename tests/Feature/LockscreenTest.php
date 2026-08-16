@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use lockscreen\FilamentLockscreen\Http\Middleware\Locker;
 use Tests\TestCase;
 
 /**
@@ -41,7 +42,7 @@ class LockscreenTest extends TestCase
             $middleware,
         );
 
-        $this->assertContains(\lockscreen\FilamentLockscreen\Http\Middleware\Locker::class, $names);
+        $this->assertContains(Locker::class, $names);
     }
 
     public function test_an_anonymous_visitor_cannot_reach_the_lock_screen(): void
@@ -81,7 +82,7 @@ class LockscreenTest extends TestCase
         $this->actingAs($user)->post('admin/lock-session');
 
         $this->actingAs($user)
-            ->get('admin/dashboard')
+            ->get('admin')
             ->assertRedirect();
     }
 
@@ -106,6 +107,6 @@ class LockscreenTest extends TestCase
     {
         $this->actingAs(User::factory()->role(UserRole::Admin)->create());
 
-        $this->get('admin/dashboard')->assertSuccessful();
+        $this->get('admin')->assertSuccessful();
     }
 }
