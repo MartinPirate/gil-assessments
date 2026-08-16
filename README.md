@@ -23,7 +23,8 @@ rather than something anyone could run:
 | Approval workflow with per-approver limits | `Sales → Approvals` |
 | Routes, trips and a driver self-service portal | `Operations`, `Driver → My Trips` |
 | Audit log — every change, with who and from where | `Administration → Audit Log` |
-| User administration with role and driver linking | `Administration → Users` |
+| User administration, roles and permissions | `Administration → Users`, `→ Roles and permissions` |
+| Driver licences on file, invoices rendered to PDF | `Master Data → Drivers`, `Sales → Invoice Register` |
 | Custom error handling, three response shapes by audience | throughout |
 
 ---
@@ -87,12 +88,60 @@ Open <http://127.0.0.1:8000/admin>. All accounts use the password `password`:
 | --- | --- | --- |
 | `admin@gil.test` | Administrator | everything, including master data |
 | `sales@gil.test` | Sales | A/R Invoice, Invoice Register, payments |
-| `approver@gil.test` | Approver | the approval queue (limit: 50,000) |
+| `manager@gil.test` | Manager | the approval queue (limit: 50,000) |
+| `manager2@gil.test` | Manager | the approval queue (no ceiling) |
 | `gate@gil.test` | Gate Officer | Gate In / Out / Log, routes and trips |
 | `driver@gil.test` | Driver | **only** their own trips — nothing else |
 
 Signing in as each shows a different navigation and a different dashboard —
 the role gating is real, not cosmetic.
+
+Every driver has a login: `driver@gil.test` through `driver6@gil.test`, one per
+seeded driver. A driver record cannot exist without an account, so the two are
+created together on `Master Data → Drivers` rather than linked afterwards.
+
+### Roles and permissions
+
+Roles are [Laratrust](https://laratrust.santigarcor.me/) rows, provisioned from
+`UserRole::permissions()` by `App\Support\AccessControl::sync()` — so the matrix
+lives in one reviewable place and the database is brought into line by running
+the seeder.
+
+**Approving is a permission, not a role.** `approve-documents` is held by
+Administrators and Managers, because "may approve a document" is something a
+person is trusted with rather than a job they do all day. The per-approver
+ceiling on `users.approval_limit` is unchanged and still enforced.
+
+`Administration → Roles and permissions` shows the matrix and how many accounts
+hold each role.
+
+### Documents on file
+
+Files are kept with [spatie/laravel-medialibrary](https://spatie.be/docs/laravel-medialibrary/v11/introduction):
+
+| What | Where | Collection |
+| --- | --- | --- |
+| Driver's licence — one per driver, replaced on re-upload | `Master Data → Drivers` | `licence` |
+| The rendered invoice PDF | `Sales → Invoice Register` → **PDF** | `pdf` (single file) |
+| Anything scanned back in against a document | `Invoice Register` | `attachments` |
+
+The PDF is stored rather than streamed on demand, so the file a customer was
+sent can be produced again unchanged — regenerating from live data would
+quietly restate the document as it looks now. Drafts do not get one.
+
+The seed ships **14 invoices** written through `InvoiceWriter` rather than
+inserted, so each one really went down the write path: numbers issued under a
+row lock, VAT resolved server-side, the approval threshold applied. Six breach
+the threshold and sit in the approval queue; two are drafts.
+
+### Model docblocks
+
+`barryvdh/laravel-ide-helper` annotates the models. The generated files are
+git-ignored; regenerate them with:
+
+```bash
+composer ide-helper
+```
 
 ---
 
