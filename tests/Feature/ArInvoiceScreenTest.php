@@ -8,6 +8,8 @@ use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\SalesEmployee;
 use App\Models\User;
+use App\Models\Warehouse;
+use Database\Seeders\ReferenceDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -31,23 +33,32 @@ class ArInvoiceScreenTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\ReferenceDataSeeder::class);
+        $this->seed(ReferenceDataSeeder::class);
 
         $this->user = User::factory()->create();
 
         $this->customer = Customer::create([
             'code' => 'CC00001',
             'name' => 'Walk In Customer - HQ',
-            'contact_person' => 'Jane Wanjiru',
             'currency' => 'KES',
             'kra_pin' => 'P051234567X',
         ]);
+
+        // The first contact created becomes the customer's default, which is
+        // the name the document picks up.
+        $this->customer->contactPeople()->create([
+            'name' => 'Jane Wanjiru',
+            'email' => 'jane.wanjiru@naivas.co.ke',
+            'phone' => '+254711234001',
+        ]);
+
+        $this->customer->refresh();
 
         $this->item = Item::create([
             'item_no' => 'FG00011',
             'description' => 'Umi All Purpose Home Baking Flour 2Kg',
             'uom' => 'Bales',
-            'warehouse' => 'FG WHS',
+            'warehouse_id' => Warehouse::where('code', 'FG WHS')->value('id'),
             'unit_price' => 1850,
             'qty_in_warehouse' => 648,
         ]);
@@ -74,10 +85,8 @@ class ArInvoiceScreenTest extends TestCase
             'lines' => [
                 [
                     'item_id' => $this->item->id,
-                    'item_no' => $this->item->item_no,
                     'item_description' => $this->item->description,
-                    'uom' => 'Bales',
-                    'warehouse' => 'FG WHS',
+                    'warehouse_id' => Warehouse::where('code', 'FG WHS')->value('id'),
                     'quantity' => 2,
                     'price_before_discount' => 1850,
                     'discount_percent' => 0,
@@ -363,5 +372,64 @@ class ArInvoiceScreenTest extends TestCase
 
         $this->assertNull($invoice->etr_barcode);
         $this->assertNull($invoice->etr_scanned_at);
+    }
+
+    /**
+     * "Up to 3 decimal places" has to be enforced, not merely displayed.
+     *
+     * The number input's step is a hint the browser honours and a paste
+     * ignores, so the refusal lives on the server as well. Caught here on the
+     * down payment, which is where a fourth decimal was getting through.
+     */
+    public function test_a_fourth_decimal_place_is_refused(): void
+    {
+        $document = $this->validDocument();
+        $document['total_down_payment'] = 0.0015;
+
+        Livewire::actingAs($this->user)
+            ->test(ArInvoice::class)
+            ->fillForm($document)
+            ->call('save')
+            ->assertHasFormErrors(['total_down_payment']);
+
+        $this->assertSame(0, Invoice::count());
+    }
+
+    public function test_three_decimal_places_are_accepted(): void
+    {
+        $document = $this->validDocument();
+        $document['total_down_payment'] = 0.001;
+
+        Livewire::actingAs($this->user)
+            ->test(ArInvoice::class)
+            ->fillForm($document)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame(1, Invoice::count());
+    }
+
+    /**
+     * The same bound on the columns the brief names.
+     */
+    public function test_a_fourth_decimal_place_is_refused_on_the_line_columns(): void
+    {
+        $document = $this->validDocument();
+        $document['lines'][0]['price_before_discount'] = 1850.0625;
+
+        Livewire::actingAs($this->user)
+            ->test(ArInvoice::class)
+            ->fillForm($document)
+            ->call('save')
+            ->assertHasFormErrors(['lines.0.price_before_discount']);
+
+        $document = $this->validDocument();
+        $document['lines'][0]['discount_percent'] = 5.405405;
+
+        Livewire::actingAs($this->user)
+            ->test(ArInvoice::class)
+            ->fillForm($document)
+            ->call('save')
+            ->assertHasFormErrors(['lines.0.discount_percent']);
     }
 }
