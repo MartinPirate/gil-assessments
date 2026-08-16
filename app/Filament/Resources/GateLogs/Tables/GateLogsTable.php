@@ -13,16 +13,16 @@ class GateLogsTable
     {
         return $table
             ->columns([
-                TextColumn::make('vehicle_number')
+                TextColumn::make('vehicle.vehicle_number')
                     ->label('Vehicle')
                     ->weight('bold')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('driver_name')
+                TextColumn::make('driver.name')
                     ->label('Driver')
-                    ->description(fn (GateLog $r) => $r->driver_national_id.' · '.$r->driver_phone)
-                    ->searchable(['driver_name', 'driver_national_id', 'driver_phone']),
+                    ->description(fn (GateLog $r) => $r->driver?->national_id.' · '.$r->driver?->phone)
+                    ->searchable(),
 
                 TextColumn::make('time_in')
                     ->label('Time In')

@@ -9,8 +9,9 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Read-only audit trail of gate movements. Records are written by the Gate In
@@ -33,9 +34,35 @@ class GateLogResource extends Resource
         return GateLogsTable::configure($table);
     }
 
+    /**
+     * The gate officer reads the whole log; a driver reads their own line of it.
+     *
+     * A driver being turned away from the record of their own movements is the
+     * one thing here nobody can justify — they were the person at the barrier.
+     */
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canOperateGate() ?? false;
+        $user = Auth::user();
+
+        return (bool) ($user?->canOperateGate() || ($user?->isDriver() && $user->driverId()));
+    }
+
+    /**
+     * A driver sees only their own crossings.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = Auth::user();
+
+        if (! $user || $user->canOperateGate()) {
+            return $query;
+        }
+
+        // Falls back to 0 rather than to an unscoped query: a driver account
+        // with no driver record must see nothing, not everything.
+        return $query->where('driver_id', $user->driverId() ?? 0);
     }
 
     public static function canCreate(): bool
@@ -43,10 +70,14 @@ class GateLogResource extends Resource
         return false;
     }
 
-    /** Badge showing how many vehicles are on site right now. */
+    /**
+     * Badge showing how many vehicles are on site right now — counted through
+     * the same query as the table, so a driver's badge cannot advertise
+     * movements they are not allowed to open.
+     */
     public static function getNavigationBadge(): ?string
     {
-        $open = GateLog::query()->open()->count();
+        $open = static::getEloquentQuery()->open()->count();
 
         return $open > 0 ? (string) $open : null;
     }
