@@ -2,17 +2,20 @@
 
 namespace App\Filament\Resources\Invoices;
 
+use App\Filament\Concerns\ScopesToOwnWork;
 use App\Filament\Resources\Invoices\Pages\ListInvoices;
 use App\Filament\Resources\Invoices\Pages\ListOrders;
 use App\Filament\Resources\Invoices\Pages\ViewInvoice;
 use App\Filament\Resources\Invoices\Tables\InvoicesTable;
 use App\Models\Invoice;
 use BackedEnum;
+use Filament\Navigation\NavigationItem;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
  * Read-only register of posted A/R invoices.
@@ -23,7 +26,11 @@ use Illuminate\Support\Facades\Auth;
  */
 class InvoiceResource extends Resource
 {
+    use ScopesToOwnWork;
+
     protected static ?string $model = Invoice::class;
+
+    protected static ?string $recordTitleAttribute = 'doc_num';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
@@ -38,9 +45,19 @@ class InvoiceResource extends Resource
         return InvoicesTable::configure($table);
     }
 
+    /**
+     * Reading the register is not the same as writing a document.
+     *
+     * Approvers were shut out of it, which left a manager with a queue of
+     * documents awaiting their decision and no way to open one and read what
+     * they were being asked to approve. Raising an invoice stays with sales —
+     * that gate lives on the A/R Invoice page itself.
+     */
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canSell() ?? false;
+        $user = Auth::user();
+
+        return (bool) ($user?->canSell() || $user?->canApprove());
     }
 
     public static function canCreate(): bool
@@ -64,13 +81,13 @@ class InvoiceResource extends Resource
             // The register's own item would otherwise stay lit on the orders
             // route too, since Filament matches the whole resource by prefix.
             ...collect(parent::getNavigationItems())
-                ->each(fn (\Filament\Navigation\NavigationItem $item) => $item->isActiveWhen(
+                ->each(fn (NavigationItem $item) => $item->isActiveWhen(
                     fn (): bool => request()->routeIs(static::getRouteBaseName().'.*')
                         && ! request()->routeIs($ordersRoute),
                 ))
                 ->all(),
 
-            \Filament\Navigation\NavigationItem::make('Orders')
+            NavigationItem::make('Orders')
                 ->group('Sales')
                 ->icon(Heroicon::OutlinedShoppingBag)
                 ->sort(1)
@@ -90,5 +107,14 @@ class InvoiceResource extends Resource
             'orders' => ListOrders::route('/orders'),
             'view' => ViewInvoice::route('/{record}'),
         ];
+    }
+
+    /**
+     * A salesperson sees the documents they raised; approvers and
+     * administrators see the register.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return static::scopeInvoicesToOwn(parent::getEloquentQuery());
     }
 }

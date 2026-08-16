@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\Invoices\Tables;
 
+use App\Models\Invoice;
+use App\Services\InvoicePdf;
+use App\Support\InvoiceCalculator;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -36,19 +40,19 @@ class InvoicesTable
 
                 TextColumn::make('total_before_discount')
                     ->label('Before Disc.')
-                    ->numeric(decimalPlaces: 3)
+                    ->numeric(decimalPlaces: InvoiceCalculator::DOCUMENT_SCALE)
                     ->alignEnd()
                     ->sortable(),
 
                 TextColumn::make('discount_percent')
                     ->label('Disc. %')
-                    ->numeric(decimalPlaces: 3)
+                    ->numeric(decimalPlaces: InvoiceCalculator::DOCUMENT_SCALE)
                     ->alignEnd()
                     ->toggleable(),
 
                 TextColumn::make('total_after_discount')
                     ->label('Total')
-                    ->numeric(decimalPlaces: 3)
+                    ->numeric(decimalPlaces: InvoiceCalculator::DOCUMENT_SCALE)
                     ->alignEnd()
                     ->weight('bold')
                     ->sortable(),
@@ -96,8 +100,38 @@ class InvoicesTable
                     ->label('Posting date')
                     ->placeholder('Any date'),
             ])
+            /*
+             * Buttons rather than bare icons. Rendered as icons they were easy
+             * to miss entirely — a register where only the row under the mouse
+             * looks actionable reads as though the rest are locked.
+             */
             ->recordActions([
-                ViewAction::make(),
+                ViewAction::make()
+                    ->button()
+                    ->outlined()
+                    ->size('xs'),
+
+                /*
+                 * Renders the document and files it against the invoice, then
+                 * hands it over. Stored rather than streamed so the file that
+                 * was sent to a customer can be produced again unchanged.
+                 *
+                 * Drafts are excluded: a draft is not a document anybody should
+                 * be sending out.
+                 */
+                Action::make('pdf')
+                    ->label(fn (Invoice $record) => $record->hasPdf() ? 'PDF' : 'Generate PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->button()
+                    ->outlined()
+                    ->size('xs')
+                    ->color('gray')
+                    ->visible(fn (Invoice $record) => $record->doc_type !== Invoice::TYPE_DRAFT)
+                    ->action(function (Invoice $record) {
+                        $media = $record->pdf() ?? app(InvoicePdf::class)->render($record);
+
+                        return response()->download($media->getPath(), $media->file_name);
+                    }),
             ]);
     }
 }
