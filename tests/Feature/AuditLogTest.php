@@ -141,7 +141,7 @@ class AuditLogTest extends TestCase
 
     public function test_only_admins_can_read_the_audit_trail(): void
     {
-        foreach ([UserRole::Sales, UserRole::Approver, UserRole::GateOfficer, UserRole::Driver] as $role) {
+        foreach ([UserRole::Sales, UserRole::Manager, UserRole::GateOfficer, UserRole::Driver] as $role) {
             $this->actingAs(User::factory()->role($role)->create());
             $this->assertFalse(AuditLogResource::canAccess(), "{$role->value} must not read the audit log.");
         }
