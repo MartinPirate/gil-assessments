@@ -375,9 +375,6 @@
    Totals block — right aligned, monospaced figures
    -------------------------------------------------------------------------- */
 
-.sap-totals .fi-fo-field {
-    grid-template-columns: minmax(0, 1fr) 13rem;
-}
 
 /* Totals captions hug the figures they describe. */
 .sap-totals .fi-fo-field-label-ctn {
@@ -1254,32 +1251,6 @@
     --primary-950: #0d1d2d;
 }
 
-/* --------------------------------------------------------------------------
-   Launchpad bar without a topbar
-   --------------------------------------------------------------------------
-   The Launchpad space switcher renders as `.fi-topbar-ctn` and is stuck to
-   `top: 64px` — the height of the Filament topbar it expects to sit beneath.
-   This panel renders no topbar, so the bar hung 64px down the page and the
-   page heading passed underneath it.
-
-   It is a space switcher, not a toolbar; nothing is lost by letting it sit in
-   the normal flow at the top of the content.
-   -------------------------------------------------------------------------- */
-
-/*
-   The Launchpad space switcher is not rendered.
-
-   It is a strip across the top of every page carrying three things, none of
-   which earn the room: the panel's brand, which the sidebar already shows; a
-   sidebar toggle, which duplicates the collapse chevron in the sidebar header;
-   and a switcher between spaces, of which this application has exactly one.
-
-   The launchpad itself is untouched and still lives at the panel root, which
-   the brand in the sidebar links to.
-*/
-.fi-launchpad-bar-ctn {
-    display: none;
-}
 
 /* --------------------------------------------------------------------------
    Roles and permissions matrix
@@ -1801,7 +1772,22 @@
 }
 
 /* Header inputs are fixed-width boxes, not full-bleed fields. */
-.sap-header .fi-fo-field-content-col { max-width: 10.5rem; }
+.sap-header .fi-fo-field-content-col { max-width: 13.5rem; }
+
+/*
+   The two lookups are select controls, so they carry a clear button and a
+   chevron the plain inputs beside them do not. Between them they were taking
+   about a third of the box, which is why "Walk In Customer - HQ" arrived as
+   "Walk In Customer…" while the identical text sat untruncated in Customer
+   Name directly underneath.
+
+   The client has no clear button — you pick another partner, you do not empty
+   the field — so it goes, and the name gets the room back.
+*/
+.sap-header .fi-select-input-value-remove-btn { display: none; }
+
+.sap-header .fi-select-input-value-ctn,
+.sap-header .fi-select-input-value-label { min-width: 0; }
 
 /* The document bolds this one caption. */
 .sap-field--emphasis .fi-fo-field-label-ctn,
@@ -1883,9 +1869,49 @@
    Totals block
    -------------------------------------------------------------------------- */
 
-.sap-totals .fi-fo-field { grid-template-columns: minmax(0, 1fr) 9rem; }
+/*
+   The block hugs the right edge of the document rather than spreading across
+   its half of the footer.
+
+   Left to fill the column, the label took every spare pixel and the caption
+   ended up an inch and a half from the figure it belongs to. The client keeps
+   the two together in a narrow stack pinned to the right margin, so the
+   container is capped and pushed over instead.
+*/
+.sap-totals {
+    max-width: 21rem;
+    margin-left: auto;
+}
+
+/*
+   Each caption sits directly against its own figure, and the pair is pushed to
+   the right margin.
+
+   The label column used to be `1fr`, which handed it every spare pixel in the
+   footer's right-hand half — so "Total Before Discount" ended up level with
+   the middle of the page while its box stayed at the far edge. A fixed label
+   column plus justify-content: end keeps the two together no matter how wide
+   the container turns out to be, which is what the client does.
+
+   Scoped under .sap-footer so it outranks the generic footer field rule
+   regardless of the order the two end up in.
+*/
+.sap-footer .sap-totals .fi-fo-field {
+    display: grid;
+    grid-template-columns: 10rem 8.5rem;
+    justify-content: end;
+    column-gap: 0.4rem;
+    margin-bottom: 0.1rem;
+    align-items: center;
+}
+
 .sap-totals .fi-fo-field-label-ctn { text-align: left; padding-right: 0.35rem; }
 .sap-totals input { text-align: right; font-size: 0.72rem; }
+
+/* The percent and currency affixes must not widen the box past the others. */
+.sap-totals .fi-input-wrp { min-height: 1.25rem; }
+.sap-totals .fi-input-wrp .fi-input-wrp-prefix,
+.sap-totals .fi-input-wrp .fi-input-wrp-suffix { font-size: 0.68rem; padding-inline: 0.3rem; }
 
 /* --------------------------------------------------------------------------
    Action bar
@@ -1949,3 +1975,368 @@
 /* The suffix action (the orange drill arrow) was setting the row height. */
 .sap-header .fi-input-wrp .fi-icon-btn { padding: 0; min-height: 0; }
 .sap-header .fi-input-wrp .fi-icon-btn .fi-icon { width: 0.8rem; height: 0.8rem; }
+
+/* --------------------------------------------------------------------------
+   Resizable grid columns
+   --------------------------------------------------------------------------
+   A four-pixel grab strip on the trailing edge of every header cell. It is
+   invisible until pointed at, so the header still reads as the client's.
+   -------------------------------------------------------------------------- */
+
+.sap-contents thead th { position: relative; }
+
+.sap-col-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+    touch-action: none;
+    background: transparent;
+}
+
+.sap-col-resizer:hover,
+.sap-col-resizing .sap-col-resizer:active {
+    background: var(--sap-navy, #1d3f63);
+    opacity: 0.55;
+}
+
+/* While dragging, nothing else on the page should select or hover. */
+.sap-col-resizing,
+.sap-col-resizing * {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Grid selects — the value gets the room, not the furniture
+   --------------------------------------------------------------------------
+   A select in the grid carries a prefix icon and a chevron, and both were
+   sized for a full-width form field. Shrunk to the row's scale they leave the
+   code itself legible: "FG WHS" rather than "FG W…".
+   -------------------------------------------------------------------------- */
+
+.sap-contents tbody .fi-input-wrp-prefix,
+.sap-contents tbody .fi-input-wrp-suffix {
+    padding-inline: 0.15rem;
+}
+
+.sap-contents tbody .fi-input-wrp-prefix .fi-icon,
+.sap-contents tbody .fi-input-wrp-suffix .fi-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+/* The dropdown arrow is chrome; the client does not draw one at all. */
+.sap-contents tbody .fi-select-input-btn .fi-select-input-btn-icon {
+    width: 0.7rem;
+    height: 0.7rem;
+    opacity: 0.45;
+}
+
+/* Whatever is left over belongs to the value. */
+.sap-contents tbody .fi-select-input-value-ctn,
+.sap-contents tbody .fi-select-input-value-label {
+    min-width: 0;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   Payment Order Run
+   --------------------------------------------------------------------------
+   The client sets this flag apart from the fields above it — Sales Employee
+   and Owner are things you fill in, this is something the system reports back
+   — and leaves a clear gap above it. Ours sat flush under Owner and read as a
+   third entry field.
+   -------------------------------------------------------------------------- */
+
+.sap-footer .sap-flag {
+    /* The sample leaves roughly three rows of air here, separating what you
+       fill in above from what the system reports below. */
+    margin-top: 2.1rem;
+    margin-bottom: 0.9rem;
+}
+
+.sap-footer .sap-flag .fi-fo-field-label-ctn label {
+    color: var(--sap-label);
+}
+
+/* Remarks and QRCode share a row; the QR box aligns with the top of the
+   notes rather than floating against their middle. */
+.sap-footer .sap-remarks-row {
+    column-gap: 1.5rem;
+}
+
+.sap-footer .sap-qrcode-field {
+    align-self: start;
+}
+
+/* --------------------------------------------------------------------------
+   Density pass — the sample runs tighter than a web form does
+   --------------------------------------------------------------------------
+   The client fits its whole header into about 90px and its grid rows into 16.
+   Everything here was already scaled down once; this takes it the rest of the
+   way, and keeps the ratio between caption and value the sample has (the
+   caption is the smaller of the two, not the larger).
+   -------------------------------------------------------------------------- */
+
+.sap-page .fi-fo-field-label-ctn,
+.sap-page .fi-fo-field-label-ctn label { font-size: 0.66rem; }
+
+.sap-page .fi-input,
+.sap-page .fi-select-input,
+.sap-page .fi-select-input-btn { font-size: 0.68rem; }
+
+.sap-header .fi-fo-field { min-height: 1.15rem; }
+.sap-header .fi-input-wrp,
+.sap-header .fi-fo-select-wrp .fi-input-wrp { min-height: 1rem; }
+
+/* Column captions in the grid sit smaller still, as they do in the client. */
+.sap-contents thead th { font-size: 0.62rem; letter-spacing: 0.2px; }
+.sap-contents tbody .fi-input,
+.sap-contents tbody .fi-select-input-btn { font-size: 0.66rem; }
+
+.sap-footer .fi-fo-field-label-ctn label { font-size: 0.66rem; }
+.sap-totals input { font-size: 0.68rem; }
+
+/* --------------------------------------------------------------------------
+   Derived columns are shaded
+   --------------------------------------------------------------------------
+   The client tints every column it works out for you — quantity in warehouse,
+   price after discount, the gross figures — so the eye can tell at a glance
+   which cells accept typing and which only report. Ours shaded one of them.
+   -------------------------------------------------------------------------- */
+
+.sap-contents tbody td:has(.sap-derived),
+.sap-contents tbody td:has(.sap-derived) .fi-input-wrp {
+    background: var(--sap-readonly, #e8eef6);
+}
+
+.sap-contents tbody td:has(.sap-derived) .fi-input {
+    background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Summary Type
+   --------------------------------------------------------------------------
+   The chevron was drawn at form scale and overlapped the right border of a box
+   sized for the words "By Document".
+   -------------------------------------------------------------------------- */
+
+.sap-contents .fi-fo-field:has([id$='summary_type']) .fi-input-wrp,
+.sap-summary .fi-input-wrp { padding-right: 0.1rem; }
+
+.sap-summary .fi-select-input-btn-icon,
+.sap-contents .fi-fo-field:has([id$='summary_type']) .fi-select-input-btn-icon {
+    width: 0.65rem;
+    height: 0.65rem;
+    margin-left: 0.15rem;
+}
+
+/* --------------------------------------------------------------------------
+   Density — applied to the element that actually carries the size
+   --------------------------------------------------------------------------
+   Every caption rule above set font-size on the <label>. Filament puts the
+   text in a <span class="fi-fo-field-label-content"> which declares its own
+   `font-size: var(--text-sm)`, and a declaration on the child beats a size
+   inherited from the parent — so none of it ever reached the screen. That is
+   why the captions stayed at Filament's 14px no matter what the label said.
+   -------------------------------------------------------------------------- */
+
+.sap-page .fi-fo-field-label-content {
+    font-size: 0.66rem;
+    line-height: 1.2;
+    font-weight: 500;
+}
+
+.sap-contents thead th .fi-fo-field-label-content,
+.sap-contents .fi-fo-field-label-content { font-size: 0.62rem; }
+
+/* The totals stack reads smaller still — it is a summary, not a form. */
+.sap-footer .sap-totals .fi-fo-field-label-content { font-size: 0.63rem; }
+.sap-footer .sap-totals .fi-input,
+.sap-footer .sap-totals .fi-input-wrp-prefix,
+.sap-footer .sap-totals .fi-input-wrp-suffix { font-size: 0.63rem; }
+.sap-footer .sap-totals .fi-input-wrp { min-height: 1.15rem; }
+
+/* --------------------------------------------------------------------------
+   Payment Order Run reads as disabled
+   --------------------------------------------------------------------------
+   The control is disabled, but Filament greys the box and leaves the caption
+   at full strength, so it still looked like something you could tick.
+   -------------------------------------------------------------------------- */
+
+.sap-footer .sap-flag .fi-fo-field-label-content,
+.sap-footer .sap-flag label {
+    color: var(--sap-label);
+    opacity: 0.65;
+}
+
+.sap-footer .sap-flag input[type='checkbox'] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Document numbering block, pinned right
+   --------------------------------------------------------------------------
+   Same shape of fix as the totals stack: capped and pushed over, so No.,
+   Status and the three dates sit against the right edge of the document
+   rather than adrift in the middle of it.
+   -------------------------------------------------------------------------- */
+
+.sap-header .sap-docmeta {
+    max-width: 24rem;
+    margin-left: auto;
+}
+
+.sap-header .sap-docmeta .fi-fo-field {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    column-gap: 0.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   Action bar buttons — the client's, not the framework's
+   --------------------------------------------------------------------------
+   The sample uses small, square-cornered buttons: a filled steel-blue primary,
+   flat grey secondaries with a hairline border, and a caret on the three that
+   open a menu. Filament's defaults are taller, rounder and softer than that.
+   -------------------------------------------------------------------------- */
+
+.sap-actions .fi-btn {
+    border-radius: 2px;
+    padding: 0.2rem 0.75rem;
+    min-height: 1.55rem;
+    font-size: 0.7rem;
+    font-weight: 400;
+    box-shadow: none;
+    border: 1px solid var(--sap-border);
+}
+
+/* The two filled ones: Add & New, and Copy From. */
+.sap-actions .fi-btn.fi-color-primary {
+    background: var(--sap-navy);
+    border-color: var(--sap-navy);
+    color: #fff;
+}
+
+.sap-actions .fi-btn.fi-color-primary:hover {
+    background: #24547f;
+    border-color: #24547f;
+}
+
+/*
+   Cancel is filled too. In the sample every button in this bar is the same
+   navy — the only one that reads differently is Copy To, because it is dead.
+*/
+.sap-actions .fi-btn.fi-color-gray:not(:disabled):not([disabled]) {
+    background: var(--sap-navy);
+    border-color: var(--sap-navy);
+    color: #fff;
+}
+
+.sap-actions .fi-btn.fi-color-gray:not(:disabled):not([disabled]):hover {
+    background: #24547f;
+    border-color: #24547f;
+}
+
+/* Disabled reads disabled — Copy To has nothing to copy to yet. */
+.sap-actions .fi-btn:disabled,
+.sap-actions .fi-btn[disabled] {
+    background: #f4f5f7;
+    color: #9aa3ad;
+    border-color: #dfe3e8;
+    cursor: not-allowed;
+}
+
+/*
+   The split-button caret. In the client, Add & New, Add Draft & New and Copy
+   From each carry a small triangle behind a hairline divider, marking the ones
+   that open a menu of related choices.
+*/
+.sap-actions [data-sap-split]::after {
+    content: '\25BE';
+    margin-left: 0.4rem;
+    padding-left: 0.3rem;
+    border-left: 1px solid currentColor;
+    opacity: 0.55;
+    font-size: 0.55rem;
+    line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Derived columns, painted full height
+   --------------------------------------------------------------------------
+   The row ruling and the column tint are layered on the same container: the
+   bands sit underneath, the ruling on top, so a shaded column stays shaded
+   past the last row of data — as it does in the client.
+   -------------------------------------------------------------------------- */
+
+.sap-contents .fi-fo-table-repeater {
+    background-image:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 1.65rem,
+            var(--sap-border-soft) 1.65rem,
+            var(--sap-border-soft) calc(1.65rem + 1px)
+        ),
+        var(--sap-bands, none);
+    /* The ruling is horizontal, so it does not care about x. The bands do:
+       the table scrolls inside this container, and a background pinned to the
+       container would leave the tint behind while the columns moved. */
+    background-position: 0 2.1rem, var(--sap-bands-x, 0) 2.1rem;
+    background-repeat: repeat, no-repeat;
+    /* The bands layer is as wide as the table, not the viewport onto it. */
+    background-size: auto, var(--sap-bands-w, 100%) calc(100% - 2.1rem);
+}
+
+/* --------------------------------------------------------------------------
+   Route map
+   -------------------------------------------------------------------------- */
+
+.route-map__canvas {
+    height: 22rem;
+    width: 100%;
+    border: 1px solid var(--sap-border);
+    border-radius: 4px;
+    z-index: 0;      /* keep Leaflet's panes under Filament's dropdowns */
+}
+
+.route-map__hint {
+    margin-top: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--sap-label);
+}
+
+/* --------------------------------------------------------------------------
+   Summary Type
+   --------------------------------------------------------------------------
+   The box was sized for the words and the chevron then drew on top of the
+   final letter — "No Summary" arriving as "No Summar\u25BE". Give it a floor
+   width and keep the caret out of the text's way.
+   -------------------------------------------------------------------------- */
+
+.sap-summary,
+.sap-summary .fi-fo-field-content-col { min-width: 9.5rem; }
+
+.sap-summary .fi-input-wrp { padding-right: 0.15rem; }
+
+.sap-summary .fi-select-input-value-ctn,
+.sap-summary .fi-select-input-value-label {
+    min-width: 0;
+    padding-right: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sap-summary .fi-select-input-btn-icon {
+    flex: 0 0 auto;
+    margin-left: 0;
+}
