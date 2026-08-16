@@ -3,17 +3,20 @@
 namespace Tests\Feature;
 
 use App\Enums\OrderStage;
+use App\Enums\UserRole;
+use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Invoice;
 use App\Models\OrderStageEvent;
 use App\Models\Route;
 use App\Models\Trip;
+use App\Models\User;
 use App\Models\Vehicle;
 use App\Services\OrderLifecycleService;
-use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Services\TripService;
 use App\Support\Timeline\OrderStageSource;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -89,7 +92,7 @@ class OrderLifecycleTest extends TestCase
             'occurred_at' => now(),
         ]);
 
-        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+        $this->expectException(UniqueConstraintViolationException::class);
 
         OrderStageEvent::create([
             'invoice_id' => $invoice->id,
@@ -142,7 +145,7 @@ class OrderLifecycleTest extends TestCase
             'origin' => 'Nairobi', 'destination' => 'Mombasa',
         ]);
         $vehicle = Vehicle::create(['vehicle_number' => 'KDA 001A', 'make' => 'Isuzu']);
-        $driver = Driver::create(['name' => 'John Mwangi', 'national_id' => '12345678', 'phone' => '254700000001']);
+        $driver = Driver::factory()->create(['name' => 'John Mwangi', 'national_id' => '12345678', 'phone' => '254700000001']);
 
         return Trip::create([
             'reference' => 'TRIP-0001',
@@ -221,7 +224,7 @@ class OrderLifecycleTest extends TestCase
         $this->lifecycle()->record($invoice, OrderStage::Paid);
         $this->lifecycle()->record($other, OrderStage::Placed);
 
-        $result = (new OrderStageSource())->forRecord($invoice)->latestFirst(false)->paginate(10);
+        $result = (new OrderStageSource)->forRecord($invoice)->latestFirst(false)->paginate(10);
 
         $this->assertCount(2, $result->entries, 'Only this order\'s stages should be returned.');
         $this->assertSame('placed', $result->entries[0]->event);
@@ -238,13 +241,13 @@ class OrderLifecycleTest extends TestCase
             $this->lifecycle()->record($invoice, $stage);
         }
 
-        $page = (new OrderStageSource())->forRecord($invoice)->latestFirst(false)->paginate(2);
+        $page = (new OrderStageSource)->forRecord($invoice)->latestFirst(false)->paginate(2);
 
         $this->assertCount(2, $page->entries);
         $this->assertTrue($page->hasMore);
         $this->assertNotNull($page->nextCursor);
 
-        $next = (new OrderStageSource())->forRecord($invoice)->latestFirst(false)->paginate(2, $page->nextCursor);
+        $next = (new OrderStageSource)->forRecord($invoice)->latestFirst(false)->paginate(2, $page->nextCursor);
 
         $this->assertCount(1, $next->entries);
         $this->assertFalse($next->hasMore);
@@ -259,7 +262,7 @@ class OrderLifecycleTest extends TestCase
         $this->lifecycle()->record($invoice, OrderStage::Placed);
         $this->lifecycle()->record($invoice, OrderStage::Paid);
 
-        $this->actingAs(\App\Models\User::factory()->role(\App\Enums\UserRole::Admin)->create());
+        $this->actingAs(User::factory()->role(UserRole::Admin)->create());
 
         $this->get(InvoiceResource::getUrl('view', ['record' => $invoice]))
             ->assertSuccessful()
@@ -274,7 +277,7 @@ class OrderLifecycleTest extends TestCase
     public function test_configuring_the_source_does_not_mutate_the_original(): void
     {
         $invoice = $this->invoice();
-        $source = new OrderStageSource();
+        $source = new OrderStageSource;
 
         $configured = $source->forRecord($invoice);
 
