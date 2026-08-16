@@ -37,17 +37,13 @@ class GateService
                 ]);
             }
 
-            $driver = Driver::find($data['driver_id'] ?? null);
+            // Required by the form and NOT NULL on the table: a gate log
+            // always names the driver who brought the vehicle in.
+            $driver = Driver::findOrFail($data['driver_id'] ?? null);
 
             return GateLog::create([
                 'vehicle_id' => $vehicle->getKey(),
-                'vehicle_number' => $vehicle->vehicle_number,
-                'driver_id' => $driver?->getKey(),
-                // Snapshotted so the record still reads correctly if the
-                // driver master row is edited later.
-                'driver_name' => $data['driver_name'] ?? $driver?->name,
-                'driver_national_id' => $data['driver_national_id'] ?? $driver?->national_id,
-                'driver_phone' => $data['driver_phone'] ?? $driver?->phone,
+                'driver_id' => $driver->getKey(),
                 'time_in' => now(),                 // auto-captured
                 'gated_in_by' => $userId,           // auto-captured
                 'status' => GateLog::STATUS_IN,

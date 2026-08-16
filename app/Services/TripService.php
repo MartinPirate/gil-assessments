@@ -24,6 +24,8 @@ class TripService
 
     /**
      * @param  array<string, mixed>  $data
+     *
+     * @throws \Throwable
      */
     public function schedule(array $data, ?int $userId = null): Trip
     {
