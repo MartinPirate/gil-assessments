@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Enums\UserRole;
 use App\Filament\Concerns\InteractsWithChooseFromList;
 use App\Models\Customer;
 use App\Models\Invoice;
@@ -13,15 +12,16 @@ use App\Services\DocumentNumberService;
 use App\Services\InvoiceWriter;
 use App\Support\ChooseFromListRegistry;
 use App\Support\InvoiceCalculator;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use JeffersonGoncalves\Filament\BarcodeField\Forms\Components\BarcodeInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -30,12 +30,17 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use JeffersonGoncalves\Filament\BarcodeField\Forms\Components\BarcodeInput;
 use Livewire\Attributes\On;
+use UnitEnum;
 
 /**
  * Task 1 — the A/R Invoice entry screen.
@@ -47,13 +52,17 @@ use Livewire\Attributes\On;
 class ArInvoice extends Page implements HasForms
 {
     use InteractsWithChooseFromList;
+
+    /** The validation key the three-places message is reported under. */
+    protected const DECIMAL_MESSAGE_KEY = 'decimal';
+
     use InteractsWithForms;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     protected static ?string $navigationLabel = 'A/R Invoice';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sales';
+    protected static string|UnitEnum|null $navigationGroup = 'Sales';
 
     protected static ?int $navigationSort = 1;
 
@@ -69,7 +78,7 @@ class ArInvoice extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canSell() ?? false;
+        return Auth::user()?->canSell() ?? false;
     }
 
     public function mount(): void
@@ -104,7 +113,11 @@ class ArInvoice extends Page implements HasForms
             'payment_order_run' => false,
             'discount_percent' => 0,
             'freight' => 0,
-            'total_down_payment' => 0,
+            'freight_charges' => [],
+            // Opened at the document's own precision so it sits level with
+            // the boxes around it. Never rewritten after that — see
+            // recalculateAllTotals().
+            'total_down_payment' => $this->displayed('total_down_payment', 0),
             'rounding_enabled' => false,
             'total_before_discount' => 0,
             'total_after_discount' => 0,
@@ -129,10 +142,12 @@ class ArInvoice extends Page implements HasForms
         return [
             'item_service_type' => 'Item',
             'item_id' => null,
-            'item_no' => null,
             'item_description' => null,
             'uom' => null,
-            'warehouse' => Warehouse::default()?->code ?? 'FG WHS',
+            // No warehouse until there is an item to put in one. The sample's
+            // empty rows are blank across every column, and pre-filling this
+            // one made a row that nobody had touched look half entered.
+            'warehouse_id' => null,
             'qty_in_warehouse' => null,
             'quantity' => null,
             'price_before_discount' => null,
@@ -214,7 +229,13 @@ class ArInvoice extends Page implements HasForms
                     ]),
 
                     // Right: document numbering and dates
-                    Grid::make(1)->schema([
+                    /*
+                     * The numbering block hugs the right edge of the document,
+                     * as it does in the client. Left to fill its half of the
+                     * header it floated in the middle of the page with a hand's
+                     * width of nothing beyond it.
+                     */
+                    Grid::make(1)->extraAttributes(['class' => 'sap-docmeta'])->schema([
                         Grid::make(['default' => 2])->schema([
                             Select::make('series')
                                 ->label('No.')
@@ -269,9 +290,9 @@ class ArInvoice extends Page implements HasForms
     /**
      * Task 1b: a label that only appears once Total Amount exceeds 10,000.
      */
-    protected function approvalNotice(): \Filament\Schemas\Components\View
+    protected function approvalNotice(): View
     {
-        return \Filament\Schemas\Components\View::make('filament.pages.partials.approval-notice')
+        return View::make('filament.pages.partials.approval-notice')
             ->visible(fn (Get $get): bool => (float) ($get('document_total') ?? 0) > Invoice::APPROVAL_THRESHOLD);
     }
 
@@ -302,7 +323,9 @@ class ArInvoice extends Page implements HasForms
                                 ->options(['No Summary' => 'No Summary', 'By Items' => 'By Items', 'By Document' => 'By Document'])
                                 ->default('No Summary')
                                 ->selectablePlaceholder(false)
-                                ->extraAttributes(['class' => 'sap-grid-strip__right']),
+                                ->native(false)
+                                ->extraAttributes(['class' => 'sap-grid-strip__right'])
+                                ->extraFieldWrapperAttributes(['class' => 'sap-summary']),
                         ]),
 
                     $this->linesRepeater(),
@@ -333,7 +356,7 @@ class ArInvoice extends Page implements HasForms
                 TableColumn::make('Item No.')->width('180px'),
                 TableColumn::make('Item Description')->width('260px'),
                 TableColumn::make('Quantity')->width('100px')->alignEnd(),
-                TableColumn::make('Whse')->width('110px'),
+                TableColumn::make('Whse')->width('150px'),
                 TableColumn::make('Qty in Whse')->width('110px')->alignEnd(),
                 TableColumn::make('UoM Code')->width('90px'),
                 TableColumn::make('Unit Price')->width('130px')->alignEnd(),
@@ -346,7 +369,7 @@ class ArInvoice extends Page implements HasForms
             ])
             ->schema([
                 // Placeholder cell; the number itself comes from CSS.
-                \Filament\Schemas\Components\Text::make('')
+                Text::make('')
                     ->extraAttributes(['class' => 'sap-rownum']),
 
                 Select::make('item_id')
@@ -373,25 +396,40 @@ class ArInvoice extends Page implements HasForms
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (Get $get, Set $set) => $this->recalculateLine($get, $set)),
 
-                Select::make('warehouse')
+                /*
+                 * The drill arrow leads the value, as it does in the client.
+                 * Trailing it, the arrow and the select's own chevron took the
+                 * right-hand half of a 110px cell between them and left
+                 * "FG WHS" showing as "FG W…".
+                 */
+                Select::make('warehouse_id')
                     ->hiddenLabel()
-                    ->options(fn () => Warehouse::query()->where('is_active', true)->pluck('code', 'code'))
+                    ->options(fn () => Warehouse::query()->where('is_active', true)->pluck('code', 'id'))
                     ->searchable()
-                    ->suffixIcon(Heroicon::ArrowRightCircle)
-                    ->suffixIconColor('warning'),
+                    ->native(false)
+                    ->prefixIcon(Heroicon::ArrowRightCircle)
+                    ->prefixIconColor('warning'),
 
                 TextInput::make('qty_in_warehouse')
                     ->hiddenLabel()
+                    ->extraFieldWrapperAttributes(['class' => 'sap-derived'])
                     ->disabled()
                     ->dehydrated(),
 
-                TextInput::make('uom')->hiddenLabel()->disabled()->dehydrated(),
+                // Read from the item, shown but not stored on the line.
+                TextInput::make('uom')->hiddenLabel()->disabled()->dehydrated(false),
 
                 TextInput::make('price_before_discount')
                     ->hiddenLabel()
                     ->numeric()
                     ->minValue(0)
-                    ->step('0.0001')
+                    // Three places, as the brief specifies of this column. The
+                    // step bounds what the browser will accept; the rule is
+                    // what refuses it on the server, because a step is a hint
+                    // and a typed-in fourth decimal would sail past it.
+                    ->step(static::decimalStep())
+                    ->rules(['numeric', static::decimalRule()])
+                    ->validationMessages([static::DECIMAL_MESSAGE_KEY => static::decimalMessage()])
                     ->prefix('KES')
                     ->extraInputAttributes(['class' => 'sap-money'])
                     ->live(onBlur: true)
@@ -402,15 +440,18 @@ class ArInvoice extends Page implements HasForms
                     ->numeric()
                     ->minValue(0)
                     ->maxValue(100)
-                    ->step('0.000001')
+                    ->step(static::decimalStep())
                     ->extraInputAttributes(['class' => 'sap-money'])
                     ->live(onBlur: true)
                     // Task 1e: discount over 50 is an error.
-                    ->rules(['numeric', 'max:50'])
-                    ->validationMessages(['max' => 'Discount cannot exceed 50%.'])
+                    ->rules(['numeric', 'max:50', static::decimalRule()])
+                    ->validationMessages([
+                        'max' => 'Discount cannot exceed 50%.',
+                        static::DECIMAL_MESSAGE_KEY => static::decimalMessage(),
+                    ])
                     ->afterStateUpdated(fn (Get $get, Set $set) => $this->recalculateLine($get, $set)),
 
-                TextInput::make('price_after_discount')->hiddenLabel()->readOnly()->dehydrated()
+                TextInput::make('price_after_discount')->hiddenLabel()->extraFieldWrapperAttributes(['class' => 'sap-derived'])->readOnly()->dehydrated()
                     ->prefix('KES')->extraInputAttributes(['class' => 'sap-money']),
 
                 Select::make('vat_code_id')
@@ -421,11 +462,11 @@ class ArInvoice extends Page implements HasForms
                     ->live()
                     ->afterStateUpdated(fn (?string $state, Get $get, Set $set) => $this->applyVatCode($state, $get, $set)),
 
-                TextInput::make('gross_price_after_discount')->hiddenLabel()->readOnly()->dehydrated()
+                TextInput::make('gross_price_after_discount')->hiddenLabel()->extraFieldWrapperAttributes(['class' => 'sap-derived'])->readOnly()->dehydrated()
                     ->prefix('KES')->extraInputAttributes(['class' => 'sap-money']),
                 TextInput::make('total')->hiddenLabel()->readOnly()->dehydrated(false)
                     ->prefix('KES')->extraInputAttributes(['class' => 'sap-money']),
-                TextInput::make('gross_total')->hiddenLabel()->readOnly()->dehydrated(false)
+                TextInput::make('gross_total')->hiddenLabel()->extraFieldWrapperAttributes(['class' => 'sap-derived'])->readOnly()->dehydrated(false)
                     ->prefix('KES')->extraInputAttributes(['class' => 'sap-money']),
             ]);
     }
@@ -472,7 +513,7 @@ class ArInvoice extends Page implements HasForms
     {
         return [
             Grid::make(1)->schema([
-                \Filament\Forms\Components\FileUpload::make('attachments')
+                FileUpload::make('attachments')
                     ->label('Supporting documents')
                     ->multiple()
                     ->directory('invoice-attachments')
@@ -568,26 +609,60 @@ class ArInvoice extends Page implements HasForms
                             ->suffixIcon(Heroicon::ArrowRightCircle)
                             ->suffixIconColor('warning'),
 
-                        Checkbox::make('payment_order_run')->label('Payment Order Run'),
-
-                        Textarea::make('remarks')
-                            ->label('Remarks')
-                            ->rows(4)
-                            ->required()                 // Task 1e: mandatory
-                            ->maxLength(1000)
-                            // Committed on blur so opening a Choose From List
-                            // modal afterwards cannot discard the text.
-                            ->live(onBlur: true)
-                            ->validationMessages(['required' => 'Remarks are required.']),
-
-                        // Populated by the KRA control unit once transmitted;
-                        // shown here because the sample document has the box.
-                        TextInput::make('qr_code')
-                            ->label('QRCode')
+                        /*
+                         * A system flag, not a decision anybody makes on this
+                         * screen. In the client it marks a document that has
+                         * been picked up by a payment order run — the batch a
+                         * finance clerk prepares for the bank — and it is
+                         * greyed out on the document for exactly that reason:
+                         * the run sets it, the typist does not.
+                         *
+                         * Nothing in this application runs payment orders yet,
+                         * so it is always off. Disabled rather than removed,
+                         * because the sample document has the box and a
+                         * missing one would read as an omission.
+                         */
+                        Checkbox::make('payment_order_run')
+                            ->label('Payment Order Run')
                             ->disabled()
                             ->dehydrated()
-                            ->placeholder('Assigned on eTIMS transmission')
-                            ->extraAttributes(['class' => 'sap-qrcode']),
+                            /*
+                             * A tooltip, not helper text: in this footer's
+                             * label-left grid the helper rendered alongside the
+                             * caption and the two printed on top of each other.
+                             */
+                            ->extraAttributes(['title' => 'Set by a payment order run, not by hand.'])
+                            ->extraFieldWrapperAttributes(['class' => 'sap-flag']),
+
+                        /*
+                         * Remarks and QRCode share a row, as they do in the
+                         * sample — the QR box sits to the right of the notes
+                         * rather than beneath them.
+                         */
+                        Grid::make(['default' => 1, 'md' => 2])
+                            ->extraAttributes(['class' => 'sap-remarks-row'])
+                            ->schema([
+                                Textarea::make('remarks')
+                                    ->label('Remarks')
+                                    ->rows(4)
+                                    ->required()                 // Task 1e: mandatory
+                                    ->maxLength(1000)
+                                    // Committed on blur so opening a Choose From List
+                                    // modal afterwards cannot discard the text.
+                                    ->live(onBlur: true)
+                                    ->validationMessages(['required' => 'Remarks are required.']),
+
+                                // Populated by the KRA control unit once
+                                // transmitted; shown here because the sample
+                                // document has the box.
+                                TextInput::make('qr_code')
+                                    ->label('QRCode')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->placeholder('Assigned on eTIMS transmission')
+                                    ->extraAttributes(['class' => 'sap-qrcode'])
+                                    ->extraFieldWrapperAttributes(['class' => 'sap-qrcode-field']),
+                            ]),
                     ]),
 
                     Grid::make(1)->extraAttributes(['class' => 'sap-totals'])->schema([
@@ -598,35 +673,85 @@ class ArInvoice extends Page implements HasForms
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(100)
-                            ->step('0.000001')
+                            ->step(static::decimalStep())
                             ->suffix('%')
                             ->live(onBlur: true)
-                            ->rules(['numeric', 'max:50'])
-                            ->validationMessages(['max' => 'Discount cannot exceed 50%.'])
+                            ->rules(['numeric', 'max:50', static::decimalRule()])
+                            ->validationMessages([
+                                'max' => 'Discount cannot exceed 50%.',
+                                static::DECIMAL_MESSAGE_KEY => static::decimalMessage(),
+                            ])
                             ->afterStateUpdated(fn () => $this->recalculateAllTotals()),
 
                         TextInput::make('total_after_discount')->label('Total After Discount')->readOnly()->prefix('KES'),
 
+                        /*
+                         * You cannot pay forward more than the document is
+                         * worth. Checked here so the figure is refused as it
+                         * is typed, and again in InvoiceWriter, which is the
+                         * guard that actually holds.
+                         */
                         TextInput::make('total_down_payment')
                             ->label('Total Down Payment')
-                            ->numeric()->minValue(0)->step('0.0001')->prefix('KES')
+                            ->numeric()->minValue(0)->step(static::decimalStep())->prefix('KES')
                             ->live(onBlur: true)
+                            ->validationMessages([static::DECIMAL_MESSAGE_KEY => static::decimalMessage()])
+                            ->rules([
+                                'numeric',
+                                static::decimalRule(),
+                                fn (): \Closure => function (string $attribute, $value, \Closure $fail): void {
+                                    $gross = $this->grossBeforeDownPayment();
+
+                                    if ((float) $value > $gross) {
+                                        $fail(sprintf(
+                                            'The down payment cannot exceed the document total of %s.',
+                                            number_format($gross, 2),
+                                        ));
+                                    }
+                                },
+                            ])
                             ->afterStateUpdated(fn () => $this->recalculateAllTotals()),
 
+                        /*
+                         * Read-only, because the figure is the sum of the
+                         * charges behind the arrow. Typing over a total made
+                         * of parts would leave the parts disagreeing with it.
+                         */
                         TextInput::make('freight')
                             ->label('Freight')
-                            ->numeric()->minValue(0)->step('0.0001')->prefix('KES')
-                            ->suffixIcon(Heroicon::ArrowRightCircle)
-                            ->suffixIconColor('warning')
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn () => $this->recalculateAllTotals()),
+                            ->readOnly()
+                            ->prefix('KES')
+                            // Says what the figure is made of without opening
+                            // the dialog again.
+                            ->helperText(function (): ?string {
+                                $charges = array_values((array) data_get($this, 'data.freight_charges', []));
+
+                                if ($charges === []) {
+                                    return null;
+                                }
+
+                                return collect($charges)
+                                    ->map(fn (array $charge) => sprintf(
+                                        '%s %s',
+                                        $charge['description'] ?? 'Charge',
+                                        number_format((float) ($charge['amount'] ?? 0), InvoiceCalculator::DOCUMENT_SCALE),
+                                    ))
+                                    ->implode(' · ');
+                            })
+                            ->suffixAction($this->freightChargesAction()),
 
                         Checkbox::make('rounding_enabled')
                             ->label('Rounding')
                             ->live()
                             ->afterStateUpdated(fn () => $this->recalculateAllTotals()),
 
-                        TextInput::make('rounding')->label('Rounding Amount')->readOnly()->prefix('KES'),
+                        /*
+                         * The rounding *amount* is not a row in the sample, nor
+                         * in the spec's footer list — the Rounding checkbox
+                         * above says whether it was applied, and the adjustment
+                         * is already inside Total. It is still stored on the
+                         * document, so the figure remains auditable.
+                         */
                         TextInput::make('tax_total')->label('Tax')->readOnly()->prefix('KES'),
 
                         TextInput::make('document_total')
@@ -685,7 +810,23 @@ class ArInvoice extends Page implements HasForms
 
         $set('customer_id', $customer?->getKey());
         $set('customer_name_lookup', $customer?->getKey());
-        $set('contact_person', $customer?->contact_person);
+
+        /*
+         * Clear the error this has just answered.
+         *
+         * Picking the partner from the Name box writes customer_id from a
+         * different field's hook, and Livewire only revalidates the field the
+         * user actually touched — so "The customer field is required" stayed on
+         * screen above a filled-in Customer.
+         */
+        if ($customer) {
+            $this->resetValidation('data.customer_id');
+        }
+        $set('contact_person', $customer?->contactPerson?->name);
+        // The name printed on this document starts as the business partner's
+        // and stays editable — a walk-in sale is billed to the person standing
+        // at the counter, not to "Walk In Customer - HQ".
+        $set('customer_display_name', $customer?->name);
         $set('currency', $customer?->currency ?? 'KES');
         $set('kra_pin', $customer?->kra_pin);
     }
@@ -704,12 +845,20 @@ class ArInvoice extends Page implements HasForms
             return;
         }
 
-        $set('item_no', $item->item_no);
         $set('item_description', $item->description);
         $set('uom', $item->uom);
-        $set('warehouse', $item->warehouse);
-        $set('qty_in_warehouse', number_format((float) $item->qty_in_warehouse, 3, '.', ''));
-        $set('price_before_discount', (float) $item->unit_price);
+        $set('warehouse_id', $item->warehouse_id);
+        /*
+         * Plain, as the sample shows it: "648", not "648.000". Stock is held to
+         * three places, so the decimals appear only when there are any.
+         */
+        $set('qty_in_warehouse', rtrim(rtrim(
+            number_format((float) $item->qty_in_warehouse, InvoiceCalculator::QTY_SCALE, '.', ''),
+            '0',
+        ), '.'));
+        // Three places, as the brief specifies for this column. No thousands
+        // separator: this box is typed into, and a comma would not parse back.
+        $set('price_before_discount', $this->displayed('price_before_discount', (float) $item->unit_price));
 
         if (blank($get('quantity'))) {
             $set('quantity', 1);
@@ -746,10 +895,10 @@ class ArInvoice extends Page implements HasForms
             'vat_rate' => (float) ($get('vat_rate') ?? 0),
         ]);
 
-        $set('price_after_discount', $this->money($line['price_after_discount']));
-        $set('gross_price_after_discount', $this->money($line['gross_price_after_discount']));
-        $set('total', $this->money($line['line_total']));
-        $set('gross_total', $this->money($line['gross_total']));
+        $set('price_after_discount', $this->displayed('price_after_discount', $line['price_after_discount']));
+        $set('gross_price_after_discount', $this->displayed('gross_price_after_discount', $line['gross_price_after_discount']));
+        $set('total', $this->displayed('line_total', $line['line_total']));
+        $set('gross_total', $this->displayed('gross_total', $line['gross_total']));
 
         $this->recalculateAllTotals();
     }
@@ -758,8 +907,101 @@ class ArInvoice extends Page implements HasForms
      * Totals are always derived from `$this->data` rather than a component
      * relative Get, so this is correct no matter which field triggered it.
      */
+    /**
+     * Keep exactly one empty row at the foot of the grid.
+     *
+     * The client has no "add row" button — you type into the blank line and
+     * another appears beneath it — so the add control is hidden and this does
+     * the appending instead. InvoiceWriter drops blank lines on save, so the
+     * trailing one is never stored.
+     */
+    protected function ensureTrailingBlankLine(): void
+    {
+        $lines = (array) data_get($this, 'data.lines', []);
+
+        if ($lines === []) {
+            data_set($this, 'data.lines', [(string) Str::uuid() => $this->blankLine()]);
+
+            return;
+        }
+
+        $last = end($lines);
+
+        if (is_array($last) && InvoiceCalculator::isBlankLine($last)) {
+            return;
+        }
+
+        $lines[(string) Str::uuid()] = $this->blankLine();
+
+        data_set($this, 'data.lines', $lines);
+    }
+
+    /**
+     * One item, one line.
+     *
+     * Two lines carrying the same item read as a mistake on the printed
+     * document and double the quantity on any stock report reading the lines
+     * rather than the totals. The later line loses its item — not the whole
+     * row, so a quantity already typed there survives to be pointed at a
+     * different item.
+     */
+    protected function rejectDuplicateItems(): void
+    {
+        $lines = (array) data_get($this, 'data.lines', []);
+        $seen = [];
+
+        foreach ($lines as $key => $line) {
+            $itemId = is_array($line) ? ($line['item_id'] ?? null) : null;
+
+            if (blank($itemId)) {
+                continue;
+            }
+
+            if (! isset($seen[$itemId])) {
+                $seen[$itemId] = array_search($key, array_keys($lines), true) + 1;
+
+                continue;
+            }
+
+            data_set($this, "data.lines.{$key}.item_id", null);
+            data_set($this, "data.lines.{$key}.item_description", null);
+            data_set($this, "data.lines.{$key}.uom", null);
+            data_set($this, "data.lines.{$key}.qty_in_warehouse", null);
+            data_set($this, "data.lines.{$key}.price_before_discount", null);
+
+            Notification::make()
+                ->title('That item is already on this document')
+                ->body(sprintf(
+                    '%s is on line %d. Change the quantity there rather than adding a second line.',
+                    Item::find($itemId)?->item_no ?? 'The item',
+                    $seen[$itemId],
+                ))
+                ->warning()
+                ->send();
+        }
+    }
+
+    /**
+     * What the document is worth before any down payment is taken off —
+     * goods after discount, plus tax, freight and any rounding.
+     */
+    protected function grossBeforeDownPayment(): float
+    {
+        $data = (array) $this->data;
+
+        return InvoiceCalculator::round(
+            (float) ($data['total_after_discount'] ?? 0)
+            + (float) ($data['tax_total'] ?? 0)
+            + (float) ($data['freight'] ?? 0)
+            + (float) ($data['rounding'] ?? 0),
+        );
+    }
+
     public function recalculateAllTotals(): void
     {
+        $this->rejectDuplicateItems();
+        $this->ensureTrailingBlankLine();
+
         $lines = (array) data_get($this, 'data.lines', []);
 
         foreach ($lines as $key => $line) {
@@ -776,35 +1018,85 @@ class ArInvoice extends Page implements HasForms
             $recalculated = InvoiceCalculator::recalculateLine($line);
 
             data_set($this, "data.lines.{$key}.vat_rate", $recalculated['vat_rate']);
-            data_set($this, "data.lines.{$key}.price_after_discount", $this->money($recalculated['price_after_discount']));
-            data_set($this, "data.lines.{$key}.gross_price_after_discount", $this->money($recalculated['gross_price_after_discount']));
-            data_set($this, "data.lines.{$key}.total", $this->money($recalculated['line_total']));
-            data_set($this, "data.lines.{$key}.gross_total", $this->money($recalculated['gross_total']));
+            data_set($this, "data.lines.{$key}.price_after_discount", $this->displayed('price_after_discount', $recalculated['price_after_discount']));
+            data_set($this, "data.lines.{$key}.gross_price_after_discount", $this->displayed('gross_price_after_discount', $recalculated['gross_price_after_discount']));
+            data_set($this, "data.lines.{$key}.total", $this->displayed('line_total', $recalculated['line_total']));
+            data_set($this, "data.lines.{$key}.gross_total", $this->displayed('gross_total', $recalculated['gross_total']));
 
             $lines[$key] = $recalculated;
         }
 
+        // Itemised freight when there is any, so its VAT reaches the tax
+        // total on screen exactly as it will when the document is written.
+        $freightCharges = array_values((array) data_get($this, 'data.freight_charges', []));
+
         $totals = InvoiceCalculator::documentTotals(
             $lines,
             (float) data_get($this, 'data.discount_percent', 0),
-            (float) data_get($this, 'data.freight', 0),
+            $freightCharges !== [] ? $freightCharges : (float) data_get($this, 'data.freight', 0),
             (float) data_get($this, 'data.total_down_payment', 0),
             (float) data_get($this, 'data.applied_amount', 0),
             (bool) data_get($this, 'data.rounding_enabled', false),
         );
 
         foreach ($totals as $key => $value) {
-            data_set($this, "data.{$key}", $this->money($value));
+            /*
+             * The down payment is typed, not derived. Writing it back would
+             * quietly reformat what the user entered — 0.0015 became 0.002 —
+             * and a figure rounded before it is validated can never be
+             * refused for carrying a fourth decimal. It is passed through
+             * these totals unchanged, so there is nothing to write back.
+             */
+            if ($key === 'total_down_payment') {
+                continue;
+            }
+
+            data_set($this, "data.{$key}", $this->displayed($key, $value));
         }
     }
 
-    /**
-     * Money is held in the form as a fixed 3 d.p. string so the displayed
-     * figure and the stored figure are never a rounding apart.
+    /*
+     * The document allows three decimal places on its money and discount
+     * columns, so nothing typed into one may carry a fourth.
+     *
+     * All three derive from InvoiceCalculator::DOCUMENT_SCALE rather than
+     * repeating the number, so the field that accepts a figure and the column
+     * that displays it cannot end up disagreeing.
      */
-    protected function money(float $value): string
+    protected static function decimalStep(): string
     {
-        return number_format($value, InvoiceCalculator::SCALE, '.', '');
+        return '0.'.str_pad('1', InvoiceCalculator::DOCUMENT_SCALE, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Both halves are needed: the step is what the browser's own spinner
+     * honours, and the rule is what refuses a fourth decimal typed or pasted
+     * straight in — a step is a hint, not a guard.
+     */
+    protected static function decimalRule(): string
+    {
+        return 'decimal:0,'.InvoiceCalculator::DOCUMENT_SCALE;
+    }
+
+    protected static function decimalMessage(): string
+    {
+        return 'Up to '.InvoiceCalculator::DOCUMENT_SCALE.' decimal places.';
+    }
+
+    /**
+     * Format a field at the precision the document is read at.
+     *
+     * Three places for money and discount, as the brief specifies of the grid's
+     * columns; InvoiceCalculator holds the scale for every field so the line,
+     * the footer and the register cannot each pick their own. The stored value
+     * keeps the finer working precision behind it.
+     *
+     * No thousands separator: several of these boxes are numeric inputs the
+     * user types into, and a comma would not survive the round trip.
+     */
+    protected function displayed(string $field, float $value): string
+    {
+        return InvoiceCalculator::display($field, $value, thousands: false);
     }
 
     public function getApprovalMessage(): string
@@ -827,6 +1119,7 @@ class ArInvoice extends Page implements HasForms
     {
         return Action::make('addAndNew')
             ->label('Add & New')
+            ->extraAttributes(['data-sap-split' => 'true'])
             ->color('primary')
             ->submit('save');
     }
@@ -835,8 +1128,98 @@ class ArInvoice extends Page implements HasForms
     {
         return Action::make('addDraftAndNew')
             ->label('Add Draft & New')
-            ->color('gray')
+            ->extraAttributes(['data-sap-split' => 'true'])
+            // The sample fills every live button in this bar; only Copy To,
+            // which has nowhere to copy to, is greyed.
+            ->color('primary')
             ->action('saveDraft');
+    }
+
+    /**
+     * The Freight Charges dialog behind the orange arrow.
+     *
+     * Each charge carries its own VAT code, because they genuinely differ:
+     * delivery is standard rated, insurance usually is not. A single blanket
+     * rate on the total would be wrong one way or the other.
+     */
+    public function freightChargesAction(): Action
+    {
+        return Action::make('freightCharges')
+            ->icon(Heroicon::ArrowRightCircle)
+            ->iconButton()
+            ->color('warning')
+            ->modalHeading('Freight charges')
+            ->modalDescription('Delivery, insurance, packing — whatever is billed on top of the goods.')
+            ->modalSubmitActionLabel('Apply')
+            ->fillForm(fn (): array => ['charges' => array_values((array) data_get($this, 'data.freight_charges', []))])
+            ->schema([
+                /*
+                 * A table rather than stacked cards. Each charge is one short
+                 * row — the card layout gave every row a reorder handle, a
+                 * delete button and four labels of its own, which for three
+                 * fields read as a form per charge.
+                 */
+                Repeater::make('charges')
+                    ->hiddenLabel()
+                    ->addActionLabel('Add charge')
+                    ->defaultItems(1)
+                    ->reorderable(false)
+                    ->table([
+                        TableColumn::make('Charge')->width('34%'),
+                        TableColumn::make('Amount')->width('20%')->alignEnd(),
+                        TableColumn::make('VAT code')->width('16%'),
+                        TableColumn::make('Remarks'),
+                    ])
+                    ->schema([
+                        TextInput::make('description')
+                            ->hiddenLabel()
+                            ->placeholder('Delivery, insurance, packing…')
+                            ->required()
+                            ->maxLength(150),
+
+                        TextInput::make('amount')
+                            ->hiddenLabel()
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(static::decimalStep())
+                            ->rules(['numeric', static::decimalRule()])
+                            ->validationMessages([static::DECIMAL_MESSAGE_KEY => static::decimalMessage()])
+                            ->default(0)
+                            ->prefix('KES'),
+
+                        Select::make('vat_code_id')
+                            ->hiddenLabel()
+                            ->options(fn () => VatCode::query()->where('is_active', true)->pluck('code', 'id'))
+                            ->default(fn () => VatCode::default()?->getKey())
+                            ->selectablePlaceholder(false)
+                            ->native(false),
+
+                        TextInput::make('remarks')
+                            ->hiddenLabel()
+                            ->placeholder('Optional')
+                            ->maxLength(255),
+                    ]),
+            ])
+            ->modalWidth('4xl')
+            ->action(function (array $data): void {
+                $charges = collect($data['charges'] ?? [])
+                    ->filter(fn ($charge) => is_array($charge) && ! InvoiceCalculator::isBlankFreightCharge($charge))
+                    // The rate is read from the chosen code rather than posted,
+                    // so the screen agrees with what InvoiceWriter will store.
+                    ->map(function (array $charge): array {
+                        $vat = isset($charge['vat_code_id']) ? VatCode::find($charge['vat_code_id']) : null;
+                        $charge['vat_rate'] = (float) ($vat?->rate ?? 0);
+
+                        return $charge;
+                    })
+                    ->values()
+                    ->all();
+
+                data_set($this, 'data.freight_charges', $charges);
+                data_set($this, 'data.freight', InvoiceCalculator::freightTotals($charges)['freight']);
+
+                $this->recalculateAllTotals();
+            });
     }
 
     /**
@@ -848,10 +1231,25 @@ class ArInvoice extends Page implements HasForms
     {
         return Action::make('copyFrom')
             ->label('Copy From')
-            ->color('gray')
-            // A page-level action has no schema container, so the form state
-            // is read directly rather than through a Get utility.
-            ->disabled(fn () => blank(data_get($this, 'data.customer_id')))
+            ->extraAttributes(['data-sap-split' => 'true'])
+            // Filled, as in the sample — it sits beside a disabled Copy To and
+            // needs to read as the live one of the pair.
+            ->color('primary')
+            /*
+             * Not disabled when no customer is chosen. The client keeps this
+             * button live and answers when you press it; greying it out left
+             * it looking identical to Copy To, which is dead for good, so the
+             * two could not be told apart. The guard moved into the action.
+             */
+            ->mountUsing(function (): void {
+                if (blank(data_get($this, 'data.customer_id'))) {
+                    Notification::make()
+                        ->title('Choose a customer first')
+                        ->body('Copy From lists that customer\'s earlier documents, so it needs to know whose.')
+                        ->warning()
+                        ->send();
+                }
+            })
             ->schema([
                 Select::make('source_invoice_id')
                     ->label('Source document')
@@ -862,7 +1260,7 @@ class ArInvoice extends Page implements HasForms
                         ->limit(25)
                         ->get()
                         ->mapWithKeys(fn (Invoice $i) => [
-                            $i->id => $i->document_number.' — '.number_format((float) $i->document_total, 2),
+                            $i->id => $i->document_number.' — '.number_format((float) $i->document_total, InvoiceCalculator::DOCUMENT_SCALE),
                         ])
                         ->all())
                     ->helperText('Only documents for the selected customer are listed.'),
@@ -904,10 +1302,9 @@ class ArInvoice extends Page implements HasForms
     {
         $lines = $source->lines->map(fn ($line) => [
             'item_id' => $line->item_id,
-            'item_no' => $line->item_no,
             'item_description' => $line->item_description,
-            'uom' => $line->uom,
-            'warehouse' => $line->warehouse,
+            'uom' => $line->item?->uom,
+            'warehouse_id' => $line->warehouse_id,
             'qty_in_warehouse' => $line->qty_in_warehouse,
             'quantity' => (float) $line->quantity,
             'price_before_discount' => (float) $line->price_before_discount,
