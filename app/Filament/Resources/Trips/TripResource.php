@@ -13,12 +13,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class TripResource extends Resource
 {
     protected static ?string $model = Trip::class;
+
+    protected static ?string $recordTitleAttribute = 'reference';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 
@@ -30,7 +32,7 @@ class TripResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canManageTrips() ?? false;
+        return Auth::user()?->canManageTrips() ?? false;
     }
 
     public static function form(Schema $schema): Schema
