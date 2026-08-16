@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\DocumentSeries;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -15,7 +16,14 @@ use Illuminate\Support\Facades\DB;
  */
 class DocumentNumberService
 {
-    public const AR_INVOICE = 'AR_INVOICE';
+    public const string AR_INVOICE = 'AR_INVOICE';
+
+    /**
+     * Business partner codes come out of the same counter as documents do —
+     * they need the same guarantee, that two people pressing Create at the
+     * same moment cannot be handed CC00009 twice.
+     */
+    public const string CUSTOMER = 'CUSTOMER';
 
     /**
      * Reserve the next number for a document type/series.
@@ -48,7 +56,7 @@ class DocumentNumberService
                     'series' => $series,
                     'next_number' => $startAt,
                 ]);
-            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            } catch (UniqueConstraintViolationException $e) {
                 $row = DocumentSeries::query()
                     ->where('document_type', $documentType)
                     ->where('series', $series)

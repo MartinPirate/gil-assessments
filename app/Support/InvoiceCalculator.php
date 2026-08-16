@@ -16,17 +16,33 @@ namespace App\Support;
 class InvoiceCalculator
 {
     /**
-     * Precision, matching the sample document.
+     * Working precision — what the arithmetic is carried out and stored at.
      *
-     * The screen shows unit prices to 4 d.p. (KES 1,850.0000), discounts to
-     * 6 d.p. (5.405405) and totals to 2 d.p. (KES 35,000.00). Money is
-     * *computed and stored* at MONEY scale and only *displayed* at TOTAL
-     * scale, so a rounded presentation never becomes a rounded stored value.
+     * Deliberately finer than anything the screen shows. Rounding for display
+     * must never become rounding in the database: a unit price of 1,850.0625
+     * shown as 1,850.063 is still worth 1,850.0625 when the line is multiplied
+     * out.
      */
     public const SCALE = 4;          // unit prices, line and document money
+
     public const PERCENT_SCALE = 6;  // discount %
-    public const TOTAL_SCALE = 2;    // Total (LC), Gross Total (LC), footer
+
+    public const TOTAL_SCALE = 2;    // legacy alias, kept for callers outside the document
+
     public const QTY_SCALE = 3;      // quantities
+
+    /**
+     * Display precision for every figure on the document.
+     *
+     * Three places throughout, because the brief says so of the grid's money
+     * columns — "Price Before Discount / Discount / Price After Discount /
+     * Total: up to 3 decimal places" — and a document that showed its line at
+     * three places and its footer at two would be reporting the same money two
+     * different ways.
+     *
+     * @var int
+     */
+    public const DOCUMENT_SCALE = 3;
 
     /**
      * How each field is rendered on screen.
@@ -36,27 +52,27 @@ class InvoiceCalculator
     public const DISPLAY_SCALES = [
         'quantity' => self::QTY_SCALE,
         'qty_in_warehouse' => self::QTY_SCALE,
-        'price_before_discount' => self::SCALE,
-        'price_after_discount' => self::SCALE,
-        'gross_price_after_discount' => self::SCALE,
-        'discount_percent' => self::PERCENT_SCALE,
-        'line_total' => self::TOTAL_SCALE,
-        'total' => self::TOTAL_SCALE,
-        'gross_total' => self::TOTAL_SCALE,
-        'vat_amount' => self::TOTAL_SCALE,
-        'total_before_discount' => self::TOTAL_SCALE,
-        'total_after_discount' => self::TOTAL_SCALE,
-        'total_down_payment' => self::TOTAL_SCALE,
-        'freight' => self::TOTAL_SCALE,
-        'rounding' => self::TOTAL_SCALE,
-        'tax_total' => self::TOTAL_SCALE,
-        'document_total' => self::TOTAL_SCALE,
-        'applied_amount' => self::TOTAL_SCALE,
-        'balance_due' => self::TOTAL_SCALE,
+        'price_before_discount' => self::DOCUMENT_SCALE,
+        'price_after_discount' => self::DOCUMENT_SCALE,
+        'gross_price_after_discount' => self::DOCUMENT_SCALE,
+        'discount_percent' => self::DOCUMENT_SCALE,
+        'line_total' => self::DOCUMENT_SCALE,
+        'total' => self::DOCUMENT_SCALE,
+        'gross_total' => self::DOCUMENT_SCALE,
+        'vat_amount' => self::DOCUMENT_SCALE,
+        'total_before_discount' => self::DOCUMENT_SCALE,
+        'total_after_discount' => self::DOCUMENT_SCALE,
+        'total_down_payment' => self::DOCUMENT_SCALE,
+        'freight' => self::DOCUMENT_SCALE,
+        'rounding' => self::DOCUMENT_SCALE,
+        'tax_total' => self::DOCUMENT_SCALE,
+        'document_total' => self::DOCUMENT_SCALE,
+        'applied_amount' => self::DOCUMENT_SCALE,
+        'balance_due' => self::DOCUMENT_SCALE,
     ];
 
     /**
-     * Format a value the way the document shows it, e.g. "1,850.0000".
+     * Format a value the way the document shows it, e.g. "1,850.000".
      */
     public static function display(string $field, float|string|null $value, bool $thousands = true): string
     {
@@ -170,7 +186,7 @@ class InvoiceCalculator
     public static function documentTotals(
         iterable $lines,
         float $discountPercent = 0,
-        float $freight = 0,
+        float|iterable $freight = 0,
         float $downPayment = 0,
         float $appliedAmount = 0,
         bool $roundingEnabled = false,
@@ -179,9 +195,25 @@ class InvoiceCalculator
         $after = self::totalAfterDiscount($before, $discountPercent);
 
         $discountFactor = $before > 0 ? ($after / $before) : 1.0;
-        $tax = self::round(self::taxBeforeDiscount($lines) * $discountFactor);
+        $lineTax = self::round(self::taxBeforeDiscount($lines) * $discountFactor);
 
-        $freight = max(0.0, self::round($freight));
+        /*
+         * Freight may arrive as a bare figure or as the itemised charges
+         * behind it. Itemised, each charge carries its own VAT code, so the
+         * tax on delivery can differ from the tax on insurance.
+         *
+         * A document discount does not touch freight. The discount is on the
+         * goods; delivery is delivery, and the client treats it the same way —
+         * so the discount factor above is applied to the line tax only.
+         */
+        $freightCharges = is_iterable($freight) ? self::freightTotals($freight) : [
+            'freight' => max(0.0, self::round((float) $freight)),
+            'freight_tax' => 0.0,
+        ];
+
+        $freight = $freightCharges['freight'];
+        $tax = self::round($lineTax + $freightCharges['freight_tax']);
+
         $downPayment = max(0.0, self::round($downPayment));
 
         $gross = self::round($after + $tax + $freight);
@@ -212,6 +244,46 @@ class InvoiceCalculator
         ];
     }
 
+    /**
+     * Sum a set of freight charges and the VAT on them.
+     *
+     * @param  iterable<array<string, mixed>>  $charges
+     * @return array{freight: float, freight_tax: float}
+     */
+    public static function freightTotals(iterable $charges): array
+    {
+        $amount = 0.0;
+        $tax = 0.0;
+
+        foreach ($charges as $charge) {
+            if (! is_array($charge) || self::isBlankFreightCharge($charge)) {
+                continue;
+            }
+
+            $line = max(0.0, (float) ($charge['amount'] ?? 0));
+            $rate = max(0.0, (float) ($charge['vat_rate'] ?? 0));
+
+            $amount += $line;
+            $tax += $line * ($rate / 100);
+        }
+
+        return [
+            'freight' => self::round($amount),
+            'freight_tax' => self::round($tax),
+        ];
+    }
+
+    /**
+     * A freight row somebody added and did not fill in.
+     *
+     * @param  array<string, mixed>  $charge
+     */
+    public static function isBlankFreightCharge(array $charge): bool
+    {
+        return blank($charge['description'] ?? null)
+            && (float) ($charge['amount'] ?? 0) === 0.0;
+    }
+
     /* -----------------------------------------------------------------
      | Helpers
      | ----------------------------------------------------------------- */
@@ -225,7 +297,7 @@ class InvoiceCalculator
      */
     public static function isBlankLine(array $line): bool
     {
-        $hasIdentity = filled($line['item_no'] ?? null) || filled($line['item_description'] ?? null);
+        $hasIdentity = filled($line['item_id'] ?? null) || filled($line['item_description'] ?? null);
         $hasNumbers = (float) ($line['quantity'] ?? 0) > 0
             || (float) ($line['price_before_discount'] ?? 0) > 0;
 
