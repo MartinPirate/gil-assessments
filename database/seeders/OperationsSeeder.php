@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\UserRole;
 use App\Models\Driver;
 use App\Models\GateLog;
 use App\Models\Route;
@@ -10,7 +9,6 @@ use App\Models\Trip;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * Routes, driver logins and a few trips to demonstrate the driver portal.
@@ -31,35 +29,12 @@ class OperationsSeeder extends Seeder
             Route::updateOrCreate(
                 ['code' => $code],
                 ['name' => $name, 'origin' => $origin, 'destination' => $destination,
-                 'distance_km' => $km, 'estimated_hours' => $hours, 'is_active' => true],
+                    'distance_km' => $km, 'estimated_hours' => $hours, 'is_active' => true],
             );
         }
 
-        // Give the first two drivers a login so the portal can be demonstrated.
-        $logins = [
-            ['23456789', 'driver@gil.test'],
-            ['24567890', 'driver2@gil.test'],
-        ];
-
-        foreach ($logins as [$nationalId, $email]) {
-            $driver = Driver::where('national_id', $nationalId)->first();
-
-            if (! $driver) {
-                continue;
-            }
-
-            $user = User::updateOrCreate(
-                ['email' => $email],
-                [
-                    'name' => $driver->name,
-                    'password' => Hash::make('password'),
-                    'role' => UserRole::Driver,
-                    'is_active' => true,
-                ],
-            );
-
-            $driver->update(['user_id' => $user->getKey()]);
-        }
+        // Driver logins are created alongside the drivers themselves in
+        // DatabaseSeeder — a driver cannot exist without one.
 
         // A couple of trips for the first driver: one to start, one running.
         $driver = Driver::where('national_id', '23456789')->first();
@@ -82,6 +57,15 @@ class OperationsSeeder extends Seeder
                         'driver_name' => $driver->name,
                         'scheduled_at' => $scheduled,
                         'departed_at' => $departed,
+                        /*
+                         * Stated, not omitted. updateOrCreate leaves untouched
+                         * columns as they were, so a re-seed refreshed the
+                         * departure of a trip that a previous run had already
+                         * completed — leaving it arriving six days before it
+                         * left, and the driver's screen reporting a negative
+                         * elapsed time.
+                         */
+                        'arrived_at' => null,
                         'status' => $status,
                         'cargo_description' => '400 bales of Umi baking flour',
                     ],
@@ -121,11 +105,7 @@ class OperationsSeeder extends Seeder
                 // enforces at runtime.
                 ['vehicle_id' => $vehicle->getKey(), 'time_out' => null],
                 [
-                    'vehicle_number' => $vehicle->vehicle_number,
                     'driver_id' => $driver->getKey(),
-                    'driver_name' => $driver->name,
-                    'driver_national_id' => $driver->national_id,
-                    'driver_phone' => $driver->phone,
                     'time_in' => now()->subHours(($index * 3) + 1),
                     'status' => GateLog::STATUS_IN,
                     'gated_in_by' => $officer?->getKey(),
