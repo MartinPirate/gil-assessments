@@ -46,7 +46,9 @@ while (true) {
             exit(1);
         }
         $attempt++;
-        fwrite(STDERR, "waiting for SQL Server ({$attempt})\n");
+        // The reason, not just the fact: a refused connection, an unresolved
+        // host and a rejected password all look identical from outside.
+        fwrite(STDERR, "waiting for SQL Server ({$attempt}): " . $e->getMessage() . "\n");
         sleep(5);
     }
 }
