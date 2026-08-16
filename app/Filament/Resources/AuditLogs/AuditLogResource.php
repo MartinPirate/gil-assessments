@@ -30,7 +30,7 @@ class AuditLogResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canViewAuditLog() ?? false;
+        return Auth::user()?->canViewAuditLog() ?? false;
     }
 
     public static function canCreate(): bool

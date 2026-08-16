@@ -4,6 +4,7 @@ namespace App\Filament\Resources\AuditLogs\Tables;
 
 use App\Models\AuditLog;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -71,8 +72,8 @@ class AuditLogsTable
 
                 Filter::make('when')
                     ->schema([
-                        \Filament\Forms\Components\DatePicker::make('from')->label('From'),
-                        \Filament\Forms\Components\DatePicker::make('until')->label('Until'),
+                        DatePicker::make('from')->label('From'),
+                        DatePicker::make('until')->label('Until'),
                     ])
                     ->query(fn (Builder $q, array $data): Builder => $q
                         ->when($data['from'] ?? null, fn (Builder $q, $d) => $q->whereDate('created_at', '>=', $d))
