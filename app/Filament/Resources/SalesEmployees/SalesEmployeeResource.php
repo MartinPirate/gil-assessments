@@ -5,6 +5,7 @@ namespace App\Filament\Resources\SalesEmployees;
 use App\Filament\Resources\SalesEmployees\Pages\CreateSalesEmployee;
 use App\Filament\Resources\SalesEmployees\Pages\EditSalesEmployee;
 use App\Filament\Resources\SalesEmployees\Pages\ListSalesEmployees;
+use App\Filament\Resources\SalesEmployees\Pages\ViewSalesEmployee;
 use App\Filament\Resources\SalesEmployees\Schemas\SalesEmployeeForm;
 use App\Filament\Resources\SalesEmployees\Tables\SalesEmployeesTable;
 use App\Models\SalesEmployee;
@@ -13,12 +14,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use UnitEnum;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class SalesEmployeeResource extends Resource
 {
     protected static ?string $model = SalesEmployee::class;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
@@ -28,7 +31,7 @@ class SalesEmployeeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->role()->canAdminister() ?? false;
+        return Auth::user()?->canAdminister() ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -53,6 +56,7 @@ class SalesEmployeeResource extends Resource
         return [
             'index' => ListSalesEmployees::route('/'),
             'create' => CreateSalesEmployee::route('/create'),
+            'view' => ViewSalesEmployee::route('/{record}'),
             'edit' => EditSalesEmployee::route('/{record}/edit'),
         ];
     }
