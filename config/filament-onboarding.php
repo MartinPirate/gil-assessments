@@ -207,7 +207,12 @@ return [
     ],
 
     'models' => [
-        'flow'          => OnboardingFlow::class,
+        /*
+         * Our own subclass: the packaged flow orders its steps relation and
+         * the manager orders the same column again when eager-loading it,
+         * which SQL Server rejects. See App\Models\Onboarding\Flow.
+         */
+        'flow'          => \App\Models\Onboarding\Flow::class,
         'step'          => OnboardingStep::class,
         'flow_progress' => OnboardingFlowProgress::class,
         'step_progress' => OnboardingStepProgress::class,
