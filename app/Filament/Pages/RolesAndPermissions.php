@@ -2,32 +2,34 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\Permission;
 use App\Enums\UserRole;
 use App\Models\User;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\DB;
 use UnitEnum;
 
 /**
  * What each role may do, and how many people hold it.
  *
- * Deliberately read-only. Roles here are an enum with explicit capability
- * methods rather than rows in a permissions table, which is what makes them
- * safe: a capability cannot be granted by accident, and every check is
- * greppable. An editor on this screen would have to write to something, and
- * the only honest thing to write to is the code.
+ * Roles and permissions are Laratrust rows now, but the matrix they are
+ * provisioned from is UserRole::permissions() — so this screen reads the
+ * enum, which is what AccessControl::sync() writes to the database. Still
+ * read-only: granting a capability is a reviewed change to that map, not a
+ * checkbox somebody ticks on a Friday.
  *
- * So this answers the question people actually open a permissions screen to
- * ask — "who can approve an invoice, and who currently is one" — and points
- * at the file for changing it.
+ * It answers the question people actually open a permissions screen to ask —
+ * "who can approve an invoice, and who currently can" — and points at the file
+ * for changing it.
  */
 class RolesAndPermissions extends Page
 {
-    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedKey;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedKey;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Administration';
+    protected static string|UnitEnum|null $navigationGroup = 'Administration';
 
     protected static ?int $navigationSort = 3;
 
@@ -39,7 +41,7 @@ class RolesAndPermissions extends Page
     {
         $user = Filament::auth()->user();
 
-        return $user instanceof User && $user->role()->canAdminister();
+        return $user instanceof User && $user->canAdminister();
     }
 
     /**
@@ -50,26 +52,30 @@ class RolesAndPermissions extends Page
      */
     public function getMatrix(): array
     {
-        $counts = User::query()
-            ->selectRaw('[role], COUNT(*) AS total')
-            ->groupBy('role')
-            ->pluck('total', 'role');
+        // Counted through the pivot, which is where a role now lives.
+        $counts = DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_type', User::class)
+            ->selectRaw('[roles].[name] AS role_name, COUNT(*) AS total')
+            ->groupBy('roles.name')
+            ->pluck('total', 'role_name');
 
         return collect(UserRole::cases())
-            ->map(fn (UserRole $role): array => [
-                'label' => $role->label(),
-                'value' => $role->value,
-                'holders' => (int) ($counts[$role->value] ?? 0),
-                'capabilities' => [
-                    'Raise and view invoices' => $role->canSell(),
-                    'Decide approvals' => $role->canApprove(),
-                    'Record vehicle movements' => $role->canOperateGate(),
-                    'Plan and assign trips' => $role->canManageTrips(),
-                    'See payments' => $role->canViewPayments(),
-                    'Read the audit trail' => $role->canViewAuditLog(),
-                    'Edit master data' => $role->canAdminister(),
-                ],
-            ])
+            ->map(function (UserRole $role) use ($counts): array {
+                $held = collect($role->permissions());
+
+                return [
+                    'label' => $role->label(),
+                    'value' => $role->value,
+                    'description' => $role->description(),
+                    'holders' => (int) ($counts[$role->value] ?? 0),
+                    'capabilities' => collect(Permission::cases())
+                        ->mapWithKeys(fn (Permission $permission) => [
+                            $permission->label() => $held->contains($permission),
+                        ])
+                        ->all(),
+                ];
+            })
             ->all();
     }
 
