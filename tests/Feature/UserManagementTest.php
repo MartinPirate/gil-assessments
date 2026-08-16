@@ -6,8 +6,10 @@ use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\AuditLog;
 use App\Models\Driver;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -34,7 +36,7 @@ class UserManagementTest extends TestCase
 
     public function test_only_administrators_can_manage_users(): void
     {
-        foreach ([UserRole::Sales, UserRole::Approver, UserRole::GateOfficer, UserRole::Driver] as $role) {
+        foreach ([UserRole::Sales, UserRole::Manager, UserRole::GateOfficer, UserRole::Driver] as $role) {
             $this->actingAs(User::factory()->role($role)->create());
 
             $this->assertFalse(UserResource::canAccess(), "{$role->value} must not manage users.");
@@ -60,7 +62,7 @@ class UserManagementTest extends TestCase
 
         $user = User::where('email', 'mercy@gil.test')->firstOrFail();
 
-        $this->assertSame(UserRole::Sales, $user->role);
+        $this->assertSame(UserRole::Sales, $user->role());
         $this->assertTrue($user->is_active);
     }
 
@@ -155,69 +157,40 @@ class UserManagementTest extends TestCase
 
         Livewire::actingAs($this->admin)
             ->test(EditUser::class, ['record' => $other->getKey()])
-            ->fillForm(['role' => UserRole::Approver->value, 'approval_limit' => 25000])
+            ->fillForm(['role' => UserRole::Manager->value, 'approval_limit' => 25000])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $other->refresh();
 
-        $this->assertSame(UserRole::Approver, $other->role);
+        $this->assertSame(UserRole::Manager, $other->role());
         $this->assertEquals(25000, $other->approval_limit);
     }
 
     /* -----------------------------------------------------------------
      | Driver linking
+     |
+     | Every driver has a login, so the pairing is made once when the driver
+     | is created and cannot be moved or released from the user side — that
+     | would leave a driver record pointing at nothing.
      | ----------------------------------------------------------------- */
 
-    public function test_creating_a_driver_account_links_the_driver_record(): void
+    public function test_the_user_form_does_not_offer_to_link_a_driver(): void
     {
-        $driver = Driver::create(['name' => 'John Mwangi', 'national_id' => '900', 'phone' => '0700900900']);
-
         Livewire::actingAs($this->admin)
             ->test(CreateUser::class)
-            ->fillForm([
-                'name' => 'John Mwangi',
-                'email' => 'john.driver@gil.test',
-                'password' => 'Str0ng-Passw0rd!',
-                'role' => UserRole::Driver->value,
-                'driver_id' => $driver->getKey(),
-            ])
-            ->call('create')
-            ->assertHasNoFormErrors();
-
-        $user = User::where('email', 'john.driver@gil.test')->firstOrFail();
-
-        $this->assertEquals($user->getKey(), $driver->fresh()->user_id);
-        $this->assertEquals($driver->getKey(), $user->driverId());
+            ->fillForm(['role' => UserRole::Driver->value])
+            ->assertFormFieldDoesNotExist('driver_id');
     }
 
     /**
-     * Re-pointing a login at a different driver must release the old one, or a
-     * driver record would end up attached to two accounts.
+     * Demoting a driver's account no longer detaches the driver record. Access
+     * to the portal is decided by the role, so the pairing can safely survive.
      */
-    public function test_relinking_releases_the_previous_driver(): void
+    public function test_changing_a_driver_to_another_role_keeps_the_link(): void
     {
-        $first = Driver::create(['name' => 'First', 'national_id' => '901', 'phone' => '0700000901']);
-        $second = Driver::create(['name' => 'Second', 'national_id' => '902', 'phone' => '0700000902']);
-
-        $user = User::factory()->role(UserRole::Driver)->create();
-        $first->update(['user_id' => $user->getKey()]);
-
-        Livewire::actingAs($this->admin)
-            ->test(EditUser::class, ['record' => $user->getKey()])
-            ->fillForm(['driver_id' => $second->getKey()])
-            ->call('save')
-            ->assertHasNoFormErrors();
-
-        $this->assertNull($first->fresh()->user_id);
-        $this->assertEquals($user->getKey(), $second->fresh()->user_id);
-    }
-
-    public function test_changing_a_driver_to_another_role_releases_the_link(): void
-    {
-        $driver = Driver::create(['name' => 'Ex Driver', 'national_id' => '903', 'phone' => '0700000903']);
-        $user = User::factory()->role(UserRole::Driver)->create();
-        $driver->update(['user_id' => $user->getKey()]);
+        $driver = Driver::factory()->create(['name' => 'Ex Driver', 'national_id' => '903', 'phone' => '0700000903']);
+        $user = $driver->user;
 
         Livewire::actingAs($this->admin)
             ->test(EditUser::class, ['record' => $user->getKey()])
@@ -225,7 +198,8 @@ class UserManagementTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertNull($driver->fresh()->user_id);
+        $this->assertEquals($user->getKey(), $driver->fresh()->user_id);
+        $this->assertSame(UserRole::GateOfficer, $user->fresh()->role());
     }
 
     /* -----------------------------------------------------------------
@@ -234,7 +208,7 @@ class UserManagementTest extends TestCase
 
     public function test_a_deactivated_user_cannot_reach_the_panel(): void
     {
-        $panel = \Filament\Facades\Filament::getPanel('admin');
+        $panel = Filament::getPanel('admin');
 
         $this->assertFalse(User::factory()->inactive()->create()->canAccessPanel($panel));
         $this->assertTrue(User::factory()->create()->canAccessPanel($panel));
@@ -246,14 +220,14 @@ class UserManagementTest extends TestCase
     public function test_user_changes_are_audited(): void
     {
         $user = User::factory()->sales()->create();
-        \App\Models\AuditLog::query()->delete();
+        AuditLog::query()->delete();
 
         Livewire::actingAs($this->admin)
             ->test(EditUser::class, ['record' => $user->getKey()])
-            ->fillForm(['role' => UserRole::Approver->value])
+            ->fillForm(['role' => UserRole::Manager->value])
             ->call('save');
 
-        $log = \App\Models\AuditLog::where('auditable_type', User::class)->latest('id')->firstOrFail();
+        $log = AuditLog::where('auditable_type', User::class)->latest('id')->firstOrFail();
 
         $this->assertSame('updated', $log->event);
         $this->assertEquals($this->admin->id, $log->user_id);

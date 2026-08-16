@@ -22,7 +22,7 @@ class VehicleDetailTest extends TestCase
     protected function vehicleWithHistory(): Vehicle
     {
         $vehicle = Vehicle::create(['vehicle_number' => 'KDA 900Z', 'make' => 'Isuzu FRR', 'vehicle_type' => 'Truck']);
-        $driver = Driver::create(['name' => 'Grace Wanjiku', 'national_id' => '30000001', 'phone' => '254700111222']);
+        $driver = Driver::factory()->create(['name' => 'Grace Wanjiku', 'national_id' => '30000001', 'phone' => '254700111222']);
         $route = Route::create([
             'code' => 'RT-A', 'name' => 'Nairobi - Nakuru',
             'origin' => 'Nairobi', 'destination' => 'Nakuru', 'distance_km' => 160,

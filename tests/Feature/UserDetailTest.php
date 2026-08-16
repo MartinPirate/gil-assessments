@@ -18,7 +18,7 @@ class UserDetailTest extends TestCase
 
     public function test_the_page_shows_the_person_their_role_and_their_sessions(): void
     {
-        $subject = User::factory()->role(UserRole::Approver)->create([
+        $subject = User::factory()->role(UserRole::Manager)->create([
             'name' => 'Amina Otieno',
             'email' => 'amina@gil.test',
             'approval_limit' => 50000,
@@ -38,9 +38,9 @@ class UserDetailTest extends TestCase
             ->assertSuccessful()
             ->assertSee('Amina Otieno')
             ->assertSee('amina@gil.test')
-            ->assertSee('Approver')
+            ->assertSee('Manager')
             ->assertSee('10.0.0.9')
-            ->assertSee('Decide approvals');
+            ->assertSee('Approve documents over the threshold');
     }
 
     /**
@@ -91,7 +91,7 @@ class UserDetailTest extends TestCase
      */
     public function test_an_unlimited_approver_is_not_shown_as_a_zero_ceiling(): void
     {
-        $subject = User::factory()->role(UserRole::Approver)->create(['approval_limit' => null]);
+        $subject = User::factory()->role(UserRole::Manager)->create(['approval_limit' => null]);
 
         $this->assertTrue($subject->canApproveAmount(999_999_999));
 
@@ -108,7 +108,7 @@ class UserDetailTest extends TestCase
 
     public function test_a_capped_approver_shows_their_ceiling(): void
     {
-        $subject = User::factory()->role(UserRole::Approver)->create(['approval_limit' => 50000]);
+        $subject = User::factory()->role(UserRole::Manager)->create(['approval_limit' => 50000]);
 
         $this->assertTrue($subject->canApproveAmount(50000));
         $this->assertFalse($subject->canApproveAmount(50001));
