@@ -3,17 +3,22 @@
 namespace App\Enums;
 
 /**
- * The four jobs this system separates.
+ * The jobs this system separates.
  *
- * Kept as an enum with explicit capability checks rather than a permissions
- * table: the set is small and fixed, and a generic ACL would be machinery with
- * nothing to configure.
+ * A role is now a row in Laratrust's `roles` table holding a set of
+ * permissions; this enum is the catalogue those rows are provisioned from, so
+ * the matrix lives in one reviewable place rather than being typed into a
+ * screen and forgotten.
+ *
+ * Approving is deliberately *not* a role. It is a permission, held by
+ * administrators and managers, because "may approve a document" is a thing a
+ * person is trusted with rather than a job they do all day.
  */
 enum UserRole: string
 {
     case Admin = 'admin';
+    case Manager = 'manager';
     case Sales = 'sales';
-    case Approver = 'approver';
     case GateOfficer = 'gate';
     case Driver = 'driver';
 
@@ -21,10 +26,59 @@ enum UserRole: string
     {
         return match ($this) {
             self::Admin => 'Administrator',
+            self::Manager => 'Manager',
             self::Sales => 'Sales',
-            self::Approver => 'Approver',
             self::GateOfficer => 'Gate Officer',
             self::Driver => 'Driver',
+        };
+    }
+
+    public function description(): string
+    {
+        return match ($this) {
+            self::Admin => 'Everything, including master data and the audit trail.',
+            self::Manager => 'Approves documents over the threshold and watches the money.',
+            self::Sales => 'Raises A/R invoices and follows them to payment.',
+            self::GateOfficer => 'Admits and releases vehicles, and reads the gate log.',
+            self::Driver => 'Sees only their own trips, routes and gate log entries.',
+        };
+    }
+
+    /**
+     * What this role is allowed to do.
+     *
+     * @return array<int, Permission>
+     */
+    public function permissions(): array
+    {
+        return match ($this) {
+            // The administrator holds everything except Drive, which is not a
+            // privilege but a statement about whose trips you own.
+            self::Admin => array_values(array_filter(
+                Permission::cases(),
+                fn (Permission $permission) => $permission !== Permission::Drive,
+            )),
+
+            self::Manager => [
+                Permission::ApproveDocuments,
+                Permission::ViewPayments,
+            ],
+
+            self::Sales => [
+                Permission::SellDocuments,
+                Permission::ViewPayments,
+            ],
+
+            // The gate, and nothing else. Planning routes and trips is
+            // office work; the officer at the barrier admits and releases
+            // vehicles and reads the log of what came through.
+            self::GateOfficer => [
+                Permission::OperateGate,
+            ],
+
+            self::Driver => [
+                Permission::Drive,
+            ],
         };
     }
 
@@ -36,56 +90,5 @@ enum UserRole: string
         return collect(self::cases())
             ->mapWithKeys(fn (self $role) => [$role->value => $role->label()])
             ->all();
-    }
-
-    /** May create and view A/R invoices. */
-    public function canSell(): bool
-    {
-        return in_array($this, [self::Admin, self::Sales], true);
-    }
-
-    /** May decide on invoices that breached the approval threshold. */
-    public function canApprove(): bool
-    {
-        return in_array($this, [self::Admin, self::Approver], true);
-    }
-
-    /** May record vehicle movements. */
-    public function canOperateGate(): bool
-    {
-        return in_array($this, [self::Admin, self::GateOfficer], true);
-    }
-
-    /** May edit master data and allocate payments by hand. */
-    public function canAdminister(): bool
-    {
-        return $this === self::Admin;
-    }
-
-    /** May see payment records. */
-    public function canViewPayments(): bool
-    {
-        return in_array($this, [self::Admin, self::Sales, self::Approver], true);
-    }
-
-    /**
-     * A driver signs in only to see their own work. Deliberately narrow: this
-     * role must not reach invoices, payments or other drivers' trips.
-     */
-    public function isDriver(): bool
-    {
-        return $this === self::Driver;
-    }
-
-    /** May plan and assign trips. */
-    public function canManageTrips(): bool
-    {
-        return in_array($this, [self::Admin, self::GateOfficer], true);
-    }
-
-    /** May read the audit trail. */
-    public function canViewAuditLog(): bool
-    {
-        return $this === self::Admin;
     }
 }
