@@ -93,7 +93,7 @@ class RepairApprovalRequests extends Command
     protected function recomputeTotal(Invoice $invoice): float
     {
         $lines = $invoice->lines->map(fn ($line) => [
-            'item_no' => $line->item_no,
+            'item_no' => $line->item?->item_no,
             'quantity' => (float) $line->quantity,
             'price_before_discount' => (float) $line->price_before_discount,
             'discount_percent' => (float) $line->discount_percent,
