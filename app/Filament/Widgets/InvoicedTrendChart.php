@@ -2,10 +2,11 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Widgets\Concerns\ShowsCommercialFigures;
 use App\Models\Invoice;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Invoiced value, this year against last.
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Auth;
  */
 class InvoicedTrendChart extends ChartWidget
 {
+    use ShowsCommercialFigures;
+
     protected ?string $heading = 'Invoiced value, year on year';
 
     protected ?string $description = 'Monthly totals against the same month last year.';
@@ -23,16 +26,9 @@ class InvoicedTrendChart extends ChartWidget
     protected static ?int $sort = 2;
 
     // Half the dashboard's four columns, so the two charts pair up.
-    protected int | string | array $columnSpan = 2;
+    protected int|string|array $columnSpan = 2;
 
     protected ?string $maxHeight = '260px';
-
-    public static function canView(): bool
-    {
-        $role = Auth::user()?->role();
-
-        return ($role?->canSell() || $role?->canApprove()) ?? false;
-    }
 
     protected function getType(): string
     {
@@ -118,7 +114,8 @@ class InvoicedTrendChart extends ChartWidget
      */
     protected function monthlyTotals(int $year): array
     {
-        $totals = Invoice::query()
+        // Same set as everything else on the page.
+        $totals = InvoiceResource::getEloquentQuery()
             ->posted()
             ->whereYear('posting_date', $year)
             ->groupByRaw('MONTH([posting_date])')

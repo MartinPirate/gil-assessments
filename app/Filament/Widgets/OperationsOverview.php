@@ -2,10 +2,10 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Widgets\Concerns\ReadsTheDashboardRange;
 use App\Models\ApprovalRequest;
 use App\Models\GateLog;
-use App\Models\Invoice;
-use App\Models\MpesaTransaction;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -31,7 +31,9 @@ class OperationsOverview extends StatsOverviewWidget
      * as one band, rather than inheriting the page's column count and wrapping
      * three-and-two.
      */
-    protected int | string | array $columnSpan = 'full';
+    use ReadsTheDashboardRange;
+
+    protected int|string|array $columnSpan = 'full';
 
     protected function getColumns(): int
     {
@@ -40,42 +42,59 @@ class OperationsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $role = Auth::user()?->role();
+        $user = Auth::user();
         $stats = [];
 
-        if ($role?->canSell() || $role?->canApprove()) {
-            $invoicedToday = (float) Invoice::query()
-                ->posted()
-                ->whereDate('posting_date', today())
-                ->sum('document_total');
+        $from = $this->rangeFrom();
+        $until = $this->rangeUntil();
 
-            $outstanding = (float) Invoice::query()->outstanding()->sum('balance_due');
+        if ($user?->canSell() || $user?->canApprove()) {
+            /*
+             * Scoped to the chosen period rather than to today. The tile used
+             * to read "Invoiced today" no matter what the filter bar said,
+             * which made the two disagree in plain sight.
+             */
+            $invoiced = InvoiceResource::getEloquentQuery()->posted()->whereBetween('posting_date', [$from, $until]);
+            $invoicedValue = (float) (clone $invoiced)->sum('document_total');
 
-            $stats[] = Stat::make('Invoiced today', 'KES '.number_format($invoicedToday, 2))
-                ->description(Invoice::query()->posted()->whereDate('posting_date', today())->count().' documents')
-                ->chart($this->lastSevenDays(Invoice::query()->posted(), 'posting_date', 'document_total'))
+            $outstandingQuery = InvoiceResource::getEloquentQuery()->outstanding()->whereBetween('posting_date', [$from, $until]);
+            $outstanding = (float) (clone $outstandingQuery)->sum('balance_due');
+
+            $stats[] = Stat::make('Invoiced', 'KES '.number_format($invoicedValue, 2))
+                ->description((clone $invoiced)->count().' documents · '.$this->rangeLabel())
+                ->descriptionIcon('heroicon-m-document-text')
+                ->chart($this->lastSevenDays(InvoiceResource::getEloquentQuery()->posted(), 'posting_date', 'document_total'))
                 ->color('primary');
 
             $stats[] = Stat::make('Outstanding balance', 'KES '.number_format($outstanding, 2))
-                ->description(Invoice::query()->outstanding()->count().' unpaid invoices')
-                ->chart($this->lastSevenDays(Invoice::query()->outstanding(), 'posting_date', 'balance_due'))
+                ->description((clone $outstandingQuery)->count().' unpaid invoices raised in this period')
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->chart($this->lastSevenDays(InvoiceResource::getEloquentQuery()->outstanding(), 'posting_date', 'balance_due'))
                 ->color($outstanding > 0 ? 'warning' : 'success');
         }
 
-        if ($role?->canApprove()) {
+        if ($user?->canApprove()) {
             $pending = ApprovalRequest::query()->pending()->count();
 
+            /*
+             * Deliberately not scoped: a queue is what is waiting now, and
+             * hiding a request because it was raised before the chosen start
+             * date would mean somebody never sees it.
+             */
             $stats[] = Stat::make('Awaiting approval', (string) $pending)
-                ->description($pending > 0 ? 'Needs a decision' : 'Queue is clear')
+                ->description($pending > 0 ? 'Needs a decision — queue is live, not filtered' : 'Queue is clear')
+                ->descriptionIcon($pending > 0 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
                 ->chart($this->lastSevenDays(ApprovalRequest::query(), 'created_at'))
                 ->color($pending > 0 ? 'warning' : 'success');
         }
 
-        if ($role?->canOperateGate()) {
+        if ($user?->canOperateGate()) {
             $onSite = GateLog::query()->open()->count();
 
+            // Also live: what is in the yard is what is in the yard.
             $stats[] = Stat::make('Vehicles on site', (string) $onSite)
-                ->description('Currently gated in')
+                ->description('Currently gated in — live, not filtered')
+                ->descriptionIcon('heroicon-m-truck')
                 ->chart($this->lastSevenDays(GateLog::query(), 'time_in'))
                 ->color($onSite > 0 ? 'success' : 'gray');
         }

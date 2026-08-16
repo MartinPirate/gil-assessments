@@ -3,12 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\OrderStage;
+use App\Filament\Resources\Invoices\InvoiceResource;
+use App\Filament\Widgets\Concerns\ShowsCommercialFigures;
 use App\Models\Invoice;
+use App\Support\InvoiceCalculator;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * The documents that are actually waiting on somebody.
@@ -20,18 +22,13 @@ use Illuminate\Support\Facades\Auth;
  */
 class NeedsAttentionTable extends TableWidget
 {
+    use ShowsCommercialFigures;
+
     protected static ?string $heading = 'Needs attention';
 
     protected static ?int $sort = 4;
 
-    protected int | string | array $columnSpan = 'full';
-
-    public static function canView(): bool
-    {
-        $role = Auth::user()?->role();
-
-        return ($role?->canSell() || $role?->canApprove()) ?? false;
-    }
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -64,7 +61,7 @@ class NeedsAttentionTable extends TableWidget
 
                 TextColumn::make('balance_due')
                     ->label('Balance')
-                    ->numeric(decimalPlaces: 2)
+                    ->numeric(decimalPlaces: InvoiceCalculator::DOCUMENT_SCALE)
                     ->prefix('KES ')
                     ->alignEnd()
                     ->sortable(),
@@ -92,7 +89,12 @@ class NeedsAttentionTable extends TableWidget
      */
     protected function query(): Builder
     {
-        return Invoice::query()
+        /*
+         * Through the resource query, so this is the signed-in person's own
+         * worklist. Unscoped it listed documents attributed to other
+         * salespeople, which is somebody else's problem to chase.
+         */
+        return InvoiceResource::getEloquentQuery()
             ->posted()
             ->where(fn (Builder $query) => $query
                 ->where('status', Invoice::STATUS_PENDING_APPROVAL)

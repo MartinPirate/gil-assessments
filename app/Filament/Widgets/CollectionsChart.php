@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ReadsTheDashboardRange;
 use App\Models\MpesaTransaction;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
@@ -16,19 +17,21 @@ use Illuminate\Support\Facades\Auth;
  */
 class CollectionsChart extends ChartWidget
 {
+    use ReadsTheDashboardRange;
+
     protected ?string $heading = 'Collections';
 
-    protected ?string $description = 'M-Pesa receipts confirmed over the last 14 days.';
+    protected ?string $description = 'M-Pesa receipts confirmed over the chosen period.';
 
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 2;
+    protected int|string|array $columnSpan = 2;
 
     protected ?string $maxHeight = '260px';
 
     public static function canView(): bool
     {
-        return Auth::user()?->role()->canViewPayments() ?? false;
+        return Auth::user()?->canViewPayments() ?? false;
     }
 
     protected function getType(): string
@@ -84,11 +87,21 @@ class CollectionsChart extends ChartWidget
      */
     protected function dailyTotals(): array
     {
-        $start = today()->subDays(13);
+        /*
+         * The window comes from the filter bar. It used to be a hard-coded
+         * fortnight, so moving the dates above changed every figure on the
+         * dashboard except this one.
+         *
+         * Capped at 90 buckets: a year-long range would draw 365 columns into
+         * a strip a few centimetres tall and read as noise.
+         */
+        $start = $this->rangeFrom();
+        $end = $this->rangeUntil();
+        $span = min(90, max(1, $start->diffInDays($end) + 1));
 
         $totals = MpesaTransaction::query()
             ->where('callback_type', MpesaTransaction::TYPE_CONFIRMATION)
-            ->whereDate('created_at', '>=', $start)
+            ->whereBetween('created_at', [$start, $end])
             ->groupByRaw('CAST([created_at] AS DATE)')
             ->selectRaw('CAST([created_at] AS DATE) AS bucket, SUM(CAST([trans_amount] AS DECIMAL(18,2))) AS total')
             ->pluck('total', 'bucket')
@@ -98,8 +111,8 @@ class CollectionsChart extends ChartWidget
 
         $days = [];
 
-        for ($offset = 0; $offset < 14; $offset++) {
-            $day = $start->copy()->addDays($offset);
+        for ($offset = 0; $offset < $span; $offset++) {
+            $day = $start->addDays($offset);
             $days[$day->format('d M')] = $totals[$day->toDateString()] ?? 0.0;
         }
 
