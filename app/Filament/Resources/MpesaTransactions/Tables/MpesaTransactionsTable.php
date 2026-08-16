@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MpesaTransactions\Tables;
 
 use App\Models\Invoice;
 use App\Models\MpesaTransaction;
+use App\Models\PaymentAllocation;
 use App\Services\PaymentAllocationService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -146,7 +147,7 @@ class MpesaTransactionsTable
                             $record,
                             $invoice,
                             (float) $data['amount'],
-                            \App\Models\PaymentAllocation::MATCHED_MANUAL,
+                            PaymentAllocation::MATCHED_MANUAL,
                             Auth::id(),
                         );
 
