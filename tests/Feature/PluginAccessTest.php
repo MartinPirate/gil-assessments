@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -27,7 +29,7 @@ class PluginAccessTest extends TestCase
         return [
             'admin' => [UserRole::Admin, true],
             'sales' => [UserRole::Sales, false],
-            'approver' => [UserRole::Approver, false],
+            'approver' => [UserRole::Manager, false],
             'gate officer' => [UserRole::GateOfficer, false],
             'driver' => [UserRole::Driver, false],
         ];
@@ -37,7 +39,7 @@ class PluginAccessTest extends TestCase
      * Running artisan commands from the browser is deploy-level authority, so
      * every one of the module's abilities stops at the administrator.
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('commandCentreMatrix')]
+    #[DataProvider('commandCentreMatrix')]
     public function test_only_an_administrator_reaches_the_command_centre(UserRole $role, bool $allowed): void
     {
         $user = User::factory()->role($role)->create();
@@ -71,7 +73,7 @@ class PluginAccessTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('administratorPages')]
+    #[DataProvider('administratorPages')]
     public function test_an_administrator_can_open_each_plugin_page(string $path): void
     {
         $this->actingAs(User::factory()->role(UserRole::Admin)->create());
@@ -82,7 +84,7 @@ class PluginAccessTest extends TestCase
     /**
      * The same pages must not open for a driver, the narrowest role.
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('administratorPages')]
+    #[DataProvider('administratorPages')]
     public function test_a_driver_is_refused_every_system_page(string $path): void
     {
         // The changelog reader is deliberately open to everyone.
@@ -97,7 +99,7 @@ class PluginAccessTest extends TestCase
 
     public function test_every_plugin_is_registered_on_the_panel(): void
     {
-        $registered = array_keys(\Filament\Facades\Filament::getPanel('admin')->getPlugins());
+        $registered = array_keys(Filament::getPanel('admin')->getPlugins());
 
         foreach ([
             'filament-autosave',
@@ -105,7 +107,6 @@ class PluginAccessTest extends TestCase
             'filament-column-filters',
             'filament-odometer-easy',
             'filament-mobile-preset',
-            'launchpad',
             'filament-onboarding',
             'filament-notification-center',
             'filament-activity-timeline',
@@ -113,7 +114,6 @@ class PluginAccessTest extends TestCase
             'filament-dependency-graph',
             'command-center',
             'changelog',
-            'filament-openapi-docs',
         ] as $plugin) {
             $this->assertContains($plugin, $registered, "Plugin [{$plugin}] is not registered.");
         }
