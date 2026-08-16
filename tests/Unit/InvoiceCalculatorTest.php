@@ -26,11 +26,23 @@ class InvoiceCalculatorTest extends TestCase
 
     public function test_each_field_displays_at_its_documented_precision(): void
     {
-        // Unit prices 4 d.p., discounts 6 d.p., totals 2 d.p.
-        $this->assertSame('1,850.0000', InvoiceCalculator::display('price_before_discount', 1850));
-        $this->assertSame('5.405405', InvoiceCalculator::display('discount_percent', 5.405405));
-        $this->assertSame('35,000.00', InvoiceCalculator::display('line_total', 35000));
-        $this->assertSame('35000.00', InvoiceCalculator::display('document_total', 35000, thousands: false));
+        /*
+         * Three places on every money and discount figure, which is what the
+         * brief asks of the grid's columns. The line, the footer and the
+         * register all read this table, so none of them can drift.
+         */
+        $this->assertSame('1,850.000', InvoiceCalculator::display('price_before_discount', 1850));
+        $this->assertSame('5.405', InvoiceCalculator::display('discount_percent', 5.405405));
+        $this->assertSame('35,000.000', InvoiceCalculator::display('line_total', 35000));
+        $this->assertSame('35000.000', InvoiceCalculator::display('document_total', 35000, thousands: false));
+
+        // Quantities keep their own scale.
+        $this->assertSame('648.000', InvoiceCalculator::display('qty_in_warehouse', 648));
+
+        // Displaying at three places must not round what is stored at four:
+        // the value behind the label is still the finer figure.
+        $this->assertSame('1,850.063', InvoiceCalculator::display('price_before_discount', 1850.0625));
+        $this->assertSame(1850.0625, InvoiceCalculator::round(1850.0625));
     }
 
     public function test_line_total_is_quantity_times_discounted_price(): void
@@ -78,8 +90,11 @@ class InvoiceCalculatorTest extends TestCase
     public function test_blank_line_detection(): void
     {
         $this->assertTrue(InvoiceCalculator::isBlankLine([]));
-        $this->assertTrue(InvoiceCalculator::isBlankLine(['quantity' => 0, 'item_no' => null]));
-        $this->assertFalse(InvoiceCalculator::isBlankLine(['item_no' => 'FG00011']));
+        $this->assertTrue(InvoiceCalculator::isBlankLine(['quantity' => 0, 'item_id' => null]));
+        // A picked item is what gives a row its identity now — the line no
+        // longer carries its own copy of the item number.
+        $this->assertFalse(InvoiceCalculator::isBlankLine(['item_id' => 7]));
+        $this->assertFalse(InvoiceCalculator::isBlankLine(['item_description' => 'Ad-hoc service']));
         $this->assertFalse(InvoiceCalculator::isBlankLine(['quantity' => 1]));
     }
 }

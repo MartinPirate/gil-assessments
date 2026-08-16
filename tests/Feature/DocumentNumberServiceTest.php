@@ -17,6 +17,15 @@ class DocumentNumberServiceTest extends TestCase
     // the very behaviour under test.
     use DatabaseTruncation;
 
+    /**
+     * roles and permissions are parents of foreign keys, and SQL Server will
+     * not truncate a table another table points at. They are reference data
+     * for these tests either way — nothing here reads them.
+     *
+     * @var array<int, string>
+     */
+    protected array $exceptTables = ['roles', 'permissions'];
+
     protected DocumentNumberService $service;
 
     protected function setUp(): void
