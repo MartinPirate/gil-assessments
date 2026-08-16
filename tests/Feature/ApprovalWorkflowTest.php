@@ -3,13 +3,16 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\ArInvoice;
+use App\Filament\Resources\Approvals\Pages\ListApprovalRequests;
 use App\Models\ApprovalRequest;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Item;
 use App\Models\SalesEmployee;
 use App\Models\User;
+use App\Models\Warehouse;
 use App\Services\ApprovalService;
+use Database\Seeders\ReferenceDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
@@ -34,7 +37,7 @@ class ApprovalWorkflowTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\ReferenceDataSeeder::class);
+        $this->seed(ReferenceDataSeeder::class);
 
         $this->sales = User::factory()->sales()->create();
 
@@ -44,7 +47,8 @@ class ApprovalWorkflowTest extends TestCase
 
         $this->item = Item::create([
             'item_no' => 'FG00011', 'description' => 'Flour 2Kg', 'uom' => 'Bales',
-            'warehouse' => 'FG WHS', 'unit_price' => 1850, 'qty_in_warehouse' => 648,
+            'warehouse_id' => Warehouse::where('code', 'FG WHS')->value('id'),
+            'unit_price' => 1850, 'qty_in_warehouse' => 648,
         ]);
 
         $this->employee = SalesEmployee::create(['code' => 'SE001', 'name' => 'Farouk Mohamed']);
@@ -65,10 +69,8 @@ class ApprovalWorkflowTest extends TestCase
             'discount_percent' => 0,
             'lines' => [[
                 'item_id' => $this->item->id,
-                'item_no' => 'FG00011',
                 'item_description' => 'Flour 2Kg',
-                'uom' => 'Bales',
-                'warehouse' => 'FG WHS',
+                'warehouse_id' => Warehouse::where('code', 'FG WHS')->value('id'),
                 'quantity' => $quantity,
                 'price_before_discount' => 1850,
                 'discount_percent' => 0,
@@ -131,7 +133,7 @@ class ApprovalWorkflowTest extends TestCase
     public function test_approving_opens_the_invoice(): void
     {
         $request = $this->pendingRequest();
-        $approver = User::factory()->approver()->create();
+        $approver = User::factory()->manager()->create();
 
         app(ApprovalService::class)->approve($request, $approver, 'Checked against the PO.');
 
@@ -142,7 +144,7 @@ class ApprovalWorkflowTest extends TestCase
     public function test_rejecting_marks_the_invoice_rejected(): void
     {
         $request = $this->pendingRequest();
-        $approver = User::factory()->approver()->create();
+        $approver = User::factory()->manager()->create();
 
         app(ApprovalService::class)->reject($request, $approver, 'Price not agreed.');
 
@@ -157,7 +159,7 @@ class ApprovalWorkflowTest extends TestCase
 
         app(ApprovalService::class)->reject(
             $this->pendingRequest(),
-            User::factory()->approver()->create(),
+            User::factory()->manager()->create(),
             '   ',
         );
     }
@@ -170,17 +172,17 @@ class ApprovalWorkflowTest extends TestCase
         $request = $this->pendingRequest();
         $service = app(ApprovalService::class);
 
-        $service->approve($request, User::factory()->approver()->create());
+        $service->approve($request, User::factory()->manager()->create());
 
         $this->expectException(ValidationException::class);
 
-        $service->reject($request->fresh(), User::factory()->approver()->create(), 'Too late');
+        $service->reject($request->fresh(), User::factory()->manager()->create(), 'Too late');
     }
 
     public function test_an_approver_cannot_exceed_their_limit(): void
     {
         $request = $this->pendingRequest();          // 37,000
-        $junior = User::factory()->approver(10000)->create();
+        $junior = User::factory()->manager(10000)->create();
 
         $this->expectException(ValidationException::class);
 
@@ -202,5 +204,26 @@ class ApprovalWorkflowTest extends TestCase
             ->call('save');
 
         return ApprovalRequest::query()->pending()->firstOrFail();
+    }
+
+    /**
+     * A ceiling that refuses in silence reads as a broken button.
+     *
+     * The service reports its refusal as a validation message keyed 'request',
+     * and the modal has no field by that name — so Filament had nowhere to
+     * render it and pressing Confirm did visibly nothing. Now the button is
+     * dead before it is pressed, and its tooltip says why.
+     */
+    public function test_the_approve_action_is_disabled_above_the_limit(): void
+    {
+        $request = $this->pendingRequest();          // 37,000
+
+        Livewire::actingAs(User::factory()->manager(10000)->create())
+            ->test(ListApprovalRequests::class)
+            ->assertTableActionDisabled('approve', $request);
+
+        Livewire::actingAs(User::factory()->manager(100000)->create())
+            ->test(ListApprovalRequests::class)
+            ->assertTableActionEnabled('approve', $request);
     }
 }
