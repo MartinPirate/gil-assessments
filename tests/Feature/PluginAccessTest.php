@@ -87,11 +87,6 @@ class PluginAccessTest extends TestCase
     #[DataProvider('administratorPages')]
     public function test_a_driver_is_refused_every_system_page(string $path): void
     {
-        // The changelog reader is deliberately open to everyone.
-        if ($path === 'admin/changelog') {
-            $this->markTestSkipped('The changelog reader is intentionally readable by all roles.');
-        }
-
         $this->actingAs(User::factory()->role(UserRole::Driver)->create());
 
         $this->get($path)->assertForbidden();
