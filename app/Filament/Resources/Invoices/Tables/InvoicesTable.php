@@ -10,6 +10,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class InvoicesTable
@@ -83,7 +84,22 @@ class InvoicesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('doc_num', 'desc')
+            /*
+             * Newest first, by when the document was written rather than by
+             * its number. The two agree only while one series is in play:
+             * doc_num is a per-series counter — the unique index is on
+             * (series, doc_num) precisely so IN-5 and CR-5 can both exist — so
+             * the moment a second series is raised, ordering on doc_num alone
+             * interleaves the two counters and the register stops reading as a
+             * history. Posting date is no substitute either; it defaults to
+             * today but is the user's to change.
+             *
+             * The id carries the tie: created_at can repeat within a batch,
+             * and an order that is not total lets a row shift between pages.
+             */
+            ->defaultSort(fn (Builder $query) => $query
+                ->orderByDesc('created_at')
+                ->orderByDesc('id'))
             ->filters([
                 TernaryFilter::make('requires_approval')
                     ->label('Approval required')
