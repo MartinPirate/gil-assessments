@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\MpesaTransactions\Tables;
+namespace App\Filament\Pages\Resources\MpesaTransactions\Tables;
 
 use App\Models\Invoice;
 use App\Models\MpesaTransaction;

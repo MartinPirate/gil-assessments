@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Vehicles\Pages;
+namespace App\Filament\Pages\Resources\Vehicles\Pages;
 
 use App\Filament\Concerns\AnnouncesTheRecord;
-use App\Filament\Resources\Vehicles\VehicleResource;
+use App\Filament\Pages\Resources\Vehicles\VehicleResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateVehicle extends CreateRecord

@@ -1,8 +1,9 @@
 @php
     use App\Enums\OrderStage;
+    use App\Models\Invoice;
     use App\Services\OrderLifecycleService;
 
-    /** @var \App\Models\Invoice $record */
+    /** @var Invoice $record */
     $record = $getRecord();
 
     $lifecycle = app(OrderLifecycleService::class);
@@ -16,8 +17,6 @@
         @php
             $event = $reached->get($stage->value);
             $isDone = $event !== null;
-            // The step immediately after the furthest one reached is where the
-            // order is waiting, provided nothing has cancelled it.
             $isNext = ! $isDone && ! $cancelled && $stage->position() === $position + 1;
         @endphp
 
@@ -30,9 +29,9 @@
         >
             <div class="order-track__marker">
                 @if ($isDone)
-                    <x-filament::icon icon="heroicon-m-check" class="order-track__icon" />
+                    <x-filament::icon icon="heroicon-m-check" class="order-track__icon"/>
                 @else
-                    <x-filament::icon :icon="$stage->icon()" class="order-track__icon" />
+                    <x-filament::icon :icon="$stage->icon()" class="order-track__icon"/>
                 @endif
             </div>
 
@@ -55,7 +54,7 @@
 
 @if ($cancelled)
     <p class="order-track__cancelled">
-        <x-filament::icon icon="heroicon-m-x-circle" class="order-track__icon" />
+        <x-filament::icon icon="heroicon-m-x-circle" class="order-track__icon"/>
         This order was cancelled on
         {{ $reached->get(OrderStage::Cancelled->value)->occurred_at->format('d/m/Y H:i') }}.
     </p>

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Drivers\Pages;
+namespace App\Filament\Pages\Resources\Drivers\Pages;
 
-use App\Filament\Resources\Drivers\DriverResource;
+use App\Filament\Pages\Resources\Drivers\DriverResource;
 use App\Models\Driver;
 use App\Models\GateLog;
 use App\Models\Trip;

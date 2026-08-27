@@ -54,7 +54,7 @@ class ArInvoice extends Page implements HasForms
     use InteractsWithChooseFromList;
 
     /** The validation key the three-places message is reported under. */
-    protected const DECIMAL_MESSAGE_KEY = 'decimal';
+    protected const string DECIMAL_MESSAGE_KEY = 'decimal';
 
     use InteractsWithForms;
 
@@ -114,9 +114,6 @@ class ArInvoice extends Page implements HasForms
             'discount_percent' => 0,
             'freight' => 0,
             'freight_charges' => [],
-            // Opened at the document's own precision so it sits level with
-            // the boxes around it. Never rewritten after that — see
-            // recalculateAllTotals().
             'total_down_payment' => $this->displayed('total_down_payment', 0),
             'rounding_enabled' => false,
             'total_before_discount' => 0,
@@ -127,7 +124,6 @@ class ArInvoice extends Page implements HasForms
             'applied_amount' => 0,
             'balance_due' => 0,
             'owner_name' => Auth::user()?->name,
-            // The sample screen always shows one empty row ready for entry.
             'lines' => [$this->blankLine()],
         ];
     }
@@ -144,9 +140,6 @@ class ArInvoice extends Page implements HasForms
             'item_id' => null,
             'item_description' => null,
             'uom' => null,
-            // No warehouse until there is an item to put in one. The sample's
-            // empty rows are blank across every column, and pre-filling this
-            // one made a row that nobody had touched look half entered.
             'warehouse_id' => null,
             'qty_in_warehouse' => null,
             'quantity' => null,
@@ -221,11 +214,11 @@ class ArInvoice extends Page implements HasForms
 
                         TextInput::make('currency')->label('BP Currency')->disabled()->dehydrated(false),
 
-                        TextInput::make('kra_pin')
+                    /*    TextInput::make('kra_pin')
                             ->label('KRA PIN')
                             ->disabled()
                             ->dehydrated(false)
-                            ->extraFieldWrapperAttributes(['class' => 'sap-field--emphasis']),
+                            ->extraFieldWrapperAttributes(['class' => 'sap-field--emphasis']),*/
                     ]),
 
                     // Right: document numbering and dates
@@ -330,12 +323,12 @@ class ArInvoice extends Page implements HasForms
 
                     $this->linesRepeater(),
                 ]),
-                Tab::make('Logistics')->schema($this->logisticsFields()),
+
+            ]);/*         Tab::make('Logistics')->schema($this->logisticsFields()),
                 Tab::make('Accounting')->schema($this->accountingFields()),
                 Tab::make('Attachments')->schema($this->attachmentFields()),
                 Tab::make('TIMS')->schema($this->timsFields()),
-                Tab::make('ETIMS')->schema($this->etimsFields()),
-            ]);
+                Tab::make('ETIMS')->schema($this->etimsFields()),*/
     }
 
     protected function linesRepeater(): Repeater

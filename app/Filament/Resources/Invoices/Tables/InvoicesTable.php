@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Invoices\Tables;
+namespace App\Filament\Pages\Resources\Invoices\Tables;
 
 use App\Models\Invoice;
 use App\Services\InvoicePdf;

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\VatCodes;
+namespace App\Filament\Pages\Resources\VatCodes;
 
-use App\Filament\Resources\VatCodes\Pages\CreateVatCode;
-use App\Filament\Resources\VatCodes\Pages\EditVatCode;
-use App\Filament\Resources\VatCodes\Pages\ListVatCodes;
-use App\Filament\Resources\VatCodes\Schemas\VatCodeForm;
-use App\Filament\Resources\VatCodes\Tables\VatCodesTable;
+use App\Filament\Pages\Resources\VatCodes\Pages\CreateVatCode;
+use App\Filament\Pages\Resources\VatCodes\Pages\EditVatCode;
+use App\Filament\Pages\Resources\VatCodes\Pages\ListVatCodes;
+use App\Filament\Pages\Resources\VatCodes\Schemas\VatCodeForm;
+use App\Filament\Pages\Resources\VatCodes\Tables\VatCodesTable;
 use App\Models\VatCode;
 use BackedEnum;
 use Filament\Resources\Resource;

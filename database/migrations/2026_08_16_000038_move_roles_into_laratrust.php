@@ -28,7 +28,7 @@ return new class extends Migration
     /**
      * The retired role, and what its holders become.
      */
-    private const RENAMED = ['approver' => 'manager'];
+    private const array RENAMED = ['approver' => 'manager'];
 
     public function up(): void
     {
@@ -46,8 +46,6 @@ return new class extends Migration
                 continue;
             }
 
-            // updateOrInsert rather than insertOrIgnore: SQL Server has no
-            // INSERT ... IGNORE, and this is idempotent either way.
             DB::table('role_user')->updateOrInsert([
                 'role_id' => $roleId,
                 'user_id' => $user->id,

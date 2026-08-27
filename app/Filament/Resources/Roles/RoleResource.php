@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Roles;
+namespace App\Filament\Pages\Resources\Roles;
 
 use App\Enums\UserRole;
-use App\Filament\Resources\Roles\Pages\CreateRole;
-use App\Filament\Resources\Roles\Pages\EditRole;
-use App\Filament\Resources\Roles\Pages\ListRoles;
-use App\Filament\Resources\Roles\Schemas\RoleForm;
-use App\Filament\Resources\Roles\Tables\RolesTable;
+use App\Filament\Pages\Resources\Roles\Pages\CreateRole;
+use App\Filament\Pages\Resources\Roles\Pages\EditRole;
+use App\Filament\Pages\Resources\Roles\Pages\ListRoles;
+use App\Filament\Pages\Resources\Roles\Schemas\RoleForm;
+use App\Filament\Pages\Resources\Roles\Tables\RolesTable;
 use App\Models\Role;
 use BackedEnum;
 use Filament\Resources\Resource;

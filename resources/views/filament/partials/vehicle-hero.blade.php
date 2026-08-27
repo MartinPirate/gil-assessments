@@ -1,33 +1,30 @@
 @php
-    /** @var \App\Models\Vehicle $vehicle */
+    /** @var Vehicle $vehicle */
+    use App\Models\Vehicle;
+
     $vehicle = $getRecord();
     $summary = $this->getSummary();
 @endphp
 
 <div class="veh-hero">
     <div class="veh-hero__art" aria-hidden="true">
-        {{--
-            Drawn inline rather than shipped as an asset: it is six shapes, it
-            recolours itself from the theme tokens, and it stays crisp at any
-            size without a second HTTP request.
-        --}}
         <svg viewBox="0 0 220 110" role="presentation" focusable="false">
-            <ellipse cx="110" cy="98" rx="86" ry="7" class="veh-hero__shadow" />
+            <ellipse cx="110" cy="98" rx="86" ry="7" class="veh-hero__shadow"/>
 
             {{-- Box body --}}
-            <rect x="18" y="26" width="104" height="52" rx="5" class="veh-hero__body" />
-            <rect x="28" y="36" width="84" height="18" rx="3" class="veh-hero__panel" />
+            <rect x="18" y="26" width="104" height="52" rx="5" class="veh-hero__body"/>
+            <rect x="28" y="36" width="84" height="18" rx="3" class="veh-hero__panel"/>
 
             {{-- Cab --}}
             <path d="M122 42 h34 l24 24 v12 a4 4 0 0 1 -4 4 h-54 a4 4 0 0 1 -4 -4 v-32 a4 4 0 0 1 4 -4 z"
-                  class="veh-hero__cab" />
-            <path d="M130 48 h22 l17 17 h-39 z" class="veh-hero__glass" />
+                  class="veh-hero__cab"/>
+            <path d="M130 48 h22 l17 17 h-39 z" class="veh-hero__glass"/>
 
             {{-- Wheels --}}
-            <circle cx="52" cy="84" r="12" class="veh-hero__tyre" />
-            <circle cx="52" cy="84" r="5" class="veh-hero__hub" />
-            <circle cx="152" cy="84" r="12" class="veh-hero__tyre" />
-            <circle cx="152" cy="84" r="5" class="veh-hero__hub" />
+            <circle cx="52" cy="84" r="12" class="veh-hero__tyre"/>
+            <circle cx="52" cy="84" r="5" class="veh-hero__hub"/>
+            <circle cx="152" cy="84" r="12" class="veh-hero__tyre"/>
+            <circle cx="152" cy="84" r="5" class="veh-hero__hub"/>
         </svg>
     </div>
 

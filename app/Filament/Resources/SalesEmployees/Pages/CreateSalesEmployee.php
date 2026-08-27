@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\SalesEmployees\Pages;
+namespace App\Filament\Pages\Resources\SalesEmployees\Pages;
 
 use App\Filament\Concerns\AnnouncesTheRecord;
-use App\Filament\Resources\SalesEmployees\SalesEmployeeResource;
+use App\Filament\Pages\Resources\SalesEmployees\SalesEmployeeResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSalesEmployee extends CreateRecord

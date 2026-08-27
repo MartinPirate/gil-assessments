@@ -1,5 +1,8 @@
 @php
-    /** @var \App\Models\Driver $driver */
+    /** @var Driver $driver */
+
+    use App\Models\Driver;
+
     $driver = $getRecord();
     $stats = $this->stats();
 @endphp
@@ -21,13 +24,34 @@
     </div>
 
     <dl class="veh-hero__stats">
-        <div><dt>Phone</dt><dd>{{ $driver->phone }}</dd></div>
-        <div><dt>Login</dt><dd>{{ $driver->user?->email ?? '—' }}</dd></div>
-        <div><dt>Trips</dt><dd>{{ $stats['trips'] }}</dd></div>
-        <div><dt>Completed</dt><dd>{{ $stats['completed'] }}</dd></div>
-        <div><dt>In transit</dt><dd>{{ $stats['inTransit'] }}</dd></div>
-        <div><dt>Distance driven</dt><dd>{{ number_format((float) $stats['distance']) }} km</dd></div>
-        <div><dt>Gate movements</dt><dd>{{ $stats['gateMovements'] }}</dd></div>
+        <div>
+            <dt>Phone</dt>
+            <dd>{{ $driver->phone }}</dd>
+        </div>
+        <div>
+            <dt>Login</dt>
+            <dd>{{ $driver->user?->email ?? '—' }}</dd>
+        </div>
+        <div>
+            <dt>Trips</dt>
+            <dd>{{ $stats['trips'] }}</dd>
+        </div>
+        <div>
+            <dt>Completed</dt>
+            <dd>{{ $stats['completed'] }}</dd>
+        </div>
+        <div>
+            <dt>In transit</dt>
+            <dd>{{ $stats['inTransit'] }}</dd>
+        </div>
+        <div>
+            <dt>Distance driven</dt>
+            <dd>{{ number_format((float) $stats['distance']) }} km</dd>
+        </div>
+        <div>
+            <dt>Gate movements</dt>
+            <dd>{{ $stats['gateMovements'] }}</dd>
+        </div>
         <div>
             <dt>Last seen</dt>
             <dd>{{ $stats['lastSeen']?->format('d/m/Y H:i') ?? 'never' }}</dd>

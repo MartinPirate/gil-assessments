@@ -1,8 +1,11 @@
 @php
-    /** @var \App\Models\User $user */
+    /** @var User $user */
+    use App\Models\User;
+
     $user = $getRecord();
     $s = $this->getSummary();
     $role = $user->role();
+
     $initials = \Illuminate\Support\Str::of($user->name)->explode(' ')->take(2)
         ->map(fn ($p) => \Illuminate\Support\Str::substr($p, 0, 1))->implode('');
 @endphp

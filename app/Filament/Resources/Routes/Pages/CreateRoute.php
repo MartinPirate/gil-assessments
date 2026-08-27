@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Routes\Pages;
+namespace App\Filament\Pages\Resources\Routes\Pages;
 
 use App\Filament\Concerns\AnnouncesTheRecord;
-use App\Filament\Resources\Routes\RouteResource;
+use App\Filament\Pages\Resources\Routes\RouteResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRoute extends CreateRecord

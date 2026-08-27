@@ -1,10 +1,10 @@
 @php
-    $user = $getRecord();
+    use App\Enums\Permission;$user = $getRecord();
 
     // Built from the permission catalogue and asked of the account itself, so
     // this screen cannot disagree about what the user may do.
-    $capabilities = collect(\App\Enums\Permission::cases())
-        ->mapWithKeys(fn (\App\Enums\Permission $permission) => [
+    $capabilities = collect(Permission::cases())
+        ->mapWithKeys(fn (Permission $permission) => [
             $permission->label() => $user->isAbleTo($permission->value),
         ])
         ->all();

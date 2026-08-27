@@ -53,15 +53,11 @@ class OrderLifecycleService
                 'stage' => $stage,
                 'occurred_at' => $occurredAt ?? now(),
                 'causer_id' => $causer?->getKey(),
-                // Denormalised so the timeline still names who acted after the
-                // user account is deleted and the foreign key nulls out.
                 'causer_name' => $causer?->name,
                 'note' => $note,
                 'meta' => $meta === [] ? null : $meta,
             ]);
         } catch (UniqueConstraintViolationException) {
-            // The order was already at this stage. That is the normal outcome
-            // of a retry, so it is not worth a warning.
             return null;
         } catch (\Throwable $e) {
             /*

@@ -32,7 +32,7 @@ class ChooseFromList extends Component implements HasActions, HasForms, HasTable
     use InteractsWithTable;
 
     /** The Filament modal this component renders. */
-    public const MODAL_ID = 'choose-from-list';
+    public const string MODAL_ID = 'choose-from-list';
 
     /** Registry key of the list currently being shown. */
     public string $sourceKey = 'customers_by_code';

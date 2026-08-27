@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Customers\Schemas;
+namespace App\Filament\Pages\Resources\Customers\Schemas;
 
 use App\Models\Customer;
 use Filament\Forms\Components\Repeater;

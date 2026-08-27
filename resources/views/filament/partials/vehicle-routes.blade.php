@@ -1,6 +1,6 @@
 @php
-    /** @var \App\Models\Vehicle $vehicle */
-    $vehicle = $getRecord();
+    /** @var Vehicle $vehicle */
+    use App\Models\Vehicle;$vehicle = $getRecord();
 
     $routes = $vehicle->trips()
         ->with('route')
@@ -28,9 +28,6 @@
                     <span class="veh-route__name">{{ $entry['name'] }}</span>
                     <span class="veh-route__runs">{{ $entry['runs'] }}&times;</span>
                 </span>
-
-                {{-- Bar widths are relative to the busiest route, so the
-                     comparison reads at a glance instead of as raw counts. --}}
                 <span class="veh-route__bar" aria-hidden="true">
                     <span class="veh-route__fill" style="width: {{ round(($entry['runs'] / $busiest) * 100) }}%"></span>
                 </span>

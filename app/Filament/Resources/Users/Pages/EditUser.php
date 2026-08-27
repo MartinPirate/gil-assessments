@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Users\Pages;
+namespace App\Filament\Pages\Resources\Users\Pages;
 
 use App\Filament\Concerns\AnnouncesTheRecord;
-use App\Filament\Resources\Users\Concerns\AssignsRole;
-use App\Filament\Resources\Users\UserResource;
+use App\Filament\Pages\Resources\Users\Concerns\AssignsRole;
+use App\Filament\Pages\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 

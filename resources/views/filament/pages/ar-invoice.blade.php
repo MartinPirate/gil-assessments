@@ -1,3 +1,4 @@
+@php use App\Livewire\ChooseFromList; @endphp
 <x-filament-panels::page class="sap-page">
     <form wire:submit="save" class="sap-form">
         {{-- The document window's title bar, including the chrome the SAP
@@ -30,7 +31,7 @@
     </form>
 
     {{-- Shared Choose From List modal for every CFL button on this page. --}}
-    @livewire(\App\Livewire\ChooseFromList::class)
+    @livewire(ChooseFromList::class)
 
-    <x-filament-actions::modals />
+    <x-filament-actions::modals/>
 </x-filament-panels::page>

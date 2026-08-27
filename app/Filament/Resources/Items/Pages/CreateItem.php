@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Items\Pages;
+namespace App\Filament\Pages\Resources\Items\Pages;
 
 use App\Filament\Concerns\AnnouncesTheRecord;
-use App\Filament\Resources\Items\ItemResource;
+use App\Filament\Pages\Resources\Items\ItemResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateItem extends CreateRecord
